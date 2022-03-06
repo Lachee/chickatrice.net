@@ -21,6 +21,7 @@ class StringProperty extends Property {
     {
         if ($value == null) return parent::validateValue($value);
         if (!is_string($value)) return "Expected a string.";
+        if (empty($value) && $this->required) return parent::validateValue(null);
         return parent::validateValue($value);
     }
 }
