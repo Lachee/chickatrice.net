@@ -26,7 +26,6 @@ class MainController extends BaseController {
     public function authorize($action) { return true; }
 
     function actionIndex() {
-        if (Kiss::$app->loggedIn()) return Response::redirect(['/gallery/']);
         return $this->render('index', [
             'fullWidth' => true,
             'wrapContents' => false,
@@ -76,44 +75,36 @@ class MainController extends BaseController {
         { 
             //Get the tokens.
             $tokens = Chickatrice::$app->discord->handleRequest();
-            if ($tokens === false) return $this->actionLogin();
+            if ($tokens === false) {
+                return Chickatrice::$app->discord->redirect();
+            }
 
             //Get the discord user
             $duser  = Chickatrice::$app->discord->identify($tokens);
-            $ban = Ban::findBySnowflake($duser->id)->one();
-            if ($ban != null) throw new ArgumentException('Invalid snowflake');
 
             //Get the user, otherwise create one.
             /** @var User $user */
             $user = User::findBySnowflake($duser->id)->one();
             if ($user == null) {
-                $user = new User([
-                    'uuid' => Uuid::uuid1(Chickatrice::$app->uuidNodeProvider->getNode()),
-                    'username' => $duser->username,
-                    'snowflake' => $duser->id,
-                ]);
+                $user = User::CreateUser($duser->username, $duser->email, $duser->id);
                 Chickatrice::$app->session->addNotification('Your account has been created');
             }
 
-
             //Store the tokens
             Chickatrice::$app->discord->getStorage($user->uuid)->setTokens($tokens);
-            $guilds = Chickatrice::$app->discord->getGuilds($tokens);
-            $guilds = Arrays::map($guilds, function($g) { return $g['id']; });
-            $guilds = Guild::find()->where(['snowflake', $guilds ])->all();
-            if ($guilds == null || count($guilds) == 0) { 
-                Chickatrice::$app->session->addNotification('Cannot possibly logged in because you do not share a server', 'danger');
-                throw new Exception('Not in any guilds');
-            }
             
             //Add the user to each guild
-            foreach($guilds as $guild) {
-                $user->addGuild($guild);
-            }
+            // $guilds = Chickatrice::$app->discord->getGuilds($tokens);
+            // $guilds = Arrays::map($guilds, function($g) { return $g['id']; });
+            // $guilds = Guild::find()->where(['snowflake', $guilds ])->all();
+            // if ($guilds == null || count($guilds) == 0) { 
+            //     Chickatrice::$app->session->addNotification('Cannot possibly logged in because you do not share a server', 'danger');
+            //     throw new Exception('Not in any guilds');
+            // }
 
-            //Update our name and save
-            $user->username = $duser->username;
-            $user->save();
+            // foreach($guilds as $guild) {
+            //     $user->addGuild($guild);
+            // }
 
             //Actually login
             if (!$user->login()) {         
@@ -126,6 +117,6 @@ class MainController extends BaseController {
         }         
         
         $referal = Kiss::$app->session->get('LOGIN_REFERRAL', HTTP::referral());
-        return Response::redirect($referal ?? [ '/gallery/']);
+        return Response::redirect($referal ?? [ '/']);
     }
 }

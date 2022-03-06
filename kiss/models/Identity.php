@@ -24,9 +24,6 @@ class Identity extends ActiveRecord {
     protected $uuid;
     private $_uuid;
 
-    /** @var string Display name of the user */
-    protected $username;
-    
     /** @var string Unique key that is generated for every "logout" or account. */
     protected $accessKey;
 

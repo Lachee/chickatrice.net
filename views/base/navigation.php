@@ -20,23 +20,12 @@ $user = Kiss::$app->getUser();
             <a class="navbar-item brand-text is-tab <?= HTTP::route() != '/' ?: 'is-active' ?>" href="<?= HTTP::url('/')?>"><img src="<?= Kiss::$app->logo ?>" data-tooltip="Home" /></a>
             
             <?php if ($user): ?>
-                <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/profile/@me/favourites') ?: 'is-active' ?>" data-tooltip="Favourites" href="<?= HTTP::url('/profile/@me/favourites')?>"><i class="fal fa-fire"></i></a>
-                <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/profile/@me/submissions') ?: 'is-active' ?>" data-tooltip="Submissions" href="<?= HTTP::url('/profile/@me/submissions')?>"><i class="fal fa-books-medical"></i></a>
+                <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/profile/@me/games') ?: 'is-active' ?>" data-tooltip="Games" href="<?= HTTP::url('/profile/@me/games')?>"><i class="fal fa-chess-clock"></i></a>
+                <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/profile/@me/descks') ?: 'is-active' ?>" data-tooltip="Decks" href="<?= HTTP::url('/profile/@me/decks')?>"><i class="fal fa-album-collection"></i></a>
                 <a class="navbar-item has-icon is-tab is-hidden-desktop <?= !Strings::endsWith(HTTP::route(), '/profile/@me/') ?: 'is-active' ?>" data-tooltip="Submissions" href="<?= HTTP::url('/profile/@me/')?>"><i class="fal fa-user"></i></a>
             <?php else: ?>
                     <a class="navbar-item has-icon is-tab is-hidden-desktop <?= !Strings::endsWith(HTTP::route(), '/login') ?: 'is-active' ?>" data-tooltip="Submissions" href="<?= HTTP::url('/login')?>"><i class="fal fa-user"></i></a>    
             <?php endif; ?>
-        </div>
-
-        <!-- ITEMS -->
-        <div id="navMenu" class="navbar-menu is-hidden-touch is-hidden">
-            <div class="navbar-start">
-                <?php if ($user): ?>
-                    <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/gallery/') ?: 'is-active' ?>" data-tooltip="Gallery" href="<?= HTTP::url('/gallery/')?>"><i class="fal fa-images"></i></a>
-                    <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/profile/@me/favourites') ?: 'is-active' ?>" data-tooltip="Favourites" href="<?= HTTP::url('/profile/@me/favourites')?>"><i class="fal fa-fire"></i></a>
-                    <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/profile/@me/submissions') ?: 'is-active' ?>" data-tooltip="Submissions" href="<?= HTTP::url('/profile/@me/submissions')?>"><i class="fal fa-books-medical"></i></a>
-                <?php endif;  ?>
-            </div>
         </div>
 
         <!-- RHS ITEMS -->
@@ -44,10 +33,11 @@ $user = Kiss::$app->getUser();
             <div class="navbar-start">
                 <div class="navbar-item">
                     <?php if ($user): ?>
+                        <!-- LOGGED IN USERS -->
                         <div class="field has-addons"> 
                             <p class="control">
                                 <a class="button" id="login-button" href="<?= HTTP::url(['/profile/@me/']); ?>"  data-tooltip="Profile">
-                                    <span class="icon"><i class="fab fa-discord"></i></span>
+                                    <span class="icon"><i class="fal fa-user"></i></span>
                                     <span><?= HTML::encode($user->username) ?></span>
                                 </a>
                             </p>
@@ -63,6 +53,7 @@ $user = Kiss::$app->getUser();
                             </p>
                         </div>
                     <?php else: ?>
+                        <!-- GUEST USERS -->
                         <div class="field has-addons">
                             <p class="control">
                                 <a class="button" id="login-button" href="<?= HTTP::url(['/login' ]); ?>" data-tooltip="Login">

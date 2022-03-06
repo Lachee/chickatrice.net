@@ -31,5 +31,8 @@ class LoginForm extends Form {
         ];
     }
 
-    
+    public function save($validate = false)
+    {
+        
+    }
 }
