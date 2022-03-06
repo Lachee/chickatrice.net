@@ -255,7 +255,9 @@ class BaseObject implements SchemaInterface, JsonSerializable {
         return $success;
     }
 
-    /** Loads individual properties */
+    /** Loads individual properties
+     * @param \kiss\schema\Property $schema
+     */
     protected function loadProperty($schema, $property, $value, $append = false) {
         if (($err = $schema->validateValue($value)) !== true) {
             $this->addError("$property: $err");
@@ -272,81 +274,19 @@ class BaseObject implements SchemaInterface, JsonSerializable {
         } else {
             $result = null;
 
-            // String Value
-            if ($schema instanceof StringProperty) {
-                $result = $value;
-            }
-
-            // Number Value
-            if ($schema instanceof NumberProperty) {
-                $result = filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
-                if ($result == null){
-                    $this->addError("{$property} is not a float value.");
-                    return false;
-                }
-                $result = floatval($result);
-            }
-
-            // Int Value
-            if ($schema instanceof IntegerProperty) {
-                $result = filter_var($value, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-                if ($result == null){
-                    $this->addError("{$property} is not a int value.");
-                    return false;
-                }
-                $result = intval($result);
-            }
-
-            // Bool Value
-            if ($schema instanceof BooleanProperty) {
-                $val = $value === '' ? 'false' : $value;
-                $result = filter_var($val, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
-                if ($result === null){
-                    $this->addError("{$property} is not a boolean value.");
-                    return false;
-                }
-                $result = boolval($result);
-            }
-
             if ($schema instanceof EnumProperty) {
-
                 $result = $value;
-                if ($schema->assoc) {
-               
+                if ($schema->assoc) {               
                     //If we are an integer enum, then upate the key
                     if ($schema->type == 'integer') { 
                         $result = intval($value);
                     }
-
                 }
-            }
-
-            if ($schema instanceof ObjectProperty) {
+            } else  if ($schema instanceof ObjectProperty) {
                 $this->addError("{$property} cannot parse ObjectProperty");
                 return;
-            }
-
-            // Object Value
-            if ($schema instanceof RefProperty) {
-                
-                // apple: 10, mango: 30, orange: 3
-                $class = $schema->getReferenceClassName();
-                if (empty($class)) {
-                    $this->addError("{$property} has a invalid RefProperty as it has no class.");
-                    return false;
-                }
-
-                if (!method_exists($class, "load")) {
-                    if (is_subclass_of($class, BaseObject::class)) {
-                        $result = new $class($value);
-                    } else {
-                        $this->addError("{$property} has a invalid RefProperty as the class does not have a load() definition or implement a BaseObject.");
-                        return false;
-                    }
-                } else {
-                    $result = new $class();
-                    $result->load($value);
-                }
+            } else {
+                $result = $schema->parse($value);
             }
 
             //Set the properties value. If we are an array then append.

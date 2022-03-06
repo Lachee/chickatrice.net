@@ -26,4 +26,15 @@ class NumberProperty extends Property {
         }
         return parent::validateValue($value);
     }
+
+    
+    /** @inheritdoc */
+    public function parse($value) {
+        if ($this->parser != null) 
+            return call_user_func($this->parser, $value);
+  
+        $result = filter_var($value, FILTER_VALIDATE_FLOAT, FILTER_NULL_ON_FAILURE);
+        if ($result == null) return null;
+        return floatval($result);
+    }
 }

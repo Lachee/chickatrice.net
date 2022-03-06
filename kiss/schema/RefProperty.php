@@ -52,4 +52,30 @@ class RefProperty extends Property {
     function jsonSerialize() {
         return [ '$ref' => '#/definitions/' . $this->getReferenceClassName() ];
     }
+
+        
+    /** @inheritdoc */
+    public function parse($value) {
+        if ($this->parser != null) 
+            return call_user_func($this->parser, $value);
+        
+        // apple: 10, mango: 30, orange: 3
+        $class = $this->getReferenceClassName();
+        if (empty($class)) {
+            return null;
+        }
+
+        if (!method_exists($class, "load")) {
+            if (is_subclass_of($class, BaseObject::class)) {
+                $result = new $class($value);
+            } else {
+                return null;
+            }
+        } else {
+            $result = new $class();
+            $result->load($value);
+        }
+
+        return $result;
+    }
 }

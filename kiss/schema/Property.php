@@ -33,6 +33,9 @@ class Property extends BaseObject implements JsonSerializable {
     /** @var bool the field is considered a read only. Not included in the schema. */
     public $readOnly = false;
 
+    /** @var Callable user defined function to convert data types */
+    public $parser;
+
     /** @inheritdoc */
     public function validate() { return true; }
 
@@ -92,5 +95,16 @@ class Property extends BaseObject implements JsonSerializable {
             'options'       => 'array',
             'required'      => 'boolean',
         ];
+    }
+
+    /**
+     * Parses the string value into the correct data type
+     * @param string $value 
+     * @return mixed|null The converted value, otherwise NULL if it failed. 
+     */
+    public function parse($value) {
+        if ($this->parser != null) 
+            return call_user_func($this->parser, $value);
+        return $value; 
     }
 }

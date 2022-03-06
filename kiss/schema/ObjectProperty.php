@@ -178,4 +178,15 @@ class ObjectProperty extends Property {
         unset($properties['options']);
         return $properties;
     }
+
+    
+    /** @inheritdoc */
+    public function parse($value) {
+        if ($this->parser != null) 
+            return call_user_func($this->parser, $value);
+        
+        /** We cannot parse objects */
+        /** TODO: Write an object parser */
+        return null;
+    }
 }
