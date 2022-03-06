@@ -1,8 +1,10 @@
 <?php namespace app\controllers;
 
 use app\components\mixer\Mixer;
+use app\models\cockatrice\Deck;
 use app\models\forms\ProfileSettingForm;
 use app\models\Gallery;
+use app\models\Identifier;
 use app\models\Sparkle;
 use kiss\exception\HttpException;
 use kiss\helpers\HTTP;
@@ -45,18 +47,7 @@ class ProfileController extends BaseController {
         if ($this->profile_name == '@me' && !Chickatrice::$app->loggedIn())
             throw new HttpException(HTTP::UNAUTHORIZED, 'Need to be logged in to see your own profile.');
 
-        //Record a browse
-        if (Chickatrice::$app->loggedIn() && $this->profile->id !== Chickatrice::$app->user->id) 
-            $this->profile->recordViewage();
-
         parent::action($endpoint, ...$args);
-    }
-
-    /** Displays the sparkle stuff */
-    function actionSparkles() {
-        Sparkle::migrate();
-        $this->profile->recalculateSparkles();
-        return Response::redirect(['/profile/:profileName/', 'profileName' => $this->profile->profileName]);
     }
 
     function actionIndex() {
@@ -64,8 +55,28 @@ class ProfileController extends BaseController {
         $profile = $this->profile;
         return $this->render('index', [
             'profile'       => $profile,
-            'submissions'   => $profile->getBestGalleries()->limit(4)->all(),
-            'favourites'    => $profile->getFavouriteGalleries()->all()
+        ]);
+    }    
+    
+    function actionDecks() {
+        /** @var User $profile */
+        $profile = $this->profile;
+
+        /** @var Deck $deck */
+        $deck = Deck::findByKey(2)->one();
+        $data = $deck->getData();
+        $zone = $data->zone;
+
+        $identifiers = [];
+        foreach($zone->card as $card) {
+            $name = $card['name'][0];
+            $identifier = Identifier::findByName($name)->one();
+            if ($identifier != null) $identifiers[] = $identifier;
+        }
+
+        return $this->render('deck', [
+            'profile'       => $profile,
+            'cards'         => $identifiers
         ]);
     }
 
@@ -144,10 +155,11 @@ class ProfileController extends BaseController {
         if ($this->profile_name == '@me' && !Chickatrice::$app->loggedIn()) 
             throw new HttpException(HTTP::UNAUTHORIZED, 'Need to be logged in');
         
-        if ($this->_profile != null) return $this->_profile;        
+        if ($this->_profile != null) 
+            return $this->_profile;        
 
-        $this->_profile = User::findByProfileName($this->profile_name)->ttl(false)->one();
-        if ($this->_profile != null) return $this->_profile;        
+        if ($this->profile_name == '@me')
+            return $this->_profile = Chickatrice::$app->user;
 
         $this->_profile = User::find()->where(['uuid', $this->profile_name])->ttl(false)->one();
         if ($this->_profile != null) return $this->_profile;        
