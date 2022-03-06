@@ -19,9 +19,12 @@ class StringProperty extends Property {
     /** @inheritdoc */
     public function validateValue($value)
     {
-        if ($value == null) return parent::validateValue($value);
-        if (!is_string($value)) return "Expected a string.";
-        if (empty($value) && $this->required) return parent::validateValue(null);
+        if (empty($value) && $this->required)
+            return parent::validateValue(null);
+        if ($value == null) 
+            return parent::validateValue($value);
+        if (!is_string($value)) 
+            return "Expected a string.";
         return parent::validateValue($value);
     }
 }

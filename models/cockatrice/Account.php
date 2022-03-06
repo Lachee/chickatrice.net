@@ -39,11 +39,6 @@ class Account extends ActiveRecord {
         return $base;
     }
 
-    /** @return ActiveQuery|Account[] finds accounts with the given email */
-    public static function findByEmail($email) {
-        return self::find()->where([ 'email', Strings::toLowerCase(Strings::trim($email)) ]);
-    }
-    
     /** Sets the password for Cockatrice
      * @return $this
      */
@@ -58,6 +53,18 @@ class Account extends ActiveRecord {
         if ($salt == '') $salt = substr($hash, 0, 16);
 		return static::hashPassword($password, $salt) === $hash;
     }
+
+    
+    /** @return ActiveQuery|Account[] finds accounts with the given email */
+    public static function findByEmail($email) {
+        return self::find()->where([ 'email', Strings::toLowerCase(Strings::trim($email)) ]);
+    }
+    
+    /** @return ActiveQuery|Account[] finds accounts with the given email */
+    public static function findByName($name) {
+        return self::find()->where([ 'name',  $name ]);
+    }
+    
 
     /**
      * Creates a new account
@@ -79,7 +86,7 @@ class Account extends ActiveRecord {
             'realname'          => '',
             'gender'            => 'r',
             'password_sha512'   => '',
-            'email'             => $email,
+            'email'             => Strings::toLowerCase($email),
             'active'            => 1,
             'country'           => '',
             'registrationDate'  => date('Y-m-d H:i:s'),

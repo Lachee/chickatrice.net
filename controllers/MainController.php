@@ -56,6 +56,8 @@ class MainController extends BaseController {
                 } else {
                     Kiss::$app->session->addNotification('Failed to login: ' . $loginForm->errorSummary(), 'danger');
                 }
+            } else if ($loginForm->hasErrors()) {
+                Kiss::$app->session->addNotification( $loginForm->errorSummary(), 'danger');
             }
 
             if ($registerForm->load(HTTP::post())) {
@@ -64,6 +66,8 @@ class MainController extends BaseController {
                 } else {
                     Kiss::$app->session->addNotification('Failed to register: ' . $registerForm->errorSummary(), 'danger');
                 }
+            } else if ($registerForm->hasErrors()) {
+                Kiss::$app->session->addNotification( $registerForm->errorSummary(), 'danger');
             }
         }
 

@@ -317,6 +317,9 @@ class BaseObject implements SchemaInterface, JsonSerializable {
     /** @return string summary of all errors. */
     public function errorSummary() { return join('. ', $this->errors()); }
 
+    /** @return bool does the object have any errors */
+    public function hasErrors() { return count($this->errors()) > 0; }
+
     /** Gets the name of the current class */
     public function className() {
         return get_called_class();

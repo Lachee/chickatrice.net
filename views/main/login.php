@@ -49,7 +49,8 @@ use kiss\Kiss;
                         <div class="card-content">
                             <p class="title">Register</p>
                             <p class="subtitle">Register a new Cockatrice Account</p>
-                            <p>This is an old method to signup for backwards compatabilities. It's recommended to use your Discord Account where possible</p>
+                            <p>By signing up using this form, you agree to let us share your email with third-party anti-spam APIs.</p><br>
+                            <p>If you wish to opt-out, please use the Discord Login method.</p><br>
                             <?= $registerForm->render(); ?>
                         </div>
                         <footer class="card-footer">

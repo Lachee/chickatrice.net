@@ -184,7 +184,10 @@ class Form extends BaseObject {
 
         $subdata = $data;
         if (!empty($this->formName))
-            $subdata = $data[$this->formName];
+            $subdata = Arrays::value($data, $this->formName, null);
+
+        if ($subdata == null)
+            return false;
 
         //send it
         if (!parent::load($subdata))
