@@ -1,0 +1,17 @@
+.select2-selection__rendered > span {
+    position: relative;
+    top: -4px;
+}
+
+.emote-tag {
+    font-family: monospace;
+    background: #121212;
+    color: #cccccc;
+    padding: 5px;
+    border-radius: 4pt;
+    border: 1px solid gray;
+    height: 32px;
+    overflow: hidden;
+}
+
+.field .control span.select { width: 100%; }

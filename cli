@@ -1,0 +1,84 @@
+#!/usr/bin/env php
+<?php
+
+defined('KISS_SESSIONLESS') or define('KISS_SESSIONLESS', true);
+defined('KISS_DEBUG') or define('KISS_DEBUG', true);
+defined('KISS_ENV') or define('KISS_ENV', 'CLI');
+require_once './autoload.php';
+
+use kiss\controllers\cli\Command;
+use kiss\exception\HttpException;
+use kiss\exception\UncaughtException;
+use kiss\helpers\HTTP;
+use kiss\helpers\Response;
+use kiss\Kiss;
+use kiss\models\BaseObject;
+use kiss\router\RouteFactory;
+
+set_error_handler(function($errno, $errstr, $errfile, $errline) {
+    $exception = new UncaughtException($errno, $errstr, $errfile, $errline);        
+    Kiss::$app->respond($exception);
+    exit;
+});
+
+//Setup the defaults
+Kiss::$app->setDefaultResponseType(HTTP::CONTENT_TEXT_PLAIN);
+Response::$saveRequest = true;
+BaseObject::$defaults[Query::class] = [ //Clear all the caching settings for API calls.
+    'remember'      => false,
+    'cacheDuration' => 0,
+    'cacheVersion'  => -1,
+    'flushCache'    => true,
+];
+
+if (count($argv) < 2) 
+    die('invalid command. Expected route');
+
+//Prepare the route
+HTTP::setRoute("/{$argv[1]}");
+
+//Load up the GET with the rest of the args
+$_GET['arg0'] = $argv['0'];
+$_GET['argc'] = count($argv) - 1;
+for($i = 2; $i < count($argv); $i++)
+    $_GET['arg' . ($i - 1)] = $argv[$i];
+
+try {
+    //Prepare the route we wish to use 
+    //Just exit with no response because they are accessing the API page directly
+    $route = HTTP::route();
+    if (empty($route)) die('no route given');
+
+    //Register all the routes in the specified folder    
+    $basedir = Kiss::$app->baseDir();
+    RouteFactory::registerDirectory($basedir . "/controllers/cli/", ["*.php", "**/*.php"]);
+
+    //Prepare the segments
+    $segments = explode('/', $route);                       //Get all the segments in the route
+    $routable = array_slice($segments, 0, -1);              //Lob off the last segment as that is our action
+    $endpoint = $segments[count($segments)-1];              
+
+    //Account for the main controller
+    if (count($segments) <= 2) {
+        $routable = [ '', 'main' ];
+        $endpoint = $segments[1] ?? 'default';
+    }
+
+    //If the last part is empty, then we are index
+    if (empty($endpoint)) $endpoint = 'default';       
+
+    //Find the controller
+    $controller = RouteFactory::route($routable);
+    if ($controller == null)
+        throw new HttpException(HTTP::NOT_FOUND, "'{$route}' doesnt exist");
+
+    if (!($controller instanceof Command))
+        throw new HttpException(HTTP::INTERNAL_SERVER_ERROR, 'route is not a valid command');
+
+    $response = $controller->action($endpoint);
+    return Kiss::$app->respond($response);
+} catch(HttpException $exception) {
+    return Kiss::$app->respond($exception);
+} catch(\Throwable $exception) {
+    return Kiss::$app->respond(new HttpException(HTTP::INTERNAL_SERVER_ERROR, $exception));
+}

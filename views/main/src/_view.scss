@@ -1,0 +1,49 @@
+$checkerboardA: transparent;
+$checkerboardB: #dfdfdfdf;
+$checkerboardSize: 10px;
+
+$previewScale: 0.5;
+$previewWidth: 1920;
+$previewHeight: 1080;
+
+.panes {
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+}
+
+.pane {
+    width: 50%;
+    padding: 0px;
+    margin: 0px;
+    float: left;
+}
+
+.iframe-wrapper {
+    width: ($previewWidth * $previewScale) + 0px;
+    height: ($previewHeight * $previewScale) + 0px;
+    padding: 0;
+    overflow: hidden;
+    
+    background-image: linear-gradient(45deg, $checkerboardB 25%, $checkerboardA 25%), linear-gradient(-45deg, $checkerboardB 25%, $checkerboardA 25%), linear-gradient(45deg, $checkerboardA 75%, $checkerboardB 75%), linear-gradient(-45deg, $checkerboardA 75%, $checkerboardB 75%);
+    background-size: $checkerboardSize $checkerboardSize;
+
+    $halfCheckerboardSize: $checkerboardSize / 2;
+    background-position: 0 0, 0 $halfCheckerboardSize, $halfCheckerboardSize (-$halfCheckerboardSize), -$halfCheckerboardSize 0px;
+    
+}
+.iframe-wrapper .preview{ 
+    width: $previewWidth + 0px;
+    height: $previewHeight + 0px;
+    transform-origin: top left;
+    transform: translateX(-($previewWidth / 2) + 0px) translateY( -($previewHeight/2) + 0px) scale($previewScale) translateX(($previewWidth / 2) + 0px) translateY(($previewHeight/2) + 0px);
+    transform: scale($previewScale);
+}
+
+.flexcard .card-list { 
+    overflow: hidden;
+}
+
+#site-heading {
+    margin: auto;
+}

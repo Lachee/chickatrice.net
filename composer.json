@@ -1,0 +1,20 @@
+{
+    "name": "lachee/chickatrice",
+    "description": "Chickatrice's website",
+    "type": "project",
+    "license": "GPL3.0",
+    "authors": [
+        {
+            "name": "Lachee",
+            "email": "lachee@lachee.dev"
+        }
+    ],
+    "require": {
+        "predis/predis": "^1.1",
+        "league/oauth2-client": "^2.4",
+        "guzzlehttp/guzzle": "^6.5",
+        "ramsey/uuid": "^4.0",
+        "firebase/php-jwt": "^5.2",
+        "php-ffmpeg/php-ffmpeg": "^0.17.0"
+    }
+}

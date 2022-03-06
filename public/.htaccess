@@ -1,0 +1,23 @@
+RewriteEngine on
+Options -Indexes
+
+# If a directory or a file exists, use it directly
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Otherwise forward it to index.php
+RewriteRule . index.php
+
+ErrorDocument 400 /apache?error=400
+ErrorDocument 401 /apache?error=401
+ErrorDocument 403 /apache?error=403
+ErrorDocument 404 /apache?error=404
+ErrorDocument 405 /apache?error=405
+ErrorDocument 414 /apache?error=414
+ErrorDocument 429 /apache?error=429
+ErrorDocument 500 /apache?error=500
+ErrorDocument 501 /apache?error=501
+ErrorDocument 503 /apache?error=503
+ErrorDocument 504 /apache?error=504
+
+AddDefaultCharset utf-8

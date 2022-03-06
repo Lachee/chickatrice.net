@@ -1,0 +1,126 @@
+
+.profile-card { 
+    $card-background: #121212;
+    $avatar-size: 75px;
+    $color-height: 62%;
+    $card-height: 600px;
+
+    &.is-small .card {
+        height: 350px;
+        .card-content {
+            background: linear-gradient(0deg, #121212, 0%, #121212 50%, rgba(0, 0, 0, 0) 100%);
+            top: 193px;
+            .title, .subtitle { text-shadow: 0 0 6px black;  margin-bottom: 15px; }
+        }
+    }
+
+    .card {
+        height: $card-height;
+        width: 250px;
+        min-width: 250px;
+        border-radius: 16px;
+        background: #17141d;
+        background-size: cover;
+        box-shadow: -1rem 0 1rem #0000007d;
+        display: flex;
+        flex-direction: column;
+        transition: .2s;
+        margin: auto;
+        scroll-snap-align: start;
+        clear: both;
+        position: relative;
+        overflow: hidden;
+
+        .card-image, .card-image img, .card-content{ 
+            width: 100%;
+            height: 350px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            object-fit: cover;
+        }
+        .card-content {
+            top: 35%;
+            height: 100%;
+            background: linear-gradient(0deg, #121212, 0%, #121212 86%, rgba(0, 0, 0, 0) 100%);
+            
+            .avatar { width: 100%; }
+            .avatar img {
+                margin: auto;
+                width: $avatar-size;
+                height: $avatar-size;
+                border-radius: 50%;
+                position: relative;
+                display: block;
+                padding: 1px;
+            }
+            
+            .title {
+                text-align: center;
+                margin-top: 15px;
+                font-size: 18pt;
+            }
+            .subtitle {
+                text-align: center;
+                font-size: 10pt;
+                margin-bottom: 1em;
+            }
+
+            .content {
+                border-top: 1px solid #303030;
+                padding-top: 10px;
+                margin-bottom: 10px;
+            }
+            
+            .metric {
+                font-size: 14pt;
+                color: white;
+                a { color: #d0d0d0; }
+            }
+            .tag-group a {
+                font-size: 8pt;
+                color: #7a7a8c;
+                white-space: pre;
+                &:hover {
+                    background: linear-gradient(90deg, #ff8a00, #e52e71);
+                    text-shadow: none;
+                    -webkit-text-fill-color: transparent;
+                    -webkit-background-clip: text;
+                    -webkit-box-decoration-break: clone;
+                    background-clip: text;
+                    border-color: white;
+                    color:white;
+                }
+            }
+        }
+    }
+
+    
+    .toolbar {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 32px;
+        height: 100%;
+        padding: 5px;
+        color: white;
+
+        .toolbar-item {
+            background: #00000052;
+            padding: 8px;
+            height: 32px;
+            width: 32px;
+            margin-bottom: 10px;
+            border-radius: 100%;
+            text-align: center;
+            
+            a {
+                color: #c7c7c7;
+                text-align: center;
+                &:hover {
+                    color: white;
+                }
+            }
+        }
+    }
+}

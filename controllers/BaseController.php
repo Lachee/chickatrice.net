@@ -1,6 +1,5 @@
 <?php namespace app\controllers;
 
-use app\models\Ban;
 use Exception;
 use Chickatrice;
 use kiss\controllers\Controller;
@@ -10,8 +9,6 @@ use kiss\helpers\HTML;
 use kiss\helpers\HTTP;
 use kiss\helpers\Response;
 use kiss\Kiss;
-use Mixy;
-use XVE;
 
 class BaseController extends Controller {
 
@@ -47,12 +44,6 @@ class BaseController extends Controller {
 
             //Update that we have seen them
             Chickatrice::$app->user->seen();
-
-            //Validate they are not on our blacklist
-            if (Ban::findBySnowflake(Chickatrice::$app->user->getSnowflake())->one() != null) {
-                Kiss::$app->getUser()->logout(); 
-                Kiss::$app->session->addNotification('Failed to validate the Discord authentication.', 'danger');
-            }
         }
     
         if (!$this->authorize($endpoint))

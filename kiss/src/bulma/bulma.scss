@@ -1,0 +1,279 @@
+
+// Import a Google Font
+@import url('https://fonts.googleapis.com/css?family=Nunito:400,700');
+
+/*
+// Set your brand colors
+$purple: #8A4D76;
+$pink: #FA7C91;
+$brown: #757763;
+$beige-light: #D0D1CD;
+$beige-lighter: #EFF0EB;
+
+// Update Bulma's global variables
+$grey-dark: $brown;
+$grey-light: $beige-light;
+$primary: $purple;
+$link: $pink;
+
+// Update some of Bulma's component variables
+$body-background-color: $beige-lighter;
+$control-border-width: 2px;
+$input-border-color: transparent;
+$input-shadow: none;
+*/
+
+$family-sans-serif: "Nunito", sans-serif;
+$navbar-margin: 0 !default;
+
+
+
+/*
+@font-face {
+    font-family: IndieFlower-Regular;
+    src: url('./../IndieFlower-Regular.ttf');
+}
+*/
+
+
+@import '~bulma/bulma';
+
+//@import "bulma-prefers-dark/bulma-prefers-dark.sass";
+
+@import "bulma-prefers-dark/sass/utilities/_all";
+@import "bulma-prefers-dark/sass/base/_all";
+@import "bulma-prefers-dark/sass/elements/_all";
+@import "bulma-prefers-dark/sass/components/_all";
+@import "bulma-prefers-dark/sass/layout/_all";
+
+//@import 'bulmaswatch/superhero/bulmaswatch.scss';
+
+@import 'bulma-switch';
+@import 'bulma-gradients.scss';
+@import '~@creativebulma/bulma-collapsible';
+@import '~@sweetalert2/theme-bulma/bulma.scss';
+@import '~bulma-carousel/dist/css/bulma-carousel.min.css';
+
+$scrollbar-width: 12px;
+$scrollbar-color: #e9e9e9 !default;
+$scrollbar-thumb-color: #999999 !default;
+
+$scrollbar-color-dark: $body-background-color-dark !default;
+$scrollbar-thumb-color-dark: #0a0a0a !default;
+$scrollbar-color: $scrollbar-color-dark;
+$scrollbar-thumb-color: $scrollbar-thumb-color-dark;
+
+.has-background-transparent {
+    background-color: transparent;
+}
+
+.is-secret {
+    filter: blur(5px);
+}
+
+.is-secret:focus {
+    filter: none;
+}
+
+/** Fixes the buttons fucking up on the cards */
+button { cursor: pointer; }
+button.card-footer-item {
+    border: none;
+    background: none;
+}
+.card-footer-item:hover { 
+    background: $scheme-main-ter; 
+    color: $link;
+}
+
+//Fixes the navbar margin
+nav.navbar { 
+    margin-bottom: $navbar-margin; 
+    .is-tab { transition: border 0.25s; }
+    .navbar-item.has-icon {
+        min-width: $navbar-height;
+        i {
+            text-align: center;
+            width: 100%;
+            font-size: 14pt;
+        }
+    }
+}
+
+//Setsup the page
+.page {
+    display: flex;
+    min-height: calc(100vh - #{$navbar-height + $navbar-margin} - 6px);
+    flex-direction: column;
+}
+.page-contents {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    flex: 1 0 auto;
+}
+
+
+/**
+    Select 2 Customisations
+*/
+.select select, .select2-dropdown, .select2-search__field{ 
+    color: $input-color-dark;
+    background-color: $input-background-color-dark;
+    border-color: $input-border-color-dark;
+    &:hover {
+        color: $input-hover-color-dark;
+    }
+ }
+.select2-selection__arrow { display: none; }
+.select2-container--default .select2-selection--single { border: none; }
+.select2-container--default .select2-results__option[aria-selected=true] { background-color: #5897fb; }
+.select2-container--default .select2-selection__rendered, .select select { 
+    @extend select;
+    border-color: $input-border-color-dark;
+    &:hover { border-color: $input-hover-border-color-dark; }
+}
+.select2-container .select2-search--inline { margin-top: -3px; }
+.select2-container--default .select2-selection--multiple { border: none; }
+.select2-container--default.select2-container--focus .select2-selection--multiple { border: none; }
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    background-color: $background-dark;
+    border-color: $input-border-color-dark;
+    margin-top: -2px;
+    margin-left: 0;
+}
+.select2 {
+    .select2-container {
+        .select2-selection--single, .select2-selection--multiple {
+            height: auto !important;
+            padding: 3px 0 !important;
+            border: 1px solid #dbdbdb !important;
+        
+            .select2-selection__arrow{
+                top: 5px !important;
+            }
+        
+            .select2-selection__placeholder {
+                color: #dbdbdb !important;
+            }
+        }
+    }
+} 
+.select2-dropdown {
+
+    &.select2-dropdown--below {
+        border-top: 0!important;
+        box-shadow: 0 0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0px 0 1px rgba(10, 10, 10, 0.02);
+    }
+    &.select2-dropdown--above {
+        border-bottom: 0!important;
+        box-shadow: 0 -0.5em 1em -0.125em rgba(10, 10, 10, 0.1), 0 0px 0 1px rgba(10, 10, 10, 0.02);
+    }
+    .select2-search {
+        margin: 5px;
+        .select2-search__field {
+            padding: 10px !important;
+            border-radius: 3px !important;
+            font-size: 1rem;
+            height: 2.25em;
+            box-shadow: inset 0 1px 2px rgba(10,10,10,.1);
+            max-width: 100%;
+            width: 100%;
+            border-radius: 3px !important;
+        }
+    }    
+    .select2-results__options {
+        max-height: 200px !important;
+        .select2-results__option {
+            padding: 0.37em 0.75em !important;
+            font-size: 1rem;        
+            &.select2-results__option--highlighted {}
+        }
+    }
+}
+
+/** Scrollbar */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: $scrollbar-thumb-color $scrollbar-color;
+
+    &::-webkit-scrollbar {
+        width: $scrollbar-width;
+        height: $scrollbar-width;
+        cursor: pointer !important;
+    }
+    &::-webkit-scrollbar-track {
+        background: $scrollbar-color;
+        cursor: pointer !important;
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: $scrollbar-thumb-color;
+        border-radius: 10px;
+        border: 3px solid $scrollbar-color;
+        cursor: pointer !important;
+    }
+
+    //&::-webkit-scrollbar-thumb { border-color: $scrollbar-color-dark;  background-color: $scrollbar-thumb-color-dark; }
+    //&::-webkit-scrollbar-track { background-color: $scrollbar-color-dark; }
+}
+
+
+/** Keybaord **/
+kbd {
+    padding: 0 4px;
+    border-radius: 4px;
+    background: $white;
+    box-shadow: 0px 2px $primary;
+    border: 1px solid $primary;
+    font-size: 8pt;
+
+    &:hover {
+        box-shadow: 0px 1px $primary;
+        transform: translate(0, 1px);
+    }
+
+    @media(prefers-color-scheme: dark) {
+        background: $body-background-dark;
+    }
+}
+
+
+/** NOtifications */
+.notifications {
+    &.toast {
+        position: fixed;
+        top: 2em;
+        right: 2em;
+        z-index: 99999;
+        animation: fadein 1s;
+    }
+    & .notification.is-closed {
+        transform: translateX(500px);
+        margin-bottom: -64px;
+        transition: 0.5s cubic-bezier(0.12, -0.26, 0.36, 0.37);
+    }
+}
+
+
+
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+
+/** Fixes the column orderrs */
+@include until($tablet) {
+    .is-flex-reversable {
+        &.columns {
+            display: flex;
+            flex-direction: column-reverse;
+        }
+    }
+}
+
+@include until($desktop) {
+    .container.is-fluid {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}

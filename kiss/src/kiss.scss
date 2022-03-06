@@ -1,0 +1,163 @@
+@charset "utf-8";
+
+$footer-padding: 1rem 1.5rem 0rem;
+@import './bulma/bulma.scss';
+
+//Navbar
+.navbar-item.brand-text {
+  font-weight: 300;
+}
+.navbar-item, .navbar-link {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+//Menu
+.menu-label {
+  color: $grey-dark;
+  letter-spacing: 1.3;
+  font-weight: 700;
+}
+.menu-list a {
+  font-size: 14px;
+  font-weight: 700;
+}
+.menu-list a:hover {
+  background-color: transparent;
+  color: $link;
+}
+.menu-list a.is-active {
+  background-color: transparent;
+  color: $primary;
+  font-weight: 700;
+}
+
+//Info Tiles
+.info-tiles {
+  margin: 1rem 0;
+}
+.info-tiles .subtitle {
+  font-weight: 300;
+  color: $grey-dark;
+}
+
+//Custom Hero
+.hero .title, .hero .subtitle {
+  color: hsl(192, 17%, 99%);
+}
+
+.card .content {
+  font-size: 14px;
+}
+.card-footer-item {
+  font-size: 14px;
+  font-weight: 700;
+  color: $grey-dark;
+}
+.card-table .table {
+  margin-bottom: 0;
+}
+.events-card .card-table {
+  max-height: 250px;
+  overflow-y: scroll;
+}
+.table td > .far {
+  font-size: 20pt;
+}
+
+.content table tbody tr:last-child td, .content table tbody tr:last-child th, .table tbody tr:last-child td, .table tbody tr:last-child th {
+  border-top-width: 1px;
+}
+.content table td, .content table th, .table td, .table th {
+  border-bottom-width: 0px;
+}
+.overflow-x-auto {
+  overflow-x: auto;
+}
+
+
+// Full Width the editor
+.panel-block#editor-box > div {
+  width: 100%;
+}
+
+.stacktrace {
+  
+  $st-primary: #01a38e;
+  $st-primary-darker: #127d70;
+  $st-secondary: #0a0a0a;
+  $st-secondary-darker: #000000;
+  
+  $st-class: inherit;
+  $st-type: inherit;
+  $st-func: $st-primary;
+
+  .trace {
+    padding: 5px;
+    margin: 5px;
+    font-size: 10pt;
+    
+    &.is-important { 
+      background: #00000008;
+      .target {
+        font-weight: bold;
+      }
+
+      .file {
+        .path { background: $st-primary; }
+        .line, a:hover { background: $st-primary-darker; }
+      }
+    }
+
+    .target {
+      font-size: 13pt;
+      font-family: monospace; 
+
+      .class {
+        color: $st-class;
+      }
+      .type {
+        color: $st-type;
+      }
+      
+      .func {
+        color: $st-func;
+      }
+    }
+
+    .file {
+      .path {
+        padding: 1px 3px 1px 5px;
+        background: $st-secondary;
+        height: 100%;
+        float: left;
+      }
+      
+      .line {
+        padding: 1px 5px 1px 3px;
+        background: $st-secondary-darker;
+        font-family: monospace;
+        height: 100%;
+        float: left;
+      }
+      
+      a {
+        color: #ffffff;
+        border: 2px solid transparent;
+        overflow: hidden;
+        border-radius: 5px;
+        &:hover { background: $st-secondary-darker; }
+      }
+    }
+  }
+}
+
+//Footer
+.footer {
+  .badge {
+    margin: 10px;
+  }
+}
+
+//Force controls to be on z 3
+.field.has-addons .control .button:not([disabled]):focus, .field.has-addons .control .button:not([disabled]).is-focused, .field.has-addons .control .button:not([disabled]):active, .field.has-addons .control .button:not([disabled]).is-active, .field.has-addons .control .input:not([disabled]):focus, .field.has-addons .control .input:not([disabled]).is-focused, .field.has-addons .control .input:not([disabled]):active, .field.has-addons .control .input:not([disabled]).is-active, .field.has-addons .control .select select:not([disabled]):focus, .field.has-addons .control .select .select2-container--default .select2-selection__rendered:not([disabled]):focus, .select2-container--default .field.has-addons .control .select .select2-selection__rendered:not([disabled]):focus, .field.has-addons .control .select select:not([disabled]).is-focused, .field.has-addons .control .select .select2-container--default .select2-selection__rendered:not([disabled]).is-focused, .select2-container--default .field.has-addons .control .select .select2-selection__rendered:not([disabled]).is-focused, .field.has-addons .control .select select:not([disabled]):active, .field.has-addons .control .select .select2-container--default .select2-selection__rendered:not([disabled]):active, .select2-container--default .field.has-addons .control .select .select2-selection__rendered:not([disabled]):active, .field.has-addons .control .select select:not([disabled]).is-active, .field.has-addons .control .select .select2-container--default .select2-selection__rendered:not([disabled]).is-active, .select2-container--default .field.has-addons .control .select .select2-selection__rendered:not([disabled]).is-active { z-index: 3 !important; }

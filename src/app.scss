@@ -1,0 +1,89 @@
+@charset "utf-8";
+
+body {
+    overflow-x: hidden;
+}
+
+.card {
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.avatar, .avatar img {
+    border-radius: 100%;
+    width: 64px;
+    height: 64px;
+}
+
+/** Navbar Overrides */
+.field, .navbar-item {
+    &.is-fullwidth {
+        width: 100%;
+    }
+}
+.navbar-item {
+    form { 
+        margin: auto;
+        width: 100%;
+    }
+    #navbar-submit span { min-width: 45px; }
+    #navbar-submit i { min-width: 16px; }
+}
+
+.has-placeholder-transition {
+    $transition-time: 1s;
+    $transition-color: transparent;
+    &::placeholder { 
+        transition: color $transition-time; 
+    }
+    &::-moz-placeholder { 
+        transition: color $transition-time; 
+    }
+    &::-webkit-input-placeholder { 
+        transition: color $transition-time; 
+    }
+    
+    &.is-transitioning::placeholder { 
+        transition: color $transition-time; 
+        color: $transition-color; 
+    }
+    &.is-transitioning::-moz-placeholder { 
+        transition: color $transition-time; 
+        color: $transition-color; 
+     }
+    &.is-transitioning::-webkit-input-placeholder { 
+        transition: color $transition-time; 
+        color: $transition-color; 
+    }
+}
+
+//Sets up the navbar so we are able to have a center element
+.navbar-right { margin-right: unset; }
+.navbar-center {
+    flex-grow: 1;
+    flex-direction: column;
+    justify-content: center;
+}
+
+
+
+.emote {
+    width: 32px;
+    height: 32px;
+    margin-right: 10px;
+    vertical-align: middle;
+    &.is-tiny { 
+        width: 16px;
+        height: 16px;
+        margin-right: 0;
+    }
+    &.is-small {
+        width: 25px;
+        height: 25px;
+        margin-right: 0;
+    }
+    &.is-large {
+        width: 64px;
+        height: 64px;
+    }
+}

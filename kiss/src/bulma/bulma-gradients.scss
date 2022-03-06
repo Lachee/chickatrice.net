@@ -1,0 +1,112 @@
+.has-gradient.is-white, .has-gradient-white {
+    background: $white;
+    background: -webkit-linear-gradient(to right, $white, darken($white, 10%));
+    background: linear-gradient(to right, $white, darken($white, 10%));
+}
+.has-gradient.is-black, .has-gradient-black {
+    background: $black;
+    background: -webkit-linear-gradient(to right, $black, lighten($black, 10%));
+    background: linear-gradient(to right, $black, lighten($black, 10%));
+}
+.has-gradient.is-light, .has-gradient-light {
+    background: $light;
+    background: -webkit-linear-gradient(to right, $light, darken($light, 10%));
+    background: linear-gradient(to right, $light, darken($light, 10%));
+}
+.has-gradient.is-dark, .has-gradient-dark {
+    background: $dark;
+    background: -webkit-linear-gradient(to right, $dark, lighten($dark, 10%));
+    background: linear-gradient(to right, $dark, lighten($dark, 10%));
+}
+.has-gradient.is-primary, .has-gradient-primary {
+    background: $primary;
+    background: -webkit-linear-gradient(to right, $primary, lighten($primary, 10%));
+    background: linear-gradient(to right, $primary, lighten($primary, 10%));
+}
+.has-gradient.is-info, .has-gradient-info {
+    background: $info;
+    background: -webkit-linear-gradient(to right, $info, lighten($info, 10%));
+    background: linear-gradient(to right, $info, lighten($info, 10%));
+}
+.has-gradient.is-link, .has-gradient-link {
+    background: $link;
+    background: -webkit-linear-gradient(to right, $link, lighten($link, 10%));
+    background: linear-gradient(to right, $link, lighten($link, 10%));
+}
+.has-gradient.is-success, .has-gradient-success {
+    background: $success;
+    background: -webkit-linear-gradient(to right, $success, lighten($success, 10%));
+    background: linear-gradient(to right, $success, lighten($success, 10%));
+}
+.has-gradient.is-warning, .has-gradient-warning {
+    background: $warning;
+    background: -webkit-linear-gradient(to right, $warning, lighten($warning, 10%));
+    background: linear-gradient(to right, $warning, lighten($warning, 10%));
+}
+.has-gradient.is-danger, .has-gradient-danger {
+    background: $danger;
+    background: -webkit-linear-gradient(to right, $danger, darken($danger, 10%));
+    background: linear-gradient(to right, $danger, darken($danger, 10%));
+}
+
+
+.has-gradient-border.is-white, .has-gradient-border-white {
+    border-color: $white;
+    border-image-source: -webkit-linear-gradient(to right, $white, darken($white, 10%));
+    border-image-source: linear-gradient(to right, $white, darken($white, 10%));
+    border-image-slice: 1;
+}
+.has-gradient-border.is-black, .has-gradient-border-black {
+    border-color: $black;
+    border-image-source: -webkit-linear-gradient(to right, $black, lighten($black, 10%));
+    border-image-source: linear-gradient(to right, $black, lighten($black, 10%));
+    border-image-slice: 1;
+}
+.has-gradient-border.is-light, .has-gradient-border-light {
+    border-color: $light;
+    border-image-source: -webkit-linear-gradient(to right, $light, darken($light, 10%));
+    border-image-source: linear-gradient(to right, $light, darken($light, 10%));
+    border-image-slice: 1;
+}
+.has-gradient-border.is-dark, .has-gradient-border-dark {
+    border-color: $dark;
+    border-image-source: -webkit-linear-gradient(to right, $dark, lighten($dark, 10%));
+    border-image-source: linear-gradient(to right, $dark, lighten($dark, 10%));
+    border-image-slice: 1;
+}
+.has-gradient-border.is-primary, .has-gradient-border-primary {
+    border-color: $primary;
+    border-image-source: -webkit-linear-gradient(to right, $primary, lighten($primary, 10%));
+    border-image-source: linear-gradient(to right, $primary, lighten($primary, 10%));
+    border-image-slice: 1;
+}
+.has-gradient-border.is-info, .has-gradient-border-info {
+    border-color: $info;
+    border-image-source: -webkit-linear-gradient(to right, $info, lighten($info, 10%));
+    border-image-source: linear-gradient(to right, $info, lighten($info, 10%));
+    border-image-slice: 1;
+}
+.has-gradient-border.is-link, .has-gradient-border-link {
+    border-color: $link;
+    border-image-source: -webkit-linear-gradient(to right, $link, lighten($link, 10%));
+    border-image-source: linear-gradient(to right, $link, lighten($link, 10%));
+    border-image-slice: 1;
+}
+.has-gradient-border.is-success, .has-gradient-border-success {
+    border-color: $success;
+    border-image-source: -webkit-linear-gradient(to right, $success, lighten($success, 10%));
+    border-image-source: linear-gradient(to right, $success, lighten($success, 10%));
+    border-image-slice: 1;
+}
+.has-gradient-border.is-warning, .has-gradient-border-warning {
+    border-color: $warning;
+    border-image-source: -webkit-linear-gradient(to right, $warning, lighten($warning, 10%));
+    border-image-source: linear-gradient(to right, $warning, lighten($warning, 10%));
+    border-image-slice: 1;
+}
+.has-gradient-border.is-danger, .has-gradient-border-danger {
+    border-color: $danger;
+    border-image-source: -webkit-linear-gradient(to right, $danger, darken($danger, 10%));
+    border-image-source: linear-gradient(to right, $danger, darken($danger, 10%));
+    border-image-slice: 1;
+}
