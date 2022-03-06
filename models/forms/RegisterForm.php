@@ -11,6 +11,8 @@ use kiss\schema\StringProperty;
 
 class RegisterForm extends Form {
 
+    public const ALLOW_REGISTRATION = false;
+
     public $username;
     public $email;
     public $password;
@@ -30,8 +32,21 @@ class RegisterForm extends Form {
         ];
     }
 
+    public function render($options = [])
+    {
+        if (!self::ALLOW_REGISTRATION)
+            return HTML::tag('i', 'Registration via email and username has been disabled. Please use Third-Party method or try again later.');
+        return parent::render($options);
+    }
+
     public function validate()
     {
+        if (!self::ALLOW_REGISTRATION)
+        {
+            $this->addError('Registration has been disabled');
+            return false;    
+        }
+
         if (!parent::validate())
             return false;
 
@@ -69,6 +84,12 @@ class RegisterForm extends Form {
         //Failed to load
         if ($validate && !$this->validate()) {
             return false;
+        }
+        
+        if (!self::ALLOW_REGISTRATION)
+        {
+            $this->addError('Registration has been disabled');
+            return false;    
         }
 
         $user = User::createUser($this->username, $this->email, 0);
