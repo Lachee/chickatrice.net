@@ -8,3 +8,5 @@ public/cache/*
 *.env
 
 last_request.json
+_staging
+_staging/*
