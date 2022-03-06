@@ -7,13 +7,12 @@ use kiss\models\forms\Form;
 use kiss\schema\BooleanProperty;
 use kiss\schema\StringProperty;
 
-class LoginForm extends Form {
+class RegisterForm extends Form {
 
+    public $username;
     public $email;
     public $password;
-
-    public $btn_recover;
-    public $btn_login;
+    public $passwordConfirm;
 
     protected function init() {
         parent::init();
@@ -23,11 +22,10 @@ class LoginForm extends Form {
     {
         $btnParser = function($value) { return $value === '' || filter_var($value, FILTER_VALIDATE_BOOL | FILTER_NULL_ON_FAILURE); };
         return [
+            'username' => new StringProperty('', 'xXBestMagicPlayerXx', ['title' => 'Username']),
             'email' => new StringProperty('', 'test@example.com', [ 'title' => 'Email' ]),
             'password' => new StringProperty('', '', [ 'title' => 'Password', 'options' => [ 'password' => true ]]),
-
-            'btn_recover' => new BooleanProperty('', '', [ 'parser' => $btnParser, 'required' => false, 'options' => [ 'hidden' => true ], ]),
-            'btn_login' => new BooleanProperty('', '', [ 'parser' => $btnParser, 'required' => false, 'options' => [ 'hidden' => true ], ]),
+            'passwordConfirm' => new StringProperty('', '', [ 'title' => 'Password Confirm', 'options' => [ 'password' => true ]]),
         ];
     }
 

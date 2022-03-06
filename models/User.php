@@ -159,33 +159,8 @@ class User extends Identity {
             $account = Account::findByEmail($email)->one();
             $createAccount = $account == null || User::findByAccount($account)->any();
             
-            if ($createAccount) {
-                $account = new Account([
-                    'admin'             => 0,
-                    'name'              => $username,
-                    'realname'          => '',
-                    'gender'            => 'r',
-                    'password_sha512'   => '<!NEEDS SETTING!>',
-                    'email'             => $email,
-                    'active'            => 1,
-                    'country'           => '',
-                    'registrationDate'  => date('Y-m-d H:i:s'),
-                    'clientid'          => '',
-                    'privlevel'         => 'NONE',
-                    'privlevelStartDate'=> '0000-00-00 00:00:00',
-                    'privlevelEndDate'  => '0000-00-00 00:00:00',
-                ]);
-
-                // ensure we dont have someone using that username already
-                $count = 0;
-                while (Account::find()->where(['name', $account->name ])->any()) {
-                    $count++;
-                    $account->name = $username . $count;
-                }
-
-                // Create the account
-                $account->save();
-            }
+            if ($createAccount)
+                $account = Account::createAccount($username, $email, Strings::token(32));
         }
 
         // Setup the account and save the user

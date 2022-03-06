@@ -5,6 +5,7 @@ use JsonSerializable;
 use kiss\db\ActiveRecord;
 use kiss\exception\ArgumentException;
 use kiss\exception\InvalidOperationException;
+use kiss\helpers\Arrays;
 use kiss\helpers\HTML;
 use kiss\helpers\HTTP;
 use kiss\helpers\Strings;
@@ -22,6 +23,9 @@ use kiss\schema\StringProperty;
 
 class Form extends BaseObject {
   
+    /** @var string form name to help distringuish against multiple forms */
+    public $formName = null;
+
     /** Saves the form
      * @param bool $validate validates the record before submitting. Isn't required if loaded using Load
      * @return bool if successful 
@@ -109,7 +113,9 @@ class Form extends BaseObject {
             }
         }
 
-    
+        $inputName = $name;
+        if (!empty($this->formName))
+            $inputName = $this->formName . "[$inputName]";
         
         $field = HTML::comment("'$name' input");
         $field .= HTML::begin('div', [ 'class' => 'field' ]); 
@@ -119,7 +125,7 @@ class Form extends BaseObject {
 
             $field .= HTML::begin('div', ['class' => 'control']);
             {
-                $field .= $this->{$renderer}($name, $scheme, $options);
+                $field .= $this->{$renderer}($inputName, $scheme, $options);
             }
             $field .= HTML::end('div');
 
@@ -131,31 +137,17 @@ class Form extends BaseObject {
         return $field;
     }
 
-    /**
-     * Renders a password field
-     * @param string $name the property name
-     * @param StringProperty $scheme
-     * @param mixed $options 
-     * @return string 
-     * @throws ArgumentException 
-     */
-    protected function fieldPassword($name, $scheme, $options) {
-        return HTML::input('password', [
-            'class' => 'input',
-            'name' => $name,
-            'placeholder' => $scheme->default,
-            'value' => $this->getProperty($name, ''),
-            'disabled' => $scheme->getProperty('readOnly', false)
-        ]);
-    }
-
     /** Renders a text field
      * @param string $name the property name
      * @param StringProperty $scheme
      * @return string
     */
     protected function inputString($name, $scheme, $options = []) {
-        return HTML::input('text', [ 
+        $type = 'text';
+        if (Arrays::value($scheme->options, 'password', false))
+            $type = 'password';
+
+        return HTML::input($type, [ 
             'class'         => 'input',
             'name'          => $name,
             'placeholder'   => $scheme->default,
@@ -190,8 +182,12 @@ class Form extends BaseObject {
             return false;
         }
 
+        $subdata = $data;
+        if (!empty($this->formName))
+            $subdata = $data[$this->formName];
+
         //send it
-        if (!parent::load($data))
+        if (!parent::load($subdata))
             return false;
             
         // Validate the load

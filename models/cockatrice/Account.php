@@ -2,6 +2,12 @@
 
 use kiss\db\ActiveQuery;
 use kiss\db\ActiveRecord;
+use kiss\exception\QueryException;
+use kiss\exception\ArgumentException;
+use kiss\exception\SQLException;
+use kiss\exception\SQLDuplicateException;
+use kiss\exception\InvalidOperationException;
+use kiss\helpers\HTTP;
 use kiss\helpers\Strings;
 
 class Account extends ActiveRecord {
@@ -51,6 +57,57 @@ class Account extends ActiveRecord {
         $hash = $this->password_sha512;
         if ($salt == '') $salt = substr($hash, 0, 16);
 		return static::hashPassword($password, $salt) === $hash;
+    }
+
+    /**
+     * Creates a new account
+     * @param string $username username of the account
+     * @param string $email email of the account
+     * @param string $password password of the account
+     * @return Account 
+     * @throws QueryException 
+     * @throws ArgumentException 
+     * @throws SQLException 
+     * @throws SQLDuplicateException 
+     * @throws InvalidOperationException 
+     */
+    public static function createAccount($username, $email, $password) {
+        // Create a new account
+        $account = new Account([
+            'admin'             => 0,
+            'name'              => $username,
+            'realname'          => '',
+            'gender'            => 'r',
+            'password_sha512'   => '',
+            'email'             => $email,
+            'active'            => 1,
+            'country'           => '',
+            'registrationDate'  => date('Y-m-d H:i:s'),
+            'clientid'          => '',
+            'privlevel'         => 'NONE',
+            'privlevelStartDate'=> '0000-00-00 00:00:00',
+            'privlevelEndDate'  => '0000-00-00 00:00:00',
+        ]);
+
+        // Setupt he password
+        $account->setPassword($password);
+
+        // Guess the best country code
+        $country = HTTP::header('CF-IPCountry', '', null);
+        if (!empty($country) && strlen($country) == 2) {
+            $account->country = Strings::toLowerCase($country);
+        }
+
+        // ensure we dont have someone using that username already
+        $count = 0;
+        while (Account::find()->where(['name', $account->name ])->any()) {
+            $count++;
+            $account->name = $username . $count;
+        }
+
+        // Create the account
+        $account->save();
+        return $account;
     }
 
     /** @return string insecurely hashes the passwords */

@@ -3,6 +3,7 @@
 use app\components\mixer\Mixer;
 use app\models\Ban;
 use app\models\forms\LoginForm;
+use app\models\forms\RegisterForm;
 use app\models\Guild;
 use kiss\exception\HttpException;
 use kiss\helpers\HTTP;
@@ -46,18 +47,30 @@ class MainController extends BaseController {
         if (Kiss::$app->loggedIn())
             return Response::redirect(['/index']);
 
-        $form = new LoginForm();
+        $loginForm      = new LoginForm(['formName' => 'login']);
+        $registerForm   = new RegisterForm(['formName' => 'register']);
         if (HTTP::hasPost()) {
-            if ($form->load(HTTP::post()) && $form->save()) {
-                // Proceed with login logic
-            } else {
-                Kiss::$app->session->addNotification('Failed to login', 'danger');
+            if ($loginForm->load(HTTP::post())) {
+                if ($loginForm->save()) {
+                    // Proceed with login logic
+                } else {
+                    Kiss::$app->session->addNotification('Failed to login: ' . $loginForm->errorSummary(), 'danger');
+                }
+            }
+
+            if ($registerForm->load(HTTP::post())) {
+                if ($registerForm->save()) {
+                    // Proceed with login logic
+                } else {
+                    Kiss::$app->session->addNotification('Failed to register: ' . $registerForm->errorSummary(), 'danger');
+                }
             }
         }
 
         return $this->render('login', [
-            'model'         => $form,
-            'discordUrl'   => Chickatrice::$app->discord->getAuthUrl()
+            'loginForm'  => $loginForm,
+            'registerForm' => $registerForm,
+            'discordUrl' => Chickatrice::$app->discord->getAuthUrl()
         ]);
         // Kiss::$app->session->set('LOGIN_REFERRAL', HTTP::referral());
         // return Chickatrice::$app->discord->redirect();
@@ -81,6 +94,11 @@ class MainController extends BaseController {
 
             //Get the discord user
             $duser  = Chickatrice::$app->discord->identify($tokens);
+            if (!$duser->verified) {
+                Chickatrice::$app->session->addNotification('Your Discord Account must be Verified!', 'danger');
+                $referal = Kiss::$app->session->get('LOGIN_REFERRAL', HTTP::referral());
+                return Response::redirect($referal ?? [ '/login' ]);
+            }
 
             //Get the user, otherwise create one.
             /** @var User $user */

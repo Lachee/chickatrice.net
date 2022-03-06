@@ -5,7 +5,8 @@ use kiss\helpers\HTML;
 use kiss\helpers\HTTP;
 use kiss\Kiss;
 
-/** @var LoginForm $model */
+/** @var LoginForm $loginForm */
+/** @var RegisterForm $registerForm */
 
 ?>
 
@@ -18,15 +19,14 @@ use kiss\Kiss;
                     <form method="POST" class="m-0">
                         <div class="card-content">
                             <p class="title">Account</p>
-                            <p class="subtitle">Signin with your Cockatrice account</p>
+                            <p class="subtitle">Sign-in with your Cockatrice Account</p>
                             <p>
-                                <?= $model->render(); ?>
+                                <?= $loginForm->render(); ?>
                             </p>
                         </div>
                         <footer class="card-footer">
-                            <button class="card-footer-item" type="submit" name="btn_recover"><span><i class="fal fa-envelope"></i> Recover</span></button>
-                            <button class="card-footer-item" type="submit" name="btn_register"><span>Register</span></button>
-                            <button class="card-footer-item" type="submit" name="btn_login"><span><i class="fal fa-sign-in"></i> Login</span></button>
+                            <!--<button class="card-footer-item" type="submit" name="login[btn_recover]"><span><i class="fal fa-envelope"></i> Recover</span></button>-->
+                            <button class="card-footer-item" type="submit" name="login[btn_login]"><span><i class="fal fa-sign-in"></i> Login</span></button>
                         </footer>
                     </form>
                 </div> 
@@ -35,7 +35,7 @@ use kiss\Kiss;
                 <div class="card">
                     <div class="card-content">
                         <p class="title">Third-Party</p>
-                        <p class="subtitle">Login with an Authorised oAuth2 provider</p>
+                        <p class="subtitle">Sign-in using your Discord Account</p>
                             <a class="button is-fullwidth has-text-left" id="login-button" href="<?= $discordUrl ?>" data-tooltip="Login">
                                 <span class="icon"><i class="fab fa-discord"></i></span>
                                 <span>Discord</span>
@@ -43,7 +43,21 @@ use kiss\Kiss;
                     </div>
                 </div>
             </div>
-
+            <div class='column is-one-third' style="border-left: 3px solid #ffffffcf">
+                <div class="card">
+                    <form method="POST" class="m-0">
+                        <div class="card-content">
+                            <p class="title">Register</p>
+                            <p class="subtitle">Register a new Cockatrice Account</p>
+                            <p>This is an old method to signup for backwards compatabilities. It's recommended to use your Discord Account where possible</p>
+                            <?= $registerForm->render(); ?>
+                        </div>
+                        <footer class="card-footer">
+                            <button class="card-footer-item" type="submit"><span><i class="fal fa-user-plus"></i> Register</span></button>
+                        </footer>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </section>
