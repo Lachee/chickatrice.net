@@ -94,16 +94,22 @@ class Form extends BaseObject {
     protected function renderScheme($name, $scheme, $options = []) {
         if (!($scheme instanceof Property)) throw new ArgumentException('$scheme has to be a property');
 
+        if (isset($scheme->options['hidden']) && $scheme->options['hidden'] == true)
+            return '';
+
         $propertyType = $scheme->type;
-        $renderer = "input{$propertyType}";
-        if (!method_exists($this, $renderer)) 
-        {
-            $renderer = "field{$name}";
-            if (!method_exists($this, $renderer)) {
-                //throw new ArgumentException('Form does not have a `input' . $propertyType . '()` renderer');
+
+        $renderer = "field{$name}";
+        if (!method_exists($this, $renderer)) {
+            $renderer = "input{$propertyType}";
+            if (!method_exists($this, $renderer)) 
+            {
+                throw new ArgumentException('Form does not have a `input' . $propertyType . '()` renderer');
                 return;
             }
         }
+
+    
         
         $field = HTML::comment("'$name' input");
         $field .= HTML::begin('div', [ 'class' => 'field' ]); 
@@ -125,6 +131,24 @@ class Form extends BaseObject {
         return $field;
     }
 
+    /**
+     * Renders a password field
+     * @param string $name the property name
+     * @param StringProperty $scheme
+     * @param mixed $options 
+     * @return string 
+     * @throws ArgumentException 
+     */
+    protected function fieldPassword($name, $scheme, $options) {
+        return HTML::input('password', [
+            'class' => 'input',
+            'name' => $name,
+            'placeholder' => $scheme->default,
+            'value' => $this->getProperty($name, ''),
+            'disabled' => $scheme->getProperty('readOnly', false)
+        ]);
+    }
+
     /** Renders a text field
      * @param string $name the property name
      * @param StringProperty $scheme
@@ -139,7 +163,6 @@ class Form extends BaseObject {
             'disabled'      => $scheme->getProperty('readOnly', false)
         ]);
     }
-
     
     /** Renders a text field
      * @param string $name the property name

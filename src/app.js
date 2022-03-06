@@ -17,10 +17,6 @@ export let view;
 export let action;
 export let widgets = [];
 
-import { BaseAPI } from './api/BaseAPI.mjs';
-export const api = new BaseAPI('/api');
-
-
 //export const route = kiss.ROUTE || window.location.pathname.split('/'); 
 //route.shift();
 //

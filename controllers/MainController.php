@@ -2,6 +2,7 @@
 
 use app\components\mixer\Mixer;
 use app\models\Ban;
+use app\models\forms\LoginForm;
 use app\models\Guild;
 use kiss\exception\HttpException;
 use kiss\helpers\HTTP;
@@ -43,8 +44,24 @@ class MainController extends BaseController {
 
     /** Logs In */
     function actionLogin() {
-        Kiss::$app->session->set('LOGIN_REFERRAL', HTTP::referral());
-        return Chickatrice::$app->discord->redirect();
+        if (Kiss::$app->loggedIn())
+            return Response::redirect(['/index']);
+
+        $form = new LoginForm();
+        if (HTTP::hasPost()) {
+            if ($form->load(HTTP::post()) && $form->save()) {
+                // Proceed with login logic
+            } else {
+                Kiss::$app->session->addNotification('Failed to login', 'danger');
+            }
+        }
+
+        return $this->render('login', [
+            'model'         => $form,
+            'discordUrl'   => Chickatrice::$app->discord->getAuthUrl()
+        ]);
+        // Kiss::$app->session->set('LOGIN_REFERRAL', HTTP::referral());
+        // return Chickatrice::$app->discord->redirect();
     }
 
     /** Logs Out */

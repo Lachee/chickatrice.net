@@ -36,10 +36,6 @@ $theme = HTTP::get('theme', 'lumen');
     <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css">
 
-    <!-- LIGHTGALLERY --> 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/1.10.0/js/lightgallery-all.min.js" integrity="sha512-Qpvw3WG46QyOqV/YS9BosbxEbMKPREA+QS+iWAKXfvb/87tdfsGGQdT7vqYbQzBOgLvF2I/MHMacA86oURHsCw==" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightgallery/1.10.0/css/lightgallery.min.css" integrity="sha512-gk6oCFFexhboh5r/6fov3zqTCA2plJ+uIoUx941tQSFg6TNYahuvh1esZVV0kkK+i5Kl74jPmNJTTaHAovWIhw==" crossorigin="anonymous" />
-
     <!-- Autocomplete -->
     <link rel="stylesheet" href="https://unpkg.com/@tarekraafat/autocomplete.js@8.3.0/dist/css/autoComplete.css">
     <script src="https://unpkg.com/@tarekraafat/autocomplete.js@8.3.0/dist/js/autoComplete.min.js"></script>
@@ -61,6 +57,7 @@ $theme = HTTP::get('theme', 'lumen');
     <!-- <link rel="stylesheet" href="/dist/app/app.css">   -->
     <script src="/dist/app.js"></script>
     <link rel="stylesheet" href="/dist/app.css">
+    
 
     <!-- JS Variables -->
     <?= $this->renderJsVariables(Controller::POS_START); ?>

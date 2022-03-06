@@ -1,3 +1,1 @@
-import './GalleryList.js';
-import './ProfileCard.scss';
-import './TagGroup.scss';
+// insert imports for widgets here

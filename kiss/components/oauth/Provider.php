@@ -93,13 +93,11 @@ class Provider extends BaseObject {
         return $self === $state;
     }
 
-    /** redirects the user to the oauth authorization
-     * @param string $state additional state information for validating authorizations.
+    /** creates the URL to the authorization
      * @param bool $noPrompt hides the login prompt if they have already authorized this app
-     * @return Response the redirect response
+     * @return string the appropriate redirect URL
      */
-    public function redirect($noPrompt = true) {
-        
+    public function getAuthUrl($noPrompt = true) {        
         $url = $this->urlAuthorize;   
         $query = [
             'response_type'     => 'code',
@@ -112,8 +110,17 @@ class Provider extends BaseObject {
 
         $state = $this->getSessionState(true);
         if ($state !== false) $query['state'] = $state; 
+        return "{$url}?" . http_build_query($query);
+    }
 
-        return Response::redirect("{$url}?" . http_build_query($query));
+    /** redirects the user to the oauth authorization
+     * @param string $state additional state information for validating authorizations.
+     * @param bool $noPrompt hides the login prompt if they have already authorized this app
+     * @return Response the redirect response
+     */
+    public function redirect($noPrompt = true) {
+        $url = $this->getAuthUrl($noPrompt);
+        return Response::redirect($url);
     }
 
     /** Handles the HTTP requests

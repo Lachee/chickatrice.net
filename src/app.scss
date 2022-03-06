@@ -1,5 +1,7 @@
 @charset "utf-8";
 
+@import './_theme.scss';
+
 body {
     overflow-x: hidden;
 }
@@ -65,7 +67,9 @@ body {
     justify-content: center;
 }
 
-
+.navbar {
+    background-color: $primary;
+}
 
 .emote {
     width: 32px;
