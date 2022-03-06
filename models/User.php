@@ -11,6 +11,7 @@ use kiss\db\Query;
 use kiss\exception\ArgumentException;
 use kiss\exception\InvalidOperationException;
 use kiss\exception\NotYetImplementedException;
+use kiss\exception\QueryException;
 use kiss\exception\SQLDuplicateException;
 use kiss\exception\SQLException;
 use kiss\helpers\Arrays;
@@ -46,7 +47,7 @@ class User extends Identity {
         return [
             'uuid'          => new StringProperty('ID of the user'),
             'email'          => new StringProperty('Email address of the user'),
-            'snowflake'     => new StringProperty('Discord Snowflake id'),
+            'snowflake'     => new IntegerProperty('Discord Snowflake id'),
             'last_seen'     => new StringProperty('Last time this user was active')
         ];
     }
@@ -126,40 +127,65 @@ class User extends Identity {
         return $this->id == Kiss::$app->user->id;
     }
 
-    public static function CreateUser($username, $email, $snowflake) {
+    /** @return ActiveQuery|User finds a user by the account */
+    public static function findByAccount(Account $account) {
+        return User::find()->where(['cockatrice_id', $account->id]);
+    }
+
+    /**
+     * Creates a new user
+     * @param string $username The username for a new account
+     * @param string $email The email address of the account
+     * @param string $snowflake The discord snowflake of the account
+     * @param Account|null $account The linked account. If null, then a new one is made.
+     * @return User 
+     * @throws QueryException 
+     * @throws ArgumentException 
+     * @throws SQLException 
+     * @throws SQLDuplicateException 
+     * @throws InvalidOperationException 
+     */
+    public static function createUser($username, $email, $snowflake, $account = null) {
         // Create a new user with the given username, email and snowflake
         $user = new User([
             'uuid'      => Uuid::uuid1(Chickatrice::$app->uuidNodeProvider->getNode()),
-            'username'  => $username,
             'email'     => $email,
             'snowflake' => $snowflake,
         ]);
         
         // Find cockatrice accounts associated with the email
         /** @var Account $account cockatrice account to link up */
-        $account = Account::findByEmail($email)->one();
-        $createAccount = $account == null || User::find()->where(['cockatrice_id', $account->id])->any();
+        if ($account == null) {
+            $account = Account::findByEmail($email)->one();
+            $createAccount = $account == null || User::findByAccount($account)->any();
+            
+            if ($createAccount) {
+                $account = new Account([
+                    'admin'             => 0,
+                    'name'              => $username,
+                    'realname'          => '',
+                    'gender'            => 'r',
+                    'password_sha512'   => '<!NEEDS SETTING!>',
+                    'email'             => $email,
+                    'active'            => 1,
+                    'country'           => '',
+                    'registrationDate'  => date('Y-m-d H:i:s'),
+                    'clientid'          => '',
+                    'privlevel'         => 'NONE',
+                    'privlevelStartDate'=> '0000-00-00 00:00:00',
+                    'privlevelEndDate'  => '0000-00-00 00:00:00',
+                ]);
 
-        if ($createAccount) {
-            $account = new Account([
-                'admin'             => 0,
-                'name'              => $username,
-                'realname'          => '',
-                'gender'            => 'r',
-                'password_sha512'   => '<!NEEDS SETTING!>',
-                'email'             => $email,
-                'active'            => 1
-            ]);
+                // ensure we dont have someone using that username already
+                $count = 0;
+                while (Account::find()->where(['name', $account->name ])->any()) {
+                    $count++;
+                    $account->name = $username . $count;
+                }
 
-            // ensure we dont have someone using that username already
-            $count = 0;
-            while (Account::find()->where(['name', $account->name ])->any()) {
-                $count++;
-                $account->name = $username . $count;
+                // Create the account
+                $account->save();
             }
-
-            // Create the account
-            $account->save();
         }
 
         // Setup the account and save the user

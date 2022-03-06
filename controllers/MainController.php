@@ -86,7 +86,7 @@ class MainController extends BaseController {
             /** @var User $user */
             $user = User::findBySnowflake($duser->id)->one();
             if ($user == null) {
-                $user = User::CreateUser($duser->username, $duser->email, $duser->id);
+                $user = User::createUser($duser->username, $duser->email, $duser->id);
                 Chickatrice::$app->session->addNotification('Your account has been created');
             }
 
