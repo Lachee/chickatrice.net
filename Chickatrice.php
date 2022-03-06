@@ -13,7 +13,7 @@ use kiss\Kiss;
 class Chickatrice extends Kiss {
 
     /** @var bool allows logged out users */
-    public $allowVisitors = false;
+    public $allowVisitors = true;
 
     protected function init() {
         parent::init();

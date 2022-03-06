@@ -20,6 +20,9 @@ class Controller extends Route {
     public const POS_START = 1;
     public const POS_END = 2;
 
+    /** @var Controller $current current controller */
+    public static $current;
+
     private $js = [];
 
     private $uncaughtException = null;
@@ -102,6 +105,7 @@ class Controller extends Route {
 
     /** Renders only the content */
     public function renderContent($action, $options = []) {
+        self::$current = $this;
         $options['_CONTROLLER'] = $this;
         $filepath = $this->getContentViewPath($action) . ".php";
         return $this->renderFile($filepath, $options);
