@@ -1,8 +1,10 @@
 <?php namespace app\controllers;
 
 use app\components\mixer\Mixer;
+use app\helpers\Country;
 use app\models\cockatrice\Deck;
 use app\models\forms\ProfileSettingForm;
+use app\models\forms\UserSettingForm;
 use app\models\Gallery;
 use app\models\Identifier;
 use app\models\Sparkle;
@@ -93,15 +95,12 @@ class ProfileController extends BaseController {
             return Response::refresh();
         }
     
-        $form = new ProfileSettingForm([ 'profile' => $this->profile ]);
+        // Show the profile
+        $form = new UserSettingForm([ 'user' => $this->profile ]);
         if (HTTP::hasPost()) {
-        
-            //Force the profile to recaculate its sparkles
-            $this->profile->recalculateSparkles();
-
             if ($form->load(HTTP::post()) && $form->save()) {
                 Kiss::$app->session->addNotification('Updated profile settings', 'success');
-                return Response::redirect(['/profile/:profile/settings', 'profile' => $this->profile->profileName ]);
+                return Response::redirect([ '/profile/@me/settings' ]);
             } else {                
                 Kiss::$app->session->addNotification('Failed to load: ' . $form->errorSummary(), 'danger');
             }
@@ -112,14 +111,12 @@ class ProfileController extends BaseController {
         if (KISS_DEBUG || in_array($this->profile->snowflake, self:: DBEUG_USERS)) 
             $scopes = self::DEBUG_SCOPES;
 
-            //var_dump($scopes);
-
         //Render the page
         return $this->render('settings', [
             'profile'       => $this->profile,
+            'discord'       => $this->profile->getDiscordUser(),
             'model'         => $form,
             'key'           => $this->api_key = $this->profile->apiToken([ 'scopes' => $scopes ]),
-            'sparkles'      => $this->profile->getSparkleHistory()->limit(50)->all(),
             'fullwidth'     => false,
         ]);
     }

@@ -9,7 +9,7 @@ use kiss\schema\StringProperty;
 
 class LoginForm extends Form {
 
-    public $email;
+    public $username;
     public $password;
 
     public $btn_recover;
@@ -23,7 +23,7 @@ class LoginForm extends Form {
     {
         $btnParser = function($value) { return $value === '' || filter_var($value, FILTER_VALIDATE_BOOL | FILTER_NULL_ON_FAILURE); };
         return [
-            'email' => new StringProperty('', 'test@example.com', [ 'title' => 'Email' ]),
+            'username' => new StringProperty('', 'xXMagicPlayerXx', [ 'title' => 'Username' ]),
             'password' => new StringProperty('', '', [ 'title' => 'Password', 'options' => [ 'password' => true ]]),
 
             'btn_recover' => new BooleanProperty('', '', [ 'parser' => $btnParser, 'required' => false, 'options' => [ 'hidden' => true ], ]),
@@ -47,11 +47,11 @@ class LoginForm extends Form {
 
     /** Logins to an existing account with Username and Password */
     private function login() {
-        $err_msg = 'Incorrect email or password';
+        $err_msg = 'Incorrect username or password';
 
         // Get the accounts
         /** @var Account $account */
-        $account = Account::findByEmail($this->email)->one();
+        $account = Account::findByName($this->username)->one();
         if ($account == null) {
             $this->addError($err_msg);
             return false;
@@ -60,7 +60,7 @@ class LoginForm extends Form {
         /** @var User $user */
         $user = User::findByAccount($account)->one();
         if ($user != null && $user->getSnowflake() !== 0) {
-            $this->addError('Account requires Discord');
+            $this->addError('Account has been linked with Discord.');
             return false;
         }
 

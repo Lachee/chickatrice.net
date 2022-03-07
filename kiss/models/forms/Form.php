@@ -173,6 +173,46 @@ class Form extends BaseObject {
         return "<label class='label'>{$tag} {$scheme->title}</label>";
     }
 
+    /**
+     * @param mixed $name 
+     * @param EnumProperty $scheme 
+     * @param array $options 
+     * @return void 
+     * @throws ArgumentException 
+     */
+    protected function inputEnum($name, $scheme, $options = []) {
+        // Current selection
+        $selected   = $this->getProperty($name, '');
+
+        // select optiosn
+        $options    = [ 'name' => $name,  ];
+        if ($scheme->getProperty('readOnly', false))
+            $options['disabled'] = true;
+
+        // Draw
+        $html = '';
+        $html .= HTML::begin('span', ['class' => 'select is-fullwidth']);
+        {
+            $html .= HTML::begin('select', $options);
+            {
+                $labels = false;
+                if (isset($scheme->options['enum_titles']) && is_array($scheme->options['enum_titles']))
+                    $labels = $scheme->options['enum_titles'];
+
+                foreach($scheme->enum as $i => $key) {
+                    $label = $labels !== false ? $labels[$i] : $key;
+                    $optionOptions = [ 'value' => $key ];
+                    if ($key === $selected) $optionOptions['selected'] = 'true';
+                    $html .= HTML::tag('option', $label, $optionOptions);
+                }
+            }
+            $html .= HTML::end('select');
+        }
+        $html .= HTML::end('span');
+        $html .= HTML::tag('script', "$('[name=\"{$name}\"]').select2();");
+        return $html;
+    }
+
     /** @inheritdoc */
     public function load($data = null)
     {

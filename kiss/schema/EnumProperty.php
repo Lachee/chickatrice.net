@@ -5,7 +5,7 @@ namespace kiss\schema;
 class EnumProperty extends StringProperty {
 
     /** {@inheritdoc} */
-    public $type = 'string';
+    public $type = 'enum';
 
     /** {@inheritdoc} */
     public $format = 'selectize';

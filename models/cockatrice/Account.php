@@ -11,13 +11,17 @@ use kiss\helpers\HTTP;
 use kiss\helpers\Strings;
 
 class Account extends ActiveRecord {
+ 
     public static function tableName() { return "cockatrice_users"; }
 
     public $id;
     public $admin;
     public $name;
     public $realname;
+
+    /** @deprecated Gender has been removed. */
     public $gender;
+
     public $password_sha512;
     public $email;
     public $country;

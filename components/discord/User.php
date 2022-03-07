@@ -16,4 +16,8 @@ class User extends BaseObject {
     public $flags;
     public $premium_type;
     public $public_flags;
+
+    public function getAvatarUrl() {
+        return "https://cdn.discordapp.com/avatars/{$this->id}/{$this->avatar}";
+    }
 }

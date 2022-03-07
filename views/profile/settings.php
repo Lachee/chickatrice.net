@@ -24,43 +24,90 @@ $form->fastForm($rules);
 
 ?>
 
-<style>
-</style>
 
-<form method='POST'>
-    <?= $model->render(); ?>
-    <button class="button" type="submit">
-        <span class="icon"><i class="fal fa-save"></i></span>
-        <span>Save</span>
-    </button>
-    <hr>
-    <div class="field ">
-        <label class="label">API Key</label>
-        <div class="field has-addons is-fullwidth">
-            <div class="control" style="flex: 1">
-                <input class="input" name="api_key" placeholder="cooldude69" value="<?= $key ?>" type="text" readonly>
-            </div>  
-            <div class="control"><a href="<?= HTTP::url(['settings', 'regen' => true]) ?>" class="button" type="submit">Regenerate</a></div>
-        </div>
-        <p class="help">Used to access the API</p>
-    </div>    
-    <hr>
-    <div class="field ">
-        <label class="label">Sparkle History</label>
-        <table class="table">
-            <tr>
-                <th>Event</th>
-                <th>Gallery</th>
-                <th>Score</th>
-            </tr>
-            <?php foreach($sparkles as $sparkle): ?>
-            <tr>
-                <td><?= $sparkle->type ?></td>
-                <td><a href="<?= HTTP::url(['/gallery/:id/', 'id' => $sparkle->gallery_id]) ?>"><?= HTTP::url(['/gallery/:id/', 'id' => $sparkle->gallery_id]) ?></a></td>
-                <td><?= $sparkle->score ?></td>
-            </tr>
-            <?php endforeach; ?>
-        </table>
+<div class="columns">
+    <!-- Settings -->
+    <div class="column is-half">
+        <form method='POST' class='m-0'>
+            <div class="card">                
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <span class="icon"><i class="fal fa-user-cog"></i></span> Account Settings
+                    </p>
+                </header>
+                <div class="card-content">
+                    <div class="content">
+                        <?= $model->render(); ?>
+                    </div>
+                </div>
+                <footer class="card-footer">
+                    <button class="card-footer-item" type="submit">
+                        <span class="icon"><i class="fal fa-save"></i></span>
+                        <span>Save</span>
+                    </button>
+                </footer>
+            </div>
+        </form>
     </div>
-</form>
 
+    <!-- Discord Link -->
+    <div class="column is-half">
+        <?php if ($discord != null) : ?>
+            <div class="card">
+                <header class="card-header">
+                    <p class="card-header-title">
+                        <span class="icon"><i class="fab fa-discord"></i></span> Discord
+                    </p>
+                </header>
+                <div class="card-content">
+                    <div class="content">
+                        <div class="columns">
+                            <div class="column is-one-third">
+                                <img src="<?= $discord->getAvatarUrl() ?>.png?size=1024" alt="Discord Avatar" width="1024"/>
+                            </div>
+                            <div class="column">
+                                <p>
+                                    <label class='label'>Username</label>
+                                    <?= HTML::input('text', [ 'value' => $discord->username . '#' . $discord->discriminator, 'disabled' => true, 'class' => 'input']); ?>
+                                </p>
+                                <p>
+                                    <label class='label'>Email</label>
+                                    <?= HTML::input('text', [ 'value' => $discord->email, 'disabled' => true, 'class' => 'input' ]); ?>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php else : ?>
+            <form method='POST' class='m-0'>
+                <div class="card">
+                    <div class="card-content">
+                        <div class="content">
+                            <?= $model->render(); ?>
+                        </div>
+                    </div>
+                    <footer class="card-footer">
+                        <button class="card-footer-item" type="submit">
+                            <span class="icon"><i class="fal fa-save"></i></span>
+                            <span>Save</span>
+                        </button>
+                    </footer>
+                </div>
+            </form>
+        <?php endif; ?>
+    </div>
+</div>
+
+
+<hr>
+<div class="field ">
+    <label class="label">API Key</label>
+    <div class="field has-addons is-fullwidth">
+        <div class="control" style="flex: 1">
+            <input class="input" name="api_key" placeholder="cooldude69" value="<?= $key ?>" type="text" readonly>
+        </div>
+        <div class="control"><a href="<?= HTTP::url(['settings', 'regen' => true]) ?>" class="button" type="submit">Regenerate</a></div>
+    </div>
+    <p class="help">Used to access the API</p>
+</div>
