@@ -12,6 +12,11 @@ class Identifier extends ActiveRecord {
     public $multiverse_id;
     public $scryfall_id;
 
+    /** @return string image url */
+    public function getImageUrl() {
+        return "https://api.scryfall.com/cards/{$this->scryfall_id}?format=image";
+    }
+
     public static function tableName() {
         return "chickatrice_cards";
     }

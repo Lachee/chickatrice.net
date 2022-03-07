@@ -15,6 +15,7 @@ use kiss\exception\QueryException;
 use kiss\exception\SQLDuplicateException;
 use kiss\exception\SQLException;
 use kiss\helpers\Arrays;
+use kiss\helpers\HTML;
 use kiss\helpers\HTTP;
 use kiss\helpers\Strings;
 use kiss\K;
@@ -151,7 +152,7 @@ class User extends Identity {
     
     /** @return string the username */
     public function getUsername() {
-        return $this->getAccount()->name;
+        return HTML::encode($this->getAccount()->name);
     }
 #endregion
 

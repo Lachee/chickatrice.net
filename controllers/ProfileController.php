@@ -64,10 +64,16 @@ class ProfileController extends BaseController {
         /** @var User $profile */
         $profile = $this->profile;
 
+        $decks = Deck::findByAccount($profile->getAccount())->all();
+        return $this->render('decks', [
+            'profile'   => $profile,
+            'decks'     => $decks,
+        ]);
+
         /** @var Deck $deck */
         //$deck = Deck::findByKey(10312)->one();
         $deck = Deck::findByKey(1)->one();
-        $zones = $deck->getIdentifiers();
+        $zones = $deck->loadIdentifiers();
 
         return $this->render('deck', [
             'profile'       => $profile,
@@ -145,6 +151,7 @@ class ProfileController extends BaseController {
 
         $this->_profile = User::find()->where(['uuid', $this->profile_name])->ttl(false)->one();
         if ($this->_profile != null) return $this->_profile;        
+     
 
         //This is bunk, we found nudda
         throw new HttpException(HTTP::NOT_FOUND, 'Profile doesn\'t exist');

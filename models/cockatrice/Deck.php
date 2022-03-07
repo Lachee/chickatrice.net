@@ -15,31 +15,75 @@ class Deck extends ActiveRecord {
     public $upload_time;
     public $content;
 
-    /** @return ActiveQuery|mixed */
-    public function getData() {
-        return new SimpleXMLElement($this->content);
+    public $comment;
+    public $zones;
+
+    /** @inheritdoc */
+    public function afterQueryLoad($data) {
+        parent::afterQueryLoad($data);
+        $this->decomposeData();
     }
 
-    /** @return mixed returns associative array that contains identifiers and card counts. Indexed by the zone. */
-    public function getIdentifiers() {
-        $data = $this->getData();
-        $zones = [];
+    /** decomposes the data into its basic form */
+    private function decomposeData() {
+        
+        $xml = new SimpleXMLElement($this->content);        
+        $this->comment = $xml->comments;
 
-        foreach($data->zone as $zone) {
+        $this->zones = [];
+        foreach($xml->zone as $zone) {
+            // Decompose the zone
             $name = strval($zone['name']);
-            $zones[$name] = [];
+            $this->zones[$name] = [];
+
+            // Add the card names
             foreach($zone->card as $card) {
-                $identifier = Identifier::findByName(strval($card['name']))->one();
-                if ($identifier != null) {
-                    $zones[$name][] = [ 
-                        'identifier' => $identifier, 
-                        'count' => intval($card['number']) 
-                    ];
-                }
+                $this->zones[$name][] = [ 
+                    'name' => strval($card['name']), 
+                    'count' => intval($card['number']),
+                    'price' => intval($card['price']),
+                ];
             }
         }
 
-        return $zones;
+        return $this;
+    }
+
+    /** @return mixed Loads the identifiers for the deck */
+    public function loadIdentifiers() {        
+        foreach($this->zone as $name => $cards) {
+            foreach($cards as $index => $card) {
+                $identifier = Identifier::findByName($card['name'])->one();
+                if ($identifier != null) {
+                    $this->zone[$name][$index]['identifier'] = $identifier;
+                }
+            }
+        }
+        return $this->zone;
+    }
+
+    /** @return string Gets the deck preview image */
+    public function getImageUrl() {
+        $zones = array_values($this->zones);
+        
+        for ($i = 0; $i < count($zones[0]); $i++) {
+            $card = $zones[0][$i];
+            if (!isset($card['identifier']))
+                $card['identifier'] = Identifier::findByName($card['name'])->one();
+
+            if ($card['identifier'] != null)
+                return $card['identifier']->getImageUrl();
+        }
+        return '';
+    }
+
+    /** @return int counts the total cards */
+    public function getCardCount() {
+        $count = 0;
+        foreach($this->zones as $cards) {
+            $count += count($cards);
+        }
+        return $count;
     }
 
     /** Finds the decks for the user

@@ -24,11 +24,9 @@ class CardsetCommand extends Command {
         
         // Download the resource
         self::print('Downloading Identifier Database...');
-        if (!KISS_DEBUG || !file_exists($stageFile)) {
-            $resource = fopen($stageFile, 'w');
-            $guzzle->request('GET', self::IDENTIFIER_URL, [ 'sink' => $resource ]);
-        }
-
+        $resource = fopen($stageFile, 'w');
+        $guzzle->request('GET', self::IDENTIFIER_URL, [ 'sink' => $resource ]);
+        
         // Verify the download
         self::print('Verifying Download...');
         $response = $guzzle->request('GET', self::IDENTIFIER_URL . '.sha256');
