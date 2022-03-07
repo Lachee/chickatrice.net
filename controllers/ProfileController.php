@@ -63,38 +63,13 @@ class ProfileController extends BaseController {
         $profile = $this->profile;
 
         /** @var Deck $deck */
-        $deck = Deck::findByKey(2)->one();
-        $data = $deck->getData();
-        $zone = $data->zone;
-
-        $identifiers = [];
-        foreach($zone->card as $card) {
-            $name = $card['name'][0];
-            $identifier = Identifier::findByName($name)->one();
-            if ($identifier != null) $identifiers[] = $identifier;
-        }
+        //$deck = Deck::findByKey(10312)->one();
+        $deck = Deck::findByKey(1)->one();
+        $zones = $deck->getIdentifiers();
 
         return $this->render('deck', [
             'profile'       => $profile,
-            'cards'         => $identifiers
-        ]);
-    }
-
-    function actionFavourites() {
-        $galleries = $this->profile->getFavouriteGalleries()->orderByDesc('id')->all();
-        return $this->render('browse', [
-            'title'     => 'Favourites',
-            'profile'   => $this->profile,
-            'galleries' => $galleries
-        ]);
-    }
-
-    function actionSubmissions() {
-        $galleries = $this->profile->getGalleries()->orderByDesc('id')->all();
-        return $this->render('browse', [
-            'title'     => 'Submissions',
-            'profile'   => $this->profile,
-            'galleries' => $galleries
+            'zones'         => $zones
         ]);
     }
 

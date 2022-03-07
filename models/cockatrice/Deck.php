@@ -20,6 +20,28 @@ class Deck extends ActiveRecord {
         return new SimpleXMLElement($this->content);
     }
 
+    /** @return mixed returns associative array that contains identifiers and card counts. Indexed by the zone. */
+    public function getIdentifiers() {
+        $data = $this->getData();
+        $zones = [];
+
+        foreach($data->zone as $zone) {
+            $name = strval($zone['name']);
+            $zones[$name] = [];
+            foreach($zone->card as $card) {
+                $identifier = Identifier::findByName(strval($card['name']))->one();
+                if ($identifier != null) {
+                    $zones[$name][] = [ 
+                        'identifier' => $identifier, 
+                        'count' => intval($card['number']) 
+                    ];
+                }
+            }
+        }
+
+        return $zones;
+    }
+
     /** Finds the decks for the user
      * @param Account $account 
      * @return ActiveQuery|Deck[]

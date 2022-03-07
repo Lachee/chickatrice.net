@@ -16,21 +16,34 @@ use kiss\helpers\HTTP;
 
 <div class="columns">
     <div class="column">
-        <div class="title">Main Zone</div>
-            <?php 
-            foreach($cards as $identifier) {
+        <?php 
+        foreach($zones as $name => $deck) {
+            echo HTML::tag('div', $name, [ 'class' => 'title' ]);
+            foreach($deck as $card) 
+            {
                 /** @var Identifier $identifier */
-                $img = "https://api.scryfall.com/cards/{$identifier->scryfall_id}?format=image&image=small";
+                $identifier = $card['identifier'];
+                $count = $card['count'];
+                
+                $imageUrl = "https://api.scryfall.com/cards/{$identifier->scryfall_id}?format=image";
+                echo HTML::tag('img', null, [ 
+                    'src'       => "{$imageUrl}&version=small", 
+                    'alt-src'   => "{$imageUrl}&version=large",
+                    'class'     => 'card',
+                    'width'     => '100px',
+                ]);
+
                 //echo '<div class="tile">';
                 //echo '<div class="card">';
                 //echo '    <div class="card-image">';
                 //echo '        <figure class="image is-4by3">';
-                echo '        <img src="'.$img.'" alt="Placeholder image" width="100px">';
                 // echo '        </figure>';
                 // echo '    </div>';
                 // echo '</div>';
                 //echo '</div>';
             }
-            ?>
+            
+        }
+        ?>
     </div>
 </div>
