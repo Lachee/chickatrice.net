@@ -35,7 +35,8 @@ class User extends Identity {
     private $_discordUser;
     protected $snowflake;
     protected $last_seen;
-    
+    protected $last_sync;
+
     /** @var Account cockatrice account */
     private $_cockatriceAccount;
     protected $cockatrice_id;
@@ -48,7 +49,8 @@ class User extends Identity {
             'uuid'          => new StringProperty('ID of the user'),
             'email'          => new StringProperty('Email address of the user'),
             'snowflake'     => new IntegerProperty('Discord Snowflake id'),
-            'last_seen'     => new StringProperty('Last time this user was active')
+            'last_seen'     => new StringProperty('Last time this user was active'),
+            'last_sync'     => new StringProperty('Last time the avatar was synchronised')
         ];
     }
 
@@ -76,6 +78,12 @@ class User extends Identity {
         $storage = Chickatrice::$app->discord->getStorage($this->uuid);
         $this->_discordUser = Chickatrice::$app->discord->identify($storage);
         return $this->_discordUser;
+    }
+
+    /** Stores the internal discord user cache */
+    public function setDiscordUserCache(\app\components\discord\User $user) {
+        $this->_discordUser = $user;
+        return $this;
     }
 
     /** Gets the discord guilds */
@@ -114,6 +122,10 @@ class User extends Identity {
         // Save the account and flush it
         $account->save(false, ['avatar_bmp']);
         $this->_cockatriceAccount = Account::findByKey($this->cockatrice_id)->flush()->one();
+
+        $stm = Kiss::$app->db()->prepare('UPDATE $users SET `last_sync` = now() WHERE `id` = :id');
+        $stm->bindParam(':id', $this->id);
+        $stm->execute();
         return $this;
     }
 
