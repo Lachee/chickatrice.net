@@ -64,7 +64,7 @@ $maxDecksAvailable = 10;
 
                     <div class="list-item-controls is-hidden-mobile">
                         <div class="buttons">
-                            <button class="button" onclick="navigator.share({url: `<?= HTTP::url(['/profile/:profile/decks/:deck', 'profile' => $profile->uuid, 'deck' => $deck ], true) ?>`});">
+                            <button class="button" onclick="navigator.share({url: `<?= HTTP::url(['/profile/:profile/decks/:deck/', 'profile' => $profile->uuid, 'deck' => $deck ], true) ?>`});">
                                 <span class="icon">
                                     <i class="fal fa-share-alt"></i>
                                 </span>
@@ -78,7 +78,7 @@ $maxDecksAvailable = 10;
                             </a>
                             -->
 
-                            <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck', 'profile' => $profile->uuid, 'deck' => $deck]) ?>">
+                            <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/', 'profile' => $profile->uuid, 'deck' => $deck]) ?>">
                                 <span class="icon">
                                     <i class="fal fa-eye"></i>
                                 </span>
