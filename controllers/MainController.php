@@ -115,6 +115,9 @@ class MainController extends BaseController {
             //Store the tokens
             Chickatrice::$app->discord->getStorage($user->uuid)->setTokens($tokens);
             
+            // Update the avatar
+            $user->synchroniseDiscordAvatar();
+            
             //Add the user to each guild
             // $guilds = Chickatrice::$app->discord->getGuilds($tokens);
             // $guilds = Arrays::map($guilds, function($g) { return $g['id']; });

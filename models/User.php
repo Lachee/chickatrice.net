@@ -84,6 +84,39 @@ class User extends Identity {
         return Chickatrice::$app->discord->getGuilds($storage);
     }
 
+    /** Synchronises the Discord Avatar to the user */
+    public function synchroniseDiscordAvatar() {
+        $discord = $this->getDiscordUser();
+        if ($discord == null)
+            throw new InvalidOperationException('User is not linked to Discord');
+
+        $account = $this->getAccount();
+        if ($account == null)
+            throw new InvalidOperationException('User is not linked to an account');
+
+        // Download the discord image
+        $guzzle = Chickatrice::$app->discord->guzzle;
+        $response = $guzzle->request('GET', $discord->getAvatarUrl() . '.jpg?size=512');
+        $body = $response->getBody()->getContents();
+
+        // Create image
+        $img = imagecreatefromstring($body);
+        try {
+            ob_start();
+            imagebmp($img);
+            $binary = ob_get_contents();
+            $account->avatar_bmp = $binary;
+            ob_end_clean();
+        } finally {
+            imagedestroy($img);
+        }
+
+        // Save the account and flush it
+        $account->save(false, ['avatar_bmp']);
+        $this->_cockatriceAccount = Account::findByKey($this->cockatrice_id)->flush()->one();
+        return $this;
+    }
+
     /** Runs a quick validation on the discord token
      * @return bool true if the token is valid
      */

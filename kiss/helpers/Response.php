@@ -142,8 +142,10 @@ class Response {
 
     /** Creates a new redirect response to the current route
      * @return Response the response */
-    public static function refresh() {
-        return (new Response(HTTP::OK, [], "refreshing", HTTP::CONTENT_TEXT_PLAIN))->setLocation(HTTP::route());
+    public static function refresh($time = false) {
+        if ($time === false || $time <= 0)
+            return (new Response(HTTP::OK, [], "refreshing", HTTP::CONTENT_TEXT_PLAIN))->setLocation(HTTP::route());
+        return (new Response(HTTP::OK, [], "Redirecting in " . $time .'s...', HTTP::CONTENT_TEXT_PLAIN))->setRefresh(HTTP::route(), $time);
     }
 
     /** Sets a header and returns the response. */
@@ -161,6 +163,12 @@ class Response {
     /** Sets the location header and returns the response. */
     public function setLocation($location) {
         $this->headers['location'] = HTTP::url($location);
+        return $this;
+    }
+
+    /** Sets the refresh header and returns the response */
+    public function setRefresh($location, $time) {
+        $this->headers['refresh'] = "{$time}; URL=" . HTTP::url($location);
         return $this;
     }
 

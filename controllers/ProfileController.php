@@ -95,6 +95,16 @@ class ProfileController extends BaseController {
             return Response::refresh();
         }
     
+        if (HTTP::get('sync', false, FILTER_VALIDATE_BOOLEAN)) {
+            if ($this->profile->synchroniseDiscordAvatar()) {
+                Kiss::$app->session->addNotification('Avatar Synchronised', 'success');
+            } else {
+                Kiss::$app->session->addNotification('Failed to synchronise your avatar', 'danger');
+            }
+            sleep(1);
+            return Response::refresh();
+        }
+
         // Show the profile
         $form = new UserSettingForm([ 'user' => $this->profile ]);
         if (HTTP::hasPost()) {

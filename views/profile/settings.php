@@ -24,12 +24,16 @@ $form->fastForm($rules);
 
 ?>
 
+<style>
+    input[name="email"] { color: black; filter: blur(4px); transition: linear 0.25s filter; }
+    /* input[name="email"]:hover { filter: blur(0px); } */
+</style>
 
 <div class="columns">
     <!-- Settings -->
     <div class="column is-half">
         <form method='POST' class='m-0'>
-            <div class="card">                
+            <div class="card">
                 <header class="card-header">
                     <p class="card-header-title">
                         <span class="icon"><i class="fal fa-user-cog"></i></span> Account Settings
@@ -37,7 +41,14 @@ $form->fastForm($rules);
                 </header>
                 <div class="card-content">
                     <div class="content">
-                        <?= $model->render(); ?>
+                        <div class="columns">
+                            <div class="column is-one-third">
+                                <img src="<?= $profile->getAvatarUrl() ?>" alt="Ingame Avatar" width="1024" />
+                            </div>
+                            <div class="column">
+                                <?= $model->render(); ?>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <footer class="card-footer">
@@ -63,16 +74,19 @@ $form->fastForm($rules);
                     <div class="content">
                         <div class="columns">
                             <div class="column is-one-third">
-                                <img src="<?= $discord->getAvatarUrl() ?>.png?size=1024" alt="Discord Avatar" width="1024"/>
+                                <img src="<?= $discord->getAvatarUrl() ?>.png?size=1024" alt="Discord Avatar" width="1024" />
                             </div>
                             <div class="column">
                                 <p>
                                     <label class='label'>Username</label>
-                                    <?= HTML::input('text', [ 'value' => $discord->username . '#' . $discord->discriminator, 'disabled' => true, 'class' => 'input']); ?>
+                                    <?= HTML::input('text', ['value' => $discord->username . '#' . $discord->discriminator, 'disabled' => true, 'class' => 'input']); ?>
                                 </p>
                                 <p>
                                     <label class='label'>Email</label>
-                                    <?= HTML::input('text', [ 'value' => $discord->email, 'disabled' => true, 'class' => 'input' ]); ?>
+                                    <?= HTML::input('text', ['value' => $discord->email, 'disabled' => true, 'class' => 'input', 'name' => 'email']); ?>
+                                </p>
+                                <p>
+                                    <a href="<?= HTTP::url(['settings', 'sync' => true]) ?>" ><span class='icon'><i class='fal fa-sync'></i></span> Synchronise Avatar</a>
                                 </p>
                             </div>
                         </div>
