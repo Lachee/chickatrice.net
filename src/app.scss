@@ -24,12 +24,17 @@ body {
     }
 }
 .navbar-item {
+    color: white;
     form { 
         margin: auto;
         width: 100%;
     }
     #navbar-submit span { min-width: 45px; }
     #navbar-submit i { min-width: 16px; }
+
+    &.has-icon .icon {
+        margin-right: 0.25em;
+    }
 }
 
 .has-placeholder-transition {
