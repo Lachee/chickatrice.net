@@ -143,6 +143,7 @@ class HTTP {
     private static $SET_COOKIES = [];
     private static $_ROUTE = null;
     private static $_REFERAL;
+    private static $_CSRF = null;
 
     /** @return string the status message associated with the code */
     public static function status($code) {
@@ -332,16 +333,21 @@ class HTTP {
         return isset($_POST) && count($_POST) > 0; 
     }
 
+
     /** Sets the CSRF token and returns a HTML tag with it 
      * @return string HTML hidden input with CSRF */
     public static function CSRF() {
-        $data = [
-            'tok' => Strings::token(), // <- generates a cryptographically secure random string
-            'uid' => Kiss::$app->user != null ? Kiss::$app->user->id : '-1',
-        ];
+        $csrf = static::$_CSRF;
+        if ($csrf == null || empty($csrf)){
+            $data = [
+                'tok' => Strings::token(), // <- generates a cryptographically secure random string
+                'uid' => Kiss::$app->user != null ? Kiss::$app->user->id : '-1',
+            ];
 
-        Kiss::$app->session->set('_csrf', $data);
-        $csrf = Kiss::$app->jwtProvider->encode($data, 3600);
+            Kiss::$app->session->set('_csrf', $data);
+            static::$_CSRF = $csrf = Kiss::$app->jwtProvider->encode($data, 3600);
+        }
+
         return "<input name='_csrf' type='hidden' value='$csrf' />";
     }
 

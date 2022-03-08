@@ -106,7 +106,8 @@ class Provider extends BaseObject {
             'redirect_uri'      => $this->getRedirectUri(),
         ];
 
-        if ($noPrompt) $query['prompt'] = 'none';
+        if ($noPrompt == true) 
+            $query['prompt'] = 'none';
 
         $state = $this->getSessionState(true);
         if ($state !== false) $query['state'] = $state; 

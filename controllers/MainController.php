@@ -125,7 +125,6 @@ class MainController extends BaseController {
                 }
 
                 Chickatrice::$app->session->addNotification('Linked and Logged In with Discord', 'success');
-                Chickatrice::$app->user = User::findByKey($user->getKey())->flush()->one();
             } else {
                 
                 // Create a new user if it doesnt exist
@@ -163,6 +162,8 @@ class MainController extends BaseController {
                 if (!$user->login())
                     Kiss::$app->session->addNotification('Failed to login for some reason', 'danger');
                 
+                // Flush the user once we have logged in
+                Chickatrice::$app->user = User::findByKey($user->getKey())->flush()->one();
             }
         } 
         catch(\Exception $e) 

@@ -11,7 +11,7 @@ use kiss\schema\StringProperty;
 
 class RegisterForm extends Form {
 
-    public const ALLOW_REGISTRATION = false;
+    public const ALLOW_REGISTRATION = true;
 
     public $username;
     public $email;

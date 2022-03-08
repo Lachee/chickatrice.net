@@ -75,7 +75,7 @@ class Identity extends ActiveRecord {
         return self::find()->where([ ['uuid', $sub ], [ $var, $key ] ]);
     }
 
-    /** Logs the user in and generates a new JWT */
+    /** Logs the user in and generates a new JWT. */
     public function login() {
 
         //Create a new JWT for the user

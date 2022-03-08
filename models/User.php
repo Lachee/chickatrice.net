@@ -161,8 +161,13 @@ class User extends Identity {
      */
     public function getAvatarUrl($size = 64) {
         $bmp = $this->getAccount()->getAvatarDataUrl();
-        if ($bmp !== null) return $bmp;
-        return "https://d.lu.je/avatar/{$this->getSnowflake()}?size=$size";
+        if ($bmp !== null) 
+            return $bmp;
+
+        if ($this->getSnowflake() > 0)
+            return "https://d.lu.je/avatar/{$this->getSnowflake()}?size=$size";
+
+        return 'images/placeholder_profile.png';
     }
     
     /** @return string the username */

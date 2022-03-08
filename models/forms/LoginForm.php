@@ -2,6 +2,7 @@
 
 use app\models\cockatrice\Account;
 use app\models\User;
+use Chickatrice;
 use kiss\helpers\HTML;
 use kiss\models\forms\Form;
 use kiss\schema\BooleanProperty;
@@ -74,6 +75,9 @@ class LoginForm extends Form {
         if ($user == null) 
             $user = User::createUser($account->name, $account->email, 0, $account);
 
+        // Flush the user once we have logged in
+        Chickatrice::$app->user = User::findByKey($user->getKey())->flush()->one();
+        
         // Finally login
         return $user->login();
     }

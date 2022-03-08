@@ -19,8 +19,8 @@ class Account extends ActiveRecord {
     public $name;
     public $realname;
 
-    /** @deprecated Gender has been removed. */
-    public $gender;
+    // /** @deprecated Gender has been removed. */
+    // public $gender;
 
     public $password_sha512;
     public $email;
@@ -92,7 +92,7 @@ class Account extends ActiveRecord {
             'password_sha512'   => '',
             'email'             => Strings::toLowerCase($email),
             'active'            => 1,
-            'country'           => '',
+            'country'           => 'AQ',
             'registrationDate'  => date('Y-m-d H:i:s'),
             'clientid'          => '',
             'privlevel'         => 'NONE',
