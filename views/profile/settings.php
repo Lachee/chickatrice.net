@@ -28,17 +28,17 @@ if (KISS_DEBUG) {
 }
 ?>
 
-<?php if (!$profile->getAccount()->active): ?>
-<section class="notification hero has-gradient is-danger welcome is-small">
-    <div class="hero-body">
-        <div class="container">
-            <h1 class="title">Activation Required</h1>
-            <h2 class="subtitle">
-                Your account has not been activated. Please check your emails for a activation code before you start playing.
-            </h2>
+<?php if (!$profile->getAccount()->active) : ?>
+    <section class="notification hero has-gradient is-danger welcome is-small">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title">Activation Required</h1>
+                <h2 class="subtitle">
+                    Your account has not been activated. Please check your emails for a activation code before you start playing.
+                </h2>
+            </div>
         </div>
-    </div>
-</section>
+    </section>
 
 <?php endif; ?>
 
@@ -99,7 +99,7 @@ if (KISS_DEBUG) {
                                     <?= HTML::input('text', ['value' => $discord->email, 'disabled' => true, 'class' => 'input', 'name' => 'email']); ?>
                                 </p>
                                 <p>
-                                    <a href="<?= HTTP::url(['settings', 'sync' => true]) ?>" ><span class='icon'><i class='fal fa-sync'></i></span> Synchronise Avatar</a>
+                                    <a href="<?= HTTP::url(['settings', 'sync' => true]) ?>"><span class='icon'><i class='fal fa-sync'></i></span> Synchronise Avatar</a>
                                 </p>
                             </div>
                         </div>
@@ -107,24 +107,35 @@ if (KISS_DEBUG) {
                 </div>
             </div>
         <?php else : ?>
-            <div class='column'>
-                <div class="card">
-                    <div class="card-content">
-                        <p class="title">Third-Party</p>
-                        <p class="subtitle">Sign-in using your Discord Account</p>
-                        <p>Link a Discord Account to this profile. This won't change your name, but will allow you to sign in to edit and manage your account in the future via Discord</p>
-                        <br>
-                        <a class="button is-fullwidth has-text-left" id="login-button" href="<?= $discordUrl ?>" data-tooltip="Login">
-                            <span class="icon"><i class="fab fa-discord"></i></span>
-                            <span>Discord</span>
-                        </a>
-                    </div>
+            <div class="card">
+                <div class="card-content">
+                    <p class="title">Third-Party</p>
+                    <p class="subtitle">Sign-in using your Discord Account</p>
+                    <p>Link a Discord Account to this profile. This won't change your name, but will allow you to sign in to edit and manage your account in the future via Discord</p>
+                    <br>
+                    <a class="button is-fullwidth has-text-left" id="login-button" href="<?= $discordUrl ?>" data-tooltip="Login">
+                        <span class="icon"><i class="fab fa-discord"></i></span>
+                        <span>Discord</span>
+                    </a>
                 </div>
             </div>
         <?php endif; ?>
+        <hr>
+        <div class="card">
+            <div class="card-content">
+                <p class="title">Delete Account</p>
+                <p class="subtitle">Request Account Deletion</p>
+                <p>When requested, your Chickatrice data will be deleted immediately and the Cockatrice account will be marked for deletion within the week.</p>
+                <p><strong>This CANNOT be undone. Once deleted, data is scrubbed!</strong></p>
+                <br>
+                <a class="button is-fullwidth is-danger" href="<?= HTTP::url(['/profile/:profile/delete', 'profile' => $profile->uuid]) ?>" data-tooltip="Delete" onclick="return confirm('Are you sure? Deleted accounts cannot be recovered.')" onauxclick="if(event.button !== 0) event.preventDefault();">
+                    <span class="icon"><i class="fal fa-trash"></i></span>
+                    <span>Delete Account</span>
+                </a>
+            </div>
+        </div>
     </div>
 </div>
-
 
 <hr>
 <div class="field ">

@@ -52,7 +52,7 @@ class MainController extends BaseController {
         if (HTTP::hasPost()) {
             if ($loginForm->load(HTTP::post())) {
                 if ($loginForm->save()) {
-                    // Proceed with login logic
+                    return Response::redirect(['/profile/@me/settings']);
                 } else {
                     Kiss::$app->session->addNotification('Failed to login: ' . $loginForm->errorSummary(), 'danger');
                 }

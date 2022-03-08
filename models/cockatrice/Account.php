@@ -12,6 +12,10 @@ use kiss\helpers\Strings;
 
 class Account extends ActiveRecord {
  
+    const ADMIN_LEVEL_USER = 0;
+    const ADMIN_LEVEL_OWNER = 1;
+    const ADMIN_LEVEL_MODERATOR = 2;
+
     public static function tableName() { return "cockatrice_users"; }
 
     public $id;
@@ -48,6 +52,7 @@ class Account extends ActiveRecord {
      */
     public function setPassword($password) {
         $this->password_sha512 = static::hashPassword($password);
+        $this->markDirty('password_sha512');
         return $this;
     }
 
@@ -58,7 +63,20 @@ class Account extends ActiveRecord {
 		return static::hashPassword($password, $salt) === $hash;
     }
 
-    
+    /** @inheritdoc */
+    public function afterDelete() {
+        parent::afterDelete();
+
+        // Delete everything else.
+        // Many of these things have FK setup correctly, but just to be safe
+        $this->query()->delete('cockatrice_buddylist')->where(['id_user1', $this->id])->orWhere(['id_user2', $this->id])->execute();
+        $this->query()->delete('cockatrice_ignorelist')->where(['id_user1', $this->id])->orWhere(['id_user2', $this->id])->execute();
+        $this->query()->delete('cockatrice_decklist_files')->where(['id_user', $this->id])->execute();
+        $this->query()->delete('cockatrice_decklist_folders')->where(['id_user', $this->id])->execute();
+        $this->query()->delete('cockatrice_replays_access')->where(['id_player', $this->id])->execute();
+        $this->query()->delete('cockatrice_warnings')->where(['user_id', $this->id])->execute();        
+    }
+
     /** @return ActiveQuery|Account[] finds accounts with the given email */
     public static function findByEmail($email) {
         return self::find()->where([ 'email', Strings::toLowerCase(Strings::trim($email)) ]);
@@ -69,7 +87,6 @@ class Account extends ActiveRecord {
         return self::find()->where([ 'name',  $name ]);
     }
     
-
     /**
      * Creates a new account
      * @param string $username username of the account

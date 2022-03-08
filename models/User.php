@@ -27,7 +27,7 @@ use kiss\schema\StringProperty;
 use Ramsey\Uuid\Uuid;
 
 /**
- * @property int $sparkles the number of sparkles a user has
+ * @property Account $account
  * @package app\models
  */
 class User extends Identity {

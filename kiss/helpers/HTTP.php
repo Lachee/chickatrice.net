@@ -356,7 +356,9 @@ class HTTP {
      */
     public static function checkCSRF() {
         $csrf = self::post('_csrf', null);
-        if ($csrf == null) return false;
+        if ($csrf == null) 
+            return false;
+            
         try {
             $csrfData = Kiss::$app->jwtProvider->decode($csrf);
             $selfData = Kiss::$app->session->get('_csrf', null);

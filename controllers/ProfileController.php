@@ -2,6 +2,7 @@
 
 use app\components\mixer\Mixer;
 use app\helpers\Country;
+use app\models\cockatrice\Account;
 use app\models\cockatrice\Deck;
 use app\models\cockatrice\Game;
 use app\models\cockatrice\Replay;
@@ -20,6 +21,7 @@ use app\models\User;
 use app\widget\Notification;
 use Chickatrice;
 use kiss\helpers\HTML;
+use kiss\helpers\Strings;
 use kiss\Kiss;
 use Ramsey\Uuid\Uuid;
 
@@ -179,6 +181,32 @@ class ProfileController extends BaseController {
             'key'           => $this->api_key = $this->profile->apiToken([ 'scopes' => $scopes ]),
             'fullwidth'     => false,
         ]);
+    }
+
+    function actionDelete() {
+        //Verified they are logged in
+        if (!Chickatrice::$app->loggedIn())
+            throw new HttpException(HTTP::UNAUTHORIZED, 'Need to be logged in to edit your settings.');
+
+        //Verify its their own profile
+        /** @var User $profile */
+        if ($this->profile->id != Kiss::$app->user->id && $this->profile->account->admin != Account::ADMIN_LEVEL_OWNER) 
+            throw new HttpException(HTTP::FORBIDDEN, 'You cannot delete someone\'s else account! You cheeky bastard.');
+        
+        // Mark their account inactive and ready to delete in the next cron-job
+        $account = $this->profile->account;
+        $this->profile->account->active = false;
+        $this->profile->account->token = null;
+        $this->profile->account->setPassword(Strings::token(32));
+        if (!$this->profile->account->save()) 
+            throw new HttpException(HTTP::INTERNAL_SERVER_ERROR, 'Failed to mark account for deletion');
+
+        // Delete their user account and logout
+        $this->profile->logout();
+        $this->profile->delete();
+
+        // Return home
+        return Response::redirect(Kiss::$app->baseURL());
     }
 
     private $_profile;
