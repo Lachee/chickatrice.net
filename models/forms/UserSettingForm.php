@@ -50,7 +50,7 @@ class UserSettingForm extends Form {
         return [
             'name'              => new StringProperty('', '', [ 'title' => 'Username', 'readOnly' => true, 'required' => false ]),
             'email'             => new StringProperty('', 'test@example.com', [ 'title' => 'Email', 'readOnly' => true,  'required' => false ]),
-            'realname'          => new StringProperty('', '', [ 'title' => 'Real Name' ]),
+            'realname'          => new StringProperty('', '', [ 'title' => 'Real Name', 'required' => false ]),
             'country'           => new EnumProperty('', $countries, null, ['title' => 'Country']),
             'password'          => new StringProperty('', '', [ 'title' => 'Password', 'required' => false, 'options' => [ 'password' => true ]]),
             'passwordConfirm'   => new StringProperty('', '', [ 'title' => 'Password Confirm', 'required' => false,  'options' => [ 'password' => true ]]),

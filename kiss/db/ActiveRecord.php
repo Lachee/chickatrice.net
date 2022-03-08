@@ -196,7 +196,8 @@ class ActiveRecord extends BaseObject{
         //Prepare all the values
         $values = [];
         if ($fields == null) $fields = $this->getDirty();
-        if (count($fields) == null) return $ignoreEmpty && !$this->_newRecord;
+        if (count($fields) == null) 
+            return $ignoreEmpty && !$this->_newRecord;
 
         //Prepare the values
         foreach ($fields as $key) {
@@ -337,8 +338,7 @@ class ActiveRecord extends BaseObject{
      * @return ActiveQuery
      */
     public static function query() {
-        return BaseObject::new(ActiveQuery::class, [ 'conn' => Kiss::$app->db(), 'className' => get_called_class() ]);
-        //return new ActiveQuery(Kiss::$app->db(), get_called_class());
+        return BaseObject::new(ActiveQuery::class, [ 'conn' => Kiss::$app->db(), 'className' => get_called_class(), 'cacheDuration' => 0 ]);
     }
 
     /** Finds the query by keys.

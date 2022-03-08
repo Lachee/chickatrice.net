@@ -2,6 +2,8 @@
 
 use kiss\db\ActiveQuery;
 use kiss\db\ActiveRecord;
+use kiss\Kiss;
+use kiss\models\BaseObject;
 
 class Identifier extends ActiveRecord {
 
@@ -24,5 +26,14 @@ class Identifier extends ActiveRecord {
     /** @return ActiveQuery|Identifier[]  */
     public static function findByName($name) {
         return static::find()->where(['name', $name]);
+    }
+
+    /** Creates an active query
+     * @return ActiveQuery
+     */
+    public static function query() {
+        $query = parent::query();
+        $query->cacheDuration = 24 * 60 * 60;
+        return $query;
     }
 }

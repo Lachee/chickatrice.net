@@ -22,17 +22,17 @@ class Account extends ActiveRecord {
     // /** @deprecated Gender has been removed. */
     // public $gender;
 
-    public $password_sha512;
-    public $email;
-    public $country;
-    public $avatar_bmp;
-    public $registrationDate;
-    public $active;
-    public $token;
-    public $clientid;
-    public $privlevel;
-    public $privlevelStartDate;
-    public $privlevelEndDate;
+    protected $password_sha512;
+    protected $email;
+    protected $country;
+    protected $avatar_bmp;
+    protected $registrationDate;
+    protected $active;
+    protected $token;
+    protected $clientid;
+    protected $privlevel;
+    protected $privlevelStartDate;
+    protected $privlevelEndDate;
 
     public function getAvatarDataUrl() {
         if ($this->avatar_bmp == null) 
