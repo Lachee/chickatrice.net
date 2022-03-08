@@ -29,11 +29,11 @@ use kiss\helpers\Strings;
     </div>
 </section>
 
-<section  class="section">
+<section class="section">
     <div class="container">
         <div class="columns">
             <div class='column is-one-third'>
-                <?php if ($exception->getStatus() == 403 || $exception->getStatus() == 401): ?>
+                <?php if ($exception->getStatus() == 401) : ?>
                     <div class="card">
                         <div class="card-content">
                             <p class="title">Please Login</p>
@@ -45,11 +45,22 @@ use kiss\helpers\Strings;
                             <a href="<?= HTTP::url(['/login']); ?>" class="card-footer-item"><span><i class="fal fa-sign-in"></i> Login</span></a>
                         </footer>
                     </div>
-                <?php else: ?>
+                <?php elseif ($exception->getStatus() == 403) : ?>
+                    <div class="card">
+                        <div class="card-content">
+                            <p class="title">Forbidden</p>
+                            <p class="subtitle">Require additional permissions</p>
+                            <p> <?= $exception->getMessage() ?></p>
+                        </div>
+                        <footer class="card-footer">
+                            <a class="card-footer-item" onclick="window.history.back();"><span><i class="fal fa-arrow-left"></i> Back</span></a>
+                        </footer>
+                    </div>
+                <?php else : ?>
                     <div class="card">
                         <div class="card-content">
                             <p class="title">HTTP <?= $exception->getStatus() ?></p>
-                            <p class="subtitle"><?= HTTP::status($exception->getStatus()); ?> </p>                        
+                            <p class="subtitle"><?= HTTP::status($exception->getStatus()); ?> </p>
                             <?= $exception->getMessage() ?>
                         </div>
                         <footer class="card-footer">
@@ -61,50 +72,52 @@ use kiss\helpers\Strings;
             </div>
             <div class='column is-two-thirds'>
                 <?php
-                if((HTTP::get('_SHOWSTACK', false) !== false || KISS_DEBUG) && $exception->getStatus() == 500):
-                    $innerException = $exception->getInnerException();                    
-                    if ($innerException != null):
+                if ((HTTP::get('_SHOWSTACK', false) !== false || KISS_DEBUG) && $exception->getStatus() == 500) :
+                    $innerException = $exception->getInnerException();
+                    if ($innerException != null) :
                 ?>
 
-                                
-                    <div class="card">
-                        <header class="card-header">
-                            <p class="card-header-title">Dump</p>
-                            <a style="z-index: 1000;" href="#collapsible-vardump" data-action="collapse" class="card-header-icon is-hidden-fullscreen" aria-label="more options">
-                                <span class="icon">
-                                    <i class="fas fa-angle-down" aria-hidden="true"></i>
-                                </span>
-                            </a>
-                        </header>
-                        <div id="collapsible-vardump" class="is-collapsible is-active">
-                            <div class="card-content">
-                                <?= Dump::debug($innerException); ?>
+
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">Dump</p>
+                                <a style="z-index: 1000;" href="#collapsible-vardump" data-action="collapse" class="card-header-icon is-hidden-fullscreen" aria-label="more options">
+                                    <span class="icon">
+                                        <i class="fas fa-angle-down" aria-hidden="true"></i>
+                                    </span>
+                                </a>
+                            </header>
+                            <div id="collapsible-vardump" class="is-collapsible is-active">
+                                <div class="card-content">
+                                    <?= Dump::debug($innerException); ?>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="card">
-                        <header class="card-header">
-                            <p class="card-header-title">Stacktrace</p>                           
-                        </header>
-                        <div id="collapsible-stacktrace" class="">
-                            <div class="card-content stacktrace">
-                                <?php foreach($innerException->getTrace() as $i => $trace):
+                        <div class="card">
+                            <header class="card-header">
+                                <p class="card-header-title">Stacktrace</p>
+                            </header>
+                            <div id="collapsible-stacktrace" class="">
+                                <div class="card-content stacktrace">
+                                    <?php foreach ($innerException->getTrace() as $i => $trace) :
                                         $trace['class'] = empty($trace['class']) ? '(closure)' : $trace['class'];
                                         $trace['type'] = empty($trace['type']) ? '::' : $trace['type'];
                                     ?>
-                                    <div class='trace <?= Strings::startsWith($trace['class'], 'kiss') || Strings::startsWith($trace['class'], '(closure)') ? '' : 'is-important' ?>'>
-                                        <div class='target'><span class='class'><?= $trace['class'] ?></span><span class='type'><?= $trace['type'] ?></span><span class='func'><?= $trace['function'] ?>()</span></div>
-                                        <div class='file'><a href="<?= HTTP::url(['vscode://file/:file', 'file' => urlencode(($trace['file']?:'').':' . ($trace['line']?:''))]) ?>"><span class='path'><?= $trace['file'] ?: ''?></span><span class='line'><?= $trace['line'] ?: '' ?></span></a></div>
-                                        <a href="#collapsible-args-<?= $i ?>" data-action="collapse">Hide / Show Arguments</a>
-                                        <div id="collapsible-args-<?= $i ?>"  class='args is-collapsible'><pre><?= var_dump($trace['args']) ?></pre></div>
-                                    </div>
-                                <?php endforeach; ?>
+                                        <div class='trace <?= Strings::startsWith($trace['class'], 'kiss') || Strings::startsWith($trace['class'], '(closure)') ? '' : 'is-important' ?>'>
+                                            <div class='target'><span class='class'><?= $trace['class'] ?></span><span class='type'><?= $trace['type'] ?></span><span class='func'><?= $trace['function'] ?>()</span></div>
+                                            <div class='file'><a href="<?= HTTP::url(['vscode://file/:file', 'file' => urlencode(($trace['file'] ?: '') . ':' . ($trace['line'] ?: ''))]) ?>"><span class='path'><?= $trace['file'] ?: '' ?></span><span class='line'><?= $trace['line'] ?: '' ?></span></a></div>
+                                            <a href="#collapsible-args-<?= $i ?>" data-action="collapse">Hide / Show Arguments</a>
+                                            <div id="collapsible-args-<?= $i ?>" class='args is-collapsible'>
+                                                <pre><?= var_dump($trace['args']) ?></pre>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <?php
-                    else:
+                <?php
+                    else :
                         //Dont have an inner exception, so just log it out normally
                         var_dump($exception);
                     endif;
