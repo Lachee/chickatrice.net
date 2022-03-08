@@ -4,6 +4,7 @@ use app\components\mixer\Mixer;
 use app\helpers\Country;
 use app\models\cockatrice\Deck;
 use app\models\cockatrice\Game;
+use app\models\cockatrice\Replay;
 use app\models\cockatrice\ReplayAccess;
 use app\models\forms\ProfileSettingForm;
 use app\models\forms\UserSettingForm;
@@ -71,6 +72,41 @@ class ProfileController extends BaseController {
         //Verify its their own profile
         if ($this->profile->id != Kiss::$app->user->id) 
             throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own games.');
+
+        // Download the replay
+        if (HTTP::get('download', false) !== false) {
+            $download_id = HTTP::get('download');
+
+            /** @var ReplayAccess $access */
+            $access = ReplayAccess::findByAccount($this->profile->getAccount())
+                                        ->andWhere(['id_game', $download_id ])
+                                        ->one();
+
+            if ($access == null) 
+                throw new HttpException(HTTP::NOT_FOUND, 'Replay could not be found');
+//884493
+            $filename = preg_replace("[^\w\s\d\.\-_~,;:\[\]\(\]]", '', $access->game->descr);
+            $blob = $access->replay->replay;
+            return Response::file($filename . '.cor', $blob);
+        }
+
+        // Delete the replay access
+        if (HTTP::get('remove', false) !== false) {
+            $remove_id = HTTP::get('remove');
+
+            // Remove access for this game with this account
+            $count = ReplayAccess::findByAccount($this->profile->getAccount())
+                                        ->andWhere(['id_game', $remove_id ])
+                                        ->delete()
+                                        ->execute();
+            if ($count > 0) {
+                Chickatrice::$app->session->addNotification('Replay Removed', 'success');
+            } else {
+                Chickatrice::$app->session->addNotification('Failed to remove replay', 'danger');
+            }
+            
+            return Response::redirect(['games']);
+        }
 
         $replays = ReplayAccess::findByAccount($this->profile->getAccount())->all();
         return $this->render('replays', [

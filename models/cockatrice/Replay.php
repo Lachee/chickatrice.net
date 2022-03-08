@@ -6,7 +6,7 @@ use kiss\Kiss;
 
 /** @var string[] players */
 class Replay extends ActiveRecord {
-    public static function tableName() { return "cockatrice_games"; }
+    public static function tableName() { return "cockatrice_replays"; }
 
     public $id;
     public $id_game;
