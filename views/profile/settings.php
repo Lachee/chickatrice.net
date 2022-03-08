@@ -39,7 +39,6 @@ if (KISS_DEBUG) {
             </div>
         </div>
     </section>
-
 <?php endif; ?>
 
 <div class="columns">

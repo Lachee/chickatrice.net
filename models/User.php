@@ -227,6 +227,9 @@ class User extends Identity {
             'uuid'      => Uuid::uuid1(Chickatrice::$app->uuidNodeProvider->getNode()),
             'email'     => $email,
             'snowflake' => $snowflake,
+
+            'max_allowed_decks' => Chickatrice::$app->defaultAllowedDecks,
+            'max_allowed_replays' => Chickatrice::$app->defaultAllowedReplays
         ]);
         
         // Find cockatrice accounts associated with the email

@@ -17,6 +17,7 @@ use kiss\helpers\HTTP;
 
 $replaysAvailable = count($replays);
 $maxReplaysAvailable = $profile->max_allowed_replays;
+$precentage = $replaysAvailable / $maxReplaysAvailable;
 ?>
 
 <style>
@@ -37,8 +38,33 @@ $maxReplaysAvailable = $profile->max_allowed_replays;
     <p class="block">
         <p>Storing <strong><?= $replaysAvailable ?></strong> of <strong><?= $maxReplaysAvailable ?></strong> replays</p>
         <p><I>Exceeding the capacity will result in <strong>OLDER</strong> replays being deleted within a week.</I></p>
-        <progress class="progress is-primary" value="<?= $replaysAvailable ?>" max="<?= $maxReplaysAvailable ?>"><?= intval(($replaysAvailable / $maxReplaysAvailable) * 100) ?>%</progress>
+        <progress class="progress is-primary" value="<?= $replaysAvailable ?>" max="<?= $maxReplaysAvailable ?>"><?= intval($precentage * 100) ?>%</progress>
     </p>
+
+    <!-- Account Size Advert -->
+    <?php if ($precentage >= 1): ?>
+        <section class="notification hero has-gradient is-warning is-small">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title">No Space Left!</h1>
+                <p class="subtitle">It seems that you have run out of space! Old replays will be deleted within the week!</p>
+                <p>Lachee is not willing to upgrade replay storage space at this time. She has plans for off-site block storage however, so if you wish for more space contact her to express interest.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 
+    This feature is not implemented yet.
+    <section class="notification hero has-gradient is-info is-small">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title">Need Space?</h1>
+                <p class="subtitle">Contact Lachee about purchasing additional storage replay space.</p>
+            </div>
+        </div>
+    </section>
+    -->
+    <?php endif; ?>
 
     <div class="box">
         <h1 class="title is-4 mb-2">Replays</h1>

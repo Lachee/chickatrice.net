@@ -249,12 +249,12 @@ class Query extends BaseObject{
     }
 
     /** Where condition. 
-     * @param array[] $params parameters. eg: [ [ key, value ], [ key, op, value ] ], [ key, value ]
+     * @param array[] $params parameters. eg: [ [ key, value ], [ key, op, value ] ], [ key, value ], [ operation ]
      * @param string $method operator, ie and.
      * @return $this
     */
     public function where($params, $method = 'and') {
-        if (!is_array($params))
+        if (!is_array($params)) 
             throw new QueryException($this, "where parameter is not an array");
 
         if (count($params) == 0)

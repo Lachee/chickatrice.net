@@ -15,7 +15,7 @@ use kiss\helpers\HTTP;
 
 $decksAvailable = count($decks);
 $maxDecksAvailable = $profile->max_allowed_decks;
-
+$precentage = $decksAvailable / $maxDecksAvailable;
 ?>
 
 <style>
@@ -36,8 +36,21 @@ $maxDecksAvailable = $profile->max_allowed_decks;
     <p class="block">
         <p>Storing <strong><?= $decksAvailable ?></strong> of <strong><?= $maxDecksAvailable ?></strong> decks</p>
         <p><I>Exceeding the capacity will result in <strong>NEWER</strong> decks being deleted within a week of upload.</I></p>
-        <progress class="progress is-primary" value="<?= $decksAvailable ?>" max="<?= $maxDecksAvailable ?>"><?= intval(($decksAvailable / $maxDecksAvailable) * 100) ?>%</progress>
+        <progress class="progress is-primary" value="<?= $decksAvailable ?>" max="<?= $maxDecksAvailable ?>"><?= intval($precentage * 100) ?>%</progress>
     </p>
+
+    <!-- Account Size Advert -->
+    <?php if ($precentage >= 1): ?>
+    <section class="notification hero has-gradient is-info is-small">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title">Need Space?</h1>
+                <p class="subtitle">Contact Lachee on how you can get your account limits raised.</p>
+                <p>At the moment, all decks in red will be deleted within the week. Lachee will be increasing limits on extordanary cases, or with reimbursements via her Kofi.</p>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
 
     <div class="box">
         <h1 class="title is-4 mb-2">Decks</h1>

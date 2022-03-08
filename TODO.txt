@@ -1,10 +1,12 @@
 TODO:
-- Implement BAN header
+- Implement ban header
 - Add warning / ban table
 - Add email checks
 - Add buddy / ignore list
+- Add cron cli to synchronise discord avatars*  (requires game to work)
+
+Done:
 - Add cron cli to delete replay_access for those who exceed limit
 - Add cron cli to delete replay's who have no more replay_access
 - Add cron cli to delete decks for those who exceed limit
-- Add cron cli to synchronise discord avatars*  (requires game to work)
 - Add cron cli to delete inactive accounts within a week

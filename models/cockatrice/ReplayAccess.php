@@ -33,9 +33,14 @@ class ReplayAccess extends ActiveRecord {
         return $this->_game = Game::findByKey($this->id_game)->one();
     }
 
-    /** @return ActiveQuery|ReplayAccess[] finds all the games by the player */
-    public static function findByAccount(Account $account) {
-        return static::find()->where(['id_player', $account->id]);
+
+    /** Finds the replays for the user
+     * @param Account|int $account 
+     * @return ActiveQuery|ReplayAccess[]
+     */
+    public static function findByAccount($account) {
+        $accountId = $account instanceof Account ? $account->id : $account;
+        return static::find()->where(['id_player', $accountId]);
     }
 
     /** @return ActiveQuery|ReplayAccess[] finds all the games by the player */

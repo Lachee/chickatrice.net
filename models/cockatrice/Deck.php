@@ -89,10 +89,11 @@ class Deck extends ActiveRecord {
     }
 
     /** Finds the decks for the user
-     * @param Account $account 
+     * @param Account|int $account 
      * @return ActiveQuery|Deck[]
      */
-    public static function findByAccount(Account $account) {
-        return static::find()->where(['id_user', $account->id]);
+    public static function findByAccount($account) {
+        $accountId = $account instanceof Account ? $account->id : $account;
+        return static::find()->where(['id_user', $accountId]);
     }
 }

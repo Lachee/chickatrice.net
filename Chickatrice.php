@@ -15,6 +15,12 @@ class Chickatrice extends Kiss {
     /** @var bool allows logged out users */
     public $allowVisitors = true;
 
+    public $defaultAllowedDecks = 50;
+    public $defaultAllowedReplays = 10;
+
+    public $unlinkedAllowedDecks = 500;
+    public $unlinkedAllowedReplays = 10;
+
     protected function init() {
         parent::init();
 
