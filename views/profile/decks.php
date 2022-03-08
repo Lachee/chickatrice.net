@@ -14,7 +14,7 @@ use kiss\helpers\HTTP;
 /** @var Deck[] $decks */
 
 $decksAvailable = count($decks);
-$maxDecksAvailable = 5;
+$maxDecksAvailable = 100;
 
 ?>
 

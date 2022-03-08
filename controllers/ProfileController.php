@@ -3,6 +3,8 @@
 use app\components\mixer\Mixer;
 use app\helpers\Country;
 use app\models\cockatrice\Deck;
+use app\models\cockatrice\Game;
+use app\models\cockatrice\ReplayAccess;
 use app\models\forms\ProfileSettingForm;
 use app\models\forms\UserSettingForm;
 use app\models\Gallery;
@@ -26,21 +28,12 @@ class ProfileController extends BaseController {
 
     public const DBEUG_USERS = [
         '130973321683533824', // Lachee
-        '171764626755813376', // Swarely
     ];
 
-    /** SCopes while debugging */
-    public const DEBUG_SCOPES = [
-        'emote.update', 'emote.publish', 'emote.remove',
-        'guild', 'guild.publish', 'guild.remove', 'guild.update', 
-        'gallery', 'gallery.favourite', 'gallery.pin', 'gallery.publish', 'gallery.search', 'gallery.update', 'gallery.reaction',
-        'bot.impersonate'
-    ];
-
+    /** Scopes while debugging */
+    public const DEBUG_SCOPES = [ ];    
     /** Scopes to give to normal users */
-    public const SCOPES = [
-        'gallery', 'gallery.favourite', 'gallery.pin', 'gallery.publish', 'gallery.search', 'gallery.update', 'gallery.reaction',
-    ];
+    public const SCOPES = [ ];
 
     public $profile_name;
     public static function route() { return "/profile/:profile_name"; }
@@ -60,10 +53,29 @@ class ProfileController extends BaseController {
         /** @var User $profile */
         $profile = $this->profile;
 
+        //Verify its their own profile
+        // if ($this->profile->id != Kiss::$app->user->id) 
+        //     throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own decks.');
+
         $decks = Deck::findByAccount($profile->getAccount())->orderByAsc('id')->all();
         return $this->render('decks', [
             'profile'   => $profile,
             'decks'     => $decks,
+        ]);
+    }
+
+    function actionGames() {
+        /** @var User $profile */
+        $profile = $this->profile;
+
+        //Verify its their own profile
+        if ($this->profile->id != Kiss::$app->user->id) 
+            throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own games.');
+
+        $replays = ReplayAccess::findByAccount($this->profile->getAccount())->all();
+        return $this->render('replays', [
+            'profile'   => $profile,
+            'replays'   => $replays,
         ]);
     }
 
