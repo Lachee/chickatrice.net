@@ -1,8 +1,15 @@
 TODO:
+Must Do
+- Add email checks
+
+Should Do
+- Add buddy / ignore list
+
+Could Do
 - Implement ban header
 - Add warning / ban table
-- Add email checks
-- Add buddy / ignore list
+
+If Possible
 - Add cron cli to synchronise discord avatars*  (requires game to work)
 
 Done:
