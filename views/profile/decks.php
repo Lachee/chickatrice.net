@@ -28,7 +28,7 @@ $maxDecksAvailable = 5;
 <section class="section container is-max-desktop">
     <nav class="breadcrumb" aria-label="breadcrumbs">
     <ul>
-        <li><a href="<?= HTTP::url(['/profile/:profile/', 'profile' => $profile->uuid]) ?>"><span class="icon"><i class="fal fa-user"></i></span><?= HTML::encode($profile->getUsername()) ?></a></li>
+        <li><a href="<?= HTTP::url(['/profile/:profile/', 'profile' => $profile->getUsername()]) ?>"><span class="icon"><i class="fal fa-user"></i></span><?= HTML::encode($profile->getUsername()) ?></a></li>
         <li class="is-active"><a href="#" aria-current="page">Decks</a></li>
     </ul>
     </nav>
@@ -62,7 +62,7 @@ $maxDecksAvailable = 5;
 
                     <div class="list-item-controls is-hidden-mobile">
                         <div class="buttons">
-                            <button class="button" onclick="navigator.share({url: `<?= HTTP::url(['/profile/:profile/decks/:deck/', 'profile' => $profile->uuid, 'deck' => $deck ], true) ?>`});">
+                            <button class="button" onclick="navigator.share({url: `<?= HTTP::url(['/profile/:profile/decks/:deck/', 'profile' => $profile->getUsername(), 'deck' => $deck ], true) ?>`});">
                                 <span class="icon">
                                     <i class="fal fa-share-alt"></i>
                                 </span>
@@ -76,7 +76,7 @@ $maxDecksAvailable = 5;
                             </a>
                             -->
 
-                            <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/', 'profile' => $profile->uuid, 'deck' => $deck]) ?>">
+                            <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/', 'profile' => $profile->getUsername(), 'deck' => $deck]) ?>">
                                 <span class="icon">
                                     <i class="fal fa-eye"></i>
                                 </span>

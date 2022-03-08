@@ -154,6 +154,16 @@ class User extends Identity {
     public function getUsername() {
         return HTML::encode($this->getAccount()->name);
     }
+
+    
+
+    /** Finds a user from the username */
+    public static function findByUsername($name) {
+        return self::find()
+                        ->fields('`$users`.*')
+                        ->leftJoin('cockatrice_users', ['cockatrice_id' => 'id'])
+                        ->where(['name', $name]);
+    }
 #endregion
 
 

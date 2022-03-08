@@ -53,11 +53,7 @@ class ProfileController extends BaseController {
     }
 
     function actionIndex() {
-        /** @var User $profile */
-        $profile = $this->profile;
-        return $this->render('index', [
-            'profile'       => $profile,
-        ]);
+        return Response::redirect(['/profile/:profile/decks', 'profile' => $this->profile->getUsername()]);
     }    
     
     function actionDecks() {
@@ -139,9 +135,13 @@ class ProfileController extends BaseController {
         if ($this->profile_name == '@me')
             return $this->_profile = Chickatrice::$app->user;
 
-        $this->_profile = User::find()->where(['uuid', $this->profile_name])->ttl(false)->one();
-        if ($this->_profile != null) return $this->_profile;        
+        $this->_profile = User::findByUsername($this->profile_name)
+                                    ->orWhere(['uuid', $this->profile_name])
+                                    ->one();
+        if ($this->_profile != null)
+            return $this->_profile;        
      
+
 
         //This is bunk, we found nudda
         throw new HttpException(HTTP::NOT_FOUND, 'Profile doesn\'t exist');
