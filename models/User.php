@@ -123,22 +123,24 @@ class User extends Identity {
 
         // Download the discord image
         $guzzle = Chickatrice::$app->discord->guzzle;
-        $response = $guzzle->request('GET', $discord->getAvatarUrl() . '.jpg?size=512');
-        $body = $response->getBody()->getContents();
+        $response = $guzzle->request('GET', $discord->getAvatarUrl() . '.png?size=512');
+        $binary = $response->getBody()->getContents();
 
+        /*
         // Create image
         $img = imagecreatefromstring($body);
         try {
             ob_start();
             imagebmp($img);
             $binary = ob_get_contents();
-            $account->avatar_bmp = $binary;
             ob_end_clean();
         } finally {
             imagedestroy($img);
         }
+        */
 
         // Save the account and flush it
+        $account->avatar_bmp = $binary;
         $account->save(false, ['avatar_bmp']);
         $this->_cockatriceAccount = Account::findByKey($this->cockatrice_id)->flush()->one();
 
