@@ -156,8 +156,9 @@ class Kiss extends BaseObject {
         }
 
         //MAke sure the JWT isnt null
-        if ($jwt == null || !isset($jwt->sub)) 
+        if ($jwt == null || !isset($jwt->sub)) {
             return $this->user = null;
+        }
 
         //Get the user and authorize the JWT
         $this->user = $identityClass::findByJWT($jwt)->one();

@@ -196,6 +196,7 @@ class ActiveRecord extends BaseObject{
         //Prepare all the values
         $values = [];
         if ($fields == null) $fields = $this->getDirty();
+        if ($fields === true) $fields = array_keys($this->getProperties());
         if (count($fields) == null) 
             return $ignoreEmpty && !$this->_newRecord;
 

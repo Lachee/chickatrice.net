@@ -48,14 +48,36 @@ use kiss\helpers\HTTP;
 </style>
 
 <section class="section container is-max-desktop">
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-    <ul>
-        <li><a href="<?= HTTP::url(['/profile/:profile/', 'profile' => $profile->getUsername()]) ?>"><span class="icon"><i class="fal fa-user"></i></span><?= HTML::encode($profile->getUsername()) ?></a></li>
-        <li><a href="<?= HTTP::url(['/profile/:profile/decks', 'profile' => $profile->getUsername()]) ?>">Decks</a></li>
-        <li class="is-active"><a href="#" aria-current="page"><?= HTML::encode($deck->name) ?></a></li>
-    </ul>
-    </nav>
+    <nav class="level">
+        <div class="level-left">
+            <nav class="level-item breadcrumb" aria-label="breadcrumbs">
+                <ul>
+                    <li><a href="<?= HTTP::url(['/profile/:profile/', 'profile' => $profile->getUsername()]) ?>"><span class="icon"><i class="fal fa-user"></i></span><?= HTML::encode($profile->getUsername()) ?></a></li>
+                    <li><a href="<?= HTTP::url(['/profile/:profile/decks', 'profile' => $profile->getUsername()]) ?>">Decks</a></li>
+                    <li class="is-active"><a href="#" aria-current="page"><?= HTML::encode($deck->name) ?></a></li>
+                </ul>
+            </nav>
+        </div>
+        <div class="level-right">
 
+            <button class="button level-item has-icon" onclick="navigator.share({url: `<?= HTTP::url(['#'], true) ?>`});">
+                <span class="icon"><i class="fal fa-share-alt"></i></span>
+                <span>Share</span>
+            </button>
+
+            <?php if ($profile->id === Chickatrice::$app->user->id): ?>
+                <a class="button level-item has-icon" href="<?= HTTP::url(['/profile/:profile/decks/:deck/remove', 'profile' => $profile->getUsername(), 'deck' => $deck->id]) ?>" onclick="return confirm('Are you sure? This cannot be undone!')">
+                    <span class="icon"><i class="fal fa-trash"></i></span>
+                    <span>Delete</span>
+                </a>
+            <?php elseif (Chickatrice::$app->loggedIn() && $profile->deck_privacy == 0): ?>
+                <a class="button level-item has-icon" href="<?= HTTP::url(['/profile/:profile/decks/:deck/copy', 'profile' => $profile->getUsername(), 'deck' => $deck->id]) ?>">
+                    <span class="icon"><i class="fal fa-copy"></i></span>
+                    <span>copy</span>
+                </a>
+            <?php endif; ?>
+        </div>
+    </nav>
     <p class="block"><?= HTML::encode($deck->comment) ?></p>
 </section>
 

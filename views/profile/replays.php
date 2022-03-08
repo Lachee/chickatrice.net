@@ -83,7 +83,7 @@ $precentage = $replaysAvailable / $maxReplaysAvailable;
                         <div class="list-item-description"><?= HTML::encode(join(', ', $replay->players)) ?></div>
                     </div>
 
-                    <div class="list-item-controls is-hidden-mobile">
+                    <div class="list-item-controls">
                         <div class="buttons">
                             <a class="button" href="<?= HTTP::url(['games', 'remove' => $replay->id]) ?>" onclick="return confirm('Are you sure?')">
                                 <span class="icon">
@@ -91,7 +91,7 @@ $precentage = $replaysAvailable / $maxReplaysAvailable;
                                 </span>
                             </a>
 
-                            <a class="button" href="<?= HTTP::url(['games', 'download' => $replay->id]) ?>">
+                            <a class="button is-hidden-touch" href="<?= HTTP::url(['games', 'download' => $replay->id]) ?>">
                                 <span class="icon">
                                     <i class="fal fa-download"></i>
                                 </span>

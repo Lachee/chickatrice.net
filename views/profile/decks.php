@@ -26,6 +26,7 @@ $precentage = $decksAvailable / $maxDecksAvailable;
 </style>
 
 <section class="section container is-max-desktop">
+
     <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
             <li><a href="<?= HTTP::url(['/profile/:profile/', 'profile' => $profile->getUsername()]) ?>"><span class="icon"><i class="fal fa-user"></i></span><?= HTML::encode($profile->getUsername()) ?></a></li>
@@ -33,13 +34,16 @@ $precentage = $decksAvailable / $maxDecksAvailable;
         </ul>
     </nav>
 
+    <?php if ($profile->id === Chickatrice::$app->user->id): ?>
     <p class="block">
         <p>Storing <strong><?= $decksAvailable ?></strong> of <strong><?= $maxDecksAvailable ?></strong> decks</p>
         <p><I>Exceeding the capacity will result in <strong>NEWER</strong> decks being deleted within a week of upload.</I></p>
         <progress class="progress is-primary" value="<?= $decksAvailable ?>" max="<?= $maxDecksAvailable ?>"><?= intval($precentage * 100) ?>%</progress>
     </p>
+    <?php endif; ?>
 
     <!-- Account Size Advert -->
+    <?php if ($profile->id === Chickatrice::$app->user->id): ?>
     <?php if ($precentage >= 1): ?>
     <section class="notification hero has-gradient is-info is-small">
         <div class="hero-body">
@@ -51,11 +55,21 @@ $precentage = $decksAvailable / $maxDecksAvailable;
         </div>
     </section>
     <?php endif; ?>
+    <?php else: ?>
+    <section class="notification is-info is-small">
+        <div class="body">
+            <div class="container">
+                <p>Currently browsing another user's deck list. </p>
+                <p><a href="/profile/@me/decks">Click Here</a> to go to your own decks.</p>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
 
     <div class="box">
         <h1 class="title is-4 mb-2">Decks</h1>
 
-        <div class="list has-hoverable-list-items has-overflow-ellipsis">
+        <div class="list has-hoverable-list-items  has-visible-pointer-controls has-overflow-ellipsis">
             <?php foreach ($decks as $index => $deck) : ?>
                 <div class="list-item <?= $index >= $maxDecksAvailable ? 'has-background-danger-light' : '' ?>">
                     <div class="list-item-image">
@@ -64,7 +78,7 @@ $precentage = $decksAvailable / $maxDecksAvailable;
                         </figure>
                     </div>
 
-                    <div class="list-item-content ">
+                    <div class="list-item-content is-hidden-mobile">
                         <div class="list-item-title is-flex is-justify-content-space-between">
                             <span><?= HTML::encode($deck->name) ?></span>
                             <span class="has-text-weight-normal has-text-grey "><?= $deck->getCardCount() ?> Cards</span>
@@ -72,21 +86,19 @@ $precentage = $decksAvailable / $maxDecksAvailable;
                         <div class="list-item-description"><?= HTML::encode($deck->comment ?: 'No Comment') ?></div>
                     </div>
 
-                    <div class="list-item-controls is-hidden-mobile">
+                    <div class="list-item-controls">
                         <div class="buttons">
                             <button class="button" onclick="navigator.share({url: `<?= HTTP::url(['/profile/:profile/decks/:deck/', 'profile' => $profile->getUsername(), 'deck' => $deck ], true) ?>`});">
                                 <span class="icon">
                                     <i class="fal fa-share-alt"></i>
                                 </span>
                             </button>
-
-                            <!--
-                            <a class="button" href="">
+                            
+                            <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/remove', 'profile' => $profile->getUsername(), 'deck' => $deck->id]) ?>" onclick="return confirm('Are you sure? This cannot be undone!')">
                                 <span class="icon">
                                     <i class="fal fa-trash"></i>
                                 </span>
                             </a>
-                            -->
 
                             <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/', 'profile' => $profile->getUsername(), 'deck' => $deck]) ?>">
                                 <span class="icon">

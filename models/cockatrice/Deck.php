@@ -9,8 +9,8 @@ class Deck extends ActiveRecord {
     public static function tableName() { return "cockatrice_decklist_files"; }
     
     public $id;
-    public $folder_id;
     public $id_user;
+    public $id_folder;
     public $name;
     public $upload_time;
     public $content;

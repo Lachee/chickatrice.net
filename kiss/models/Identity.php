@@ -122,7 +122,7 @@ class Identity extends ActiveRecord {
     */
     public function jwt($payload = [], $expiry = null) {
         if (!is_array($payload)) $payload = json_encode($payload);
-        $payload['sub'] = $this->uuid;
+        $payload['sub'] = $this->uuid->toString();
         $payload['key'] = $this->accessKey;
         $payload['src'] = 'user';
         return Kiss::$app->jwtProvider->encode($payload, $expiry);

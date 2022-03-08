@@ -39,9 +39,12 @@ class User extends Identity {
     protected $last_sync;
 
     /** @var int $max_allowed_decks */ 
-    public $max_allowed_decks;
+    protected $max_allowed_decks;
     /** @var int $max_allowed_replays */ 
-    public $max_allowed_replays;
+    protected $max_allowed_replays;
+
+    /** @var int $deck_privacy */
+    protected $deck_privacy = 0;
 
     /** @var Account cockatrice account */
     private $_cockatriceAccount;
@@ -228,8 +231,9 @@ class User extends Identity {
             'email'     => $email,
             'snowflake' => $snowflake,
 
-            'max_allowed_decks' => Chickatrice::$app->defaultAllowedDecks,
-            'max_allowed_replays' => Chickatrice::$app->defaultAllowedReplays
+            'max_allowed_decks'     => Chickatrice::$app->defaultAllowedDecks,
+            'max_allowed_replays'   => Chickatrice::$app->defaultAllowedReplays,
+            'deck_privacy'          => 1
         ]);
         
         // Find cockatrice accounts associated with the email

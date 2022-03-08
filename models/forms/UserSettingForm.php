@@ -12,6 +12,12 @@ use kiss\schema\StringProperty;
 
 class UserSettingForm extends Form {
 
+    const DECK_PRIVACY = [
+        0 => 'Public',
+        1 => 'Public Copy-Protected',
+        2 => 'Private'
+    ];
+
     /** @var User $user */
     protected $user;
     /** @var Account $account */
@@ -23,6 +29,8 @@ class UserSettingForm extends Form {
     public $country;
     public $avatar;
 
+    public $privacy;
+    
     public $password;
     public $passwordConfirm;
 
@@ -42,6 +50,8 @@ class UserSettingForm extends Form {
         $this->realname   = $this->account->realname;
         $this->country    = Strings::toUpperCase($this->account->country);
         $this->avatar     = $this->account->avatar_bmp;
+        
+        $this->privacy    = $this->user->deck_privacy;
     }
 
     public static function getSchemaProperties($options = [])
@@ -52,6 +62,7 @@ class UserSettingForm extends Form {
             'email'             => new StringProperty('', 'test@example.com', [ 'title' => 'Email', 'readOnly' => true,  'required' => false ]),
             'realname'          => new StringProperty('', '', [ 'title' => 'Real Name', 'required' => false ]),
             'country'           => new EnumProperty('', $countries, null, ['title' => 'Country']),
+            'privacy'           => new EnumProperty('', array_keys(static::DECK_PRIVACY), null, [ 'title' => 'Deck Privacy', 'required' => false, 'options' => ['enum_titles' =>  array_values(static::DECK_PRIVACY) ]]),
             'password'          => new StringProperty('', '', [ 'title' => 'Password', 'required' => false, 'options' => [ 'password' => true ]]),
             'passwordConfirm'   => new StringProperty('', '', [ 'title' => 'Password Confirm', 'required' => false,  'options' => [ 'password' => true ]]),
 
@@ -76,14 +87,16 @@ class UserSettingForm extends Form {
         if ($validate && !$this->validate())
             return false;
 
+        // Account options
         $this->account->realname = $this->realname;
-        $this->account->country = $this->country;
-        
+        $this->account->country = $this->country;        
         if (!empty($this->password)) {
             $this->account->setPassword($this->password);
             Chickatrice::$app->session->addNotification('Your password has been changed.');
         }
 
-        return $this->account->save();
+        // User options
+        $this->user->deck_privacy = intval($this->privacy);
+        return $this->user->save() && $this->account->save();
     }
 }

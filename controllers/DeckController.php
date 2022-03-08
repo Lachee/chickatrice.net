@@ -31,13 +31,38 @@ class DeckController extends BaseController {
     public static function route() { return "/profile/:profile_name/decks/:deck_id"; }
 
     function actionIndex() {
+        if ($this->profile->deck_privacy >= 2 && $this->profile->id != Chickatrice::$app->user->id)
+            throw new HttpException(HTTP::FORBIDDEN, 'User has hidden their decks');
+
         $this->deck->loadIdentifiers();
         return $this->render('index', [
             'profile'       => $this->profile,
             'deck'          => $this->deck,
         ]);
     }    
+
+    function actionRemove() {
+        if ($this->profile->id != Chickatrice::$app->user->id)
+            throw new HttpException(HTTP::FORBIDDEN, 'Cannot delete other people\'s decks! Cheeky!');
+        
+        $this->deck->delete();
+        return Response::redirect(['/profile/:profile/decks', 'profile' => $this->profile_name ]);
+    }
    
+    function actionCopy() {
+        if ($this->profile->deck_privacy >= 1 && $this->profile->id != Chickatrice::$app->user->id)
+            throw new HttpException(HTTP::FORBIDDEN, 'User has copy-protected their decks');
+
+        $deck = $this->deck;
+        $deck->id = null;
+        $deck->id_user = Chickatrice::$app->user->account->id;
+        $deck->id_folder = 0;
+        $deck->upload_time = date("Y-m-d H:i:s");
+        $deck->markNewRecord();
+        $deck->save();
+        return Response::redirect(['/profile/@me/decks/:deck/', 'deck' => $deck->id ]);
+    }
+
     private $_profile;
     public function getProfile() {
 
@@ -53,10 +78,9 @@ class DeckController extends BaseController {
         $this->_profile = User::findByUsername($this->profile_name)
                                     ->orWhere(['uuid', $this->profile_name])
                                     ->one();
+
         if ($this->_profile != null)
             return $this->_profile;        
-     
-
 
         //This is bunk, we found nudda
         throw new HttpException(HTTP::NOT_FOUND, 'Profile doesn\'t exist');
