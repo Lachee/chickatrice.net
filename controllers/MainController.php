@@ -158,6 +158,10 @@ class MainController extends BaseController {
                 $user->setDiscordUserCache($duser);
                 $user->synchroniseDiscordAvatar();
 
+                // Update their account to be active
+                $user->account->active = true;
+                $user->account->save(false, ['active']);
+
                 //Actually login. We do this either way because we want to upgrade login to discord account
                 if (!$user->login())
                     Kiss::$app->session->addNotification('Failed to login for some reason', 'danger');
