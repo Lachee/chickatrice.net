@@ -216,11 +216,7 @@ class Form extends BaseObject {
     /** @inheritdoc */
     public function load($data = null)
     {
-        // Validate the CSFR
-        if (!HTTP::checkCSRF()) {
-            $this->addError('Invalid CSFR. Your request may have been forged.');
-            return false;
-        }
+     
 
         $subdata = $data;
         if (!empty($this->formName))
@@ -228,6 +224,12 @@ class Form extends BaseObject {
 
         if ($subdata == null)
             return false;
+            
+        // Validate the CSFR
+        if (!HTTP::checkCSRF()) {
+            $this->addError('Invalid CSFR. Your request may have been forged.');
+            return false;
+        }
 
         //send it
         if (!parent::load($subdata))
