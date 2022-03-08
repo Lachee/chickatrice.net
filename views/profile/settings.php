@@ -3,6 +3,7 @@
 use app\models\Gallery;
 use app\models\Image;
 use app\models\Tag;
+use app\models\User;
 use app\widget\GalleryList;
 use app\widget\ProfileCard;
 use Formr\Formr;
@@ -26,6 +27,20 @@ if (KISS_DEBUG) {
     echo HTML::tag('style', 'input[name="email"] { color: black; filter: blur(4px); transition: linear 0.25s filter; }');
 }
 ?>
+
+<?php if (!$profile->getAccount()->active): ?>
+<section class="notification hero has-gradient is-danger welcome is-small">
+    <div class="hero-body">
+        <div class="container">
+            <h1 class="title">Activation Required</h1>
+            <h2 class="subtitle">
+                Your account has not been activated. Please check your emails for a activation code before you start playing.
+            </h2>
+        </div>
+    </div>
+</section>
+
+<?php endif; ?>
 
 <div class="columns">
     <!-- Settings -->
