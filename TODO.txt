@@ -1,6 +1,6 @@
 TODO:
 Must Do
-- Add email checks
+- Stat Graph
 
 Should Do
 - Add buddy / ignore list
@@ -8,11 +8,13 @@ Should Do
 Could Do
 - Implement ban header
 - Add warning / ban table
+- Better readme
 
 If Possible
 - Add cron cli to synchronise discord avatars*  (requires game to work)
 
 Done:
+- Add email checks
 - Add cron cli to delete replay_access for those who exceed limit
 - Add cron cli to delete replay's who have no more replay_access
 - Add cron cli to delete decks for those who exceed limit
