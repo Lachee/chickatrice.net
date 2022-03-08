@@ -12,6 +12,9 @@ use kiss\Kiss;
  */
 class Chickatrice extends Kiss {
 
+    /** @var \Mailgun\Mailgun $mail Mailgun client */
+    public $mail = null;
+
     /** @var bool allows logged out users */
     public $allowVisitors = true;
 

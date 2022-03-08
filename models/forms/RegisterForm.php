@@ -4,6 +4,7 @@ use app\models\cockatrice\Account;
 use app\models\User;
 use Chickatrice;
 use kiss\helpers\HTML;
+use kiss\helpers\HTTP;
 use kiss\helpers\Strings;
 use kiss\models\forms\Form;
 use kiss\schema\BooleanProperty;
@@ -98,8 +99,35 @@ class RegisterForm extends Form {
         $account->active = 0;
         $account->token = Strings::token();
         $account->save();       
-        
 
+        $name = $this->username;
+        $token = HTTP::url(['/activate', 'token' => $account->token], true);
+
+$message = <<<TXT
+
+Welcome $name,
+
+    Thank you for registering your account on Chickatrice.net. 
+    
+    Before you can play, you need to activate your account. This can be done by following the
+    link in this email or signing in with Discord.    
+    I was too lazy to make a fancy email, so have this plain text one instead! Its very
+    doubtful that anyone reads these anyways. 
+    
+
+    Please activate your account by going to the following link:
+    $token
+
+Cheers,
+    Lachee
+TXT;
+
+        Chickatrice::$app->mail->messages()->send('mg.chickatrice.net', [
+            'from'      => 'no-reply@chickatrice.net',
+            'to'        => $this->email,
+            'subject'   => 'Chickatrice Activation',
+            'text'      => $message
+        ]);
 
         Chickatrice::$app->session->addNotification('Your account has been created. Please check your emails before you can use it.');
         return true;

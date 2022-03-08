@@ -87,6 +87,11 @@ class Account extends ActiveRecord {
         return self::find()->where([ 'name',  $name ]);
     }
     
+    /** @return ActiveQuery|Account[] finds accounts with the given email */
+    public static function findByToken($token) {
+        return self::find()->where([ 'token',  $token ]);
+    }
+    
     /**
      * Creates a new account
      * @param string $username username of the account

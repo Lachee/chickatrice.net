@@ -2,6 +2,7 @@
 
 use app\components\mixer\Mixer;
 use app\models\Ban;
+use app\models\cockatrice\Account;
 use app\models\forms\LoginForm;
 use app\models\forms\RegisterForm;
 use app\models\Guild;
@@ -15,6 +16,7 @@ use Chickatrice;
 use kiss\exception\ArgumentException;
 use kiss\helpers\Arrays;
 use kiss\Kiss;
+use Mailgun\Mailgun;
 use Ramsey\Uuid\Uuid;
 
 class MainController extends BaseController {
@@ -40,6 +42,30 @@ class MainController extends BaseController {
             'fullWidth' => true,
             'wrapContents' => false,
         ]);
+    }
+
+    /** Activates */
+    function actionActivate() {
+
+        $token = HTTP::get('token', '');
+        if (empty($token)) 
+            throw new HttpException(HTTP::BAD_REQUEST, 'Invalid token provided');
+
+        $account = Account::findByToken($token)->one();
+        if ($account == null)
+            throw new HttpException(HTTP::BAD_REQUEST, 'Invalid token provided');
+
+        if (Chickatrice::$app->loggedIn() && Chickatrice::$app->user->account->id != $account->id)
+            throw new HttpException(HTTP::BAD_REQUEST, 'Invalid token provided');
+
+        $account->active = true;
+        $account->token = '';
+        if ($account->save(false, ['active', 'token'])) {
+            Chickatrice::$app->session->addNotification('Account activated succesfully', 'success');
+        } else {
+            Chickatrice::$app->session->addNotification('Failed to activate account. Please contact Lachee.', 'danger');
+        }
+        return Response::redirect(['/login']);
     }
 
     /** Logs In */
