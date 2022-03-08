@@ -51,15 +51,15 @@ class Deck extends ActiveRecord {
 
     /** @return mixed Loads the identifiers for the deck */
     public function loadIdentifiers() {        
-        foreach($this->zone as $name => $cards) {
+        foreach($this->zones as $name => $cards) {
             foreach($cards as $index => $card) {
                 $identifier = Identifier::findByName($card['name'])->one();
                 if ($identifier != null) {
-                    $this->zone[$name][$index]['identifier'] = $identifier;
+                    $this->zones[$name][$index]['identifier'] = $identifier;
                 }
             }
         }
-        return $this->zone;
+        return $this->zones;
     }
 
     /** @return string Gets the deck preview image */
@@ -81,7 +81,9 @@ class Deck extends ActiveRecord {
     public function getCardCount() {
         $count = 0;
         foreach($this->zones as $cards) {
-            $count += count($cards);
+            foreach($cards as $card) {
+                $count += $card['count'];
+            }
         }
         return $count;
     }

@@ -31,10 +31,10 @@ class DeckController extends BaseController {
     public static function route() { return "/profile/:profile_name/decks/:deck_id"; }
 
     function actionIndex() {
-        /** @var User $profile */
-        $profile = $this->profile;
-        return $this->render('deck', [
-            'profile'       => $profile,
+        $this->deck->loadIdentifiers();
+        return $this->render('index', [
+            'profile'       => $this->profile,
+            'deck'          => $this->deck,
         ]);
     }    
    

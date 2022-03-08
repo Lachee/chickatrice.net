@@ -64,20 +64,10 @@ class ProfileController extends BaseController {
         /** @var User $profile */
         $profile = $this->profile;
 
-        $decks = Deck::findByAccount($profile->getAccount())->all();
+        $decks = Deck::findByAccount($profile->getAccount())->orderByAsc('id')->all();
         return $this->render('decks', [
             'profile'   => $profile,
             'decks'     => $decks,
-        ]);
-
-        /** @var Deck $deck */
-        //$deck = Deck::findByKey(10312)->one();
-        $deck = Deck::findByKey(1)->one();
-        $zones = $deck->loadIdentifiers();
-
-        return $this->render('deck', [
-            'profile'       => $profile,
-            'zones'         => $zones
         ]);
     }
 
