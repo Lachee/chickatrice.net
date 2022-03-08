@@ -38,6 +38,11 @@ class User extends Identity {
     protected $last_seen;
     protected $last_sync;
 
+    /** @var int $max_allowed_decks */ 
+    public $max_allowed_decks;
+    /** @var int $max_allowed_replays */ 
+    public $max_allowed_replays;
+
     /** @var Account cockatrice account */
     private $_cockatriceAccount;
     protected $cockatrice_id;

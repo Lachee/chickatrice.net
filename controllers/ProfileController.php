@@ -6,6 +6,7 @@ use app\models\cockatrice\Deck;
 use app\models\cockatrice\Game;
 use app\models\cockatrice\Replay;
 use app\models\cockatrice\ReplayAccess;
+use app\models\cockatrice\ReplayGame;
 use app\models\forms\ProfileSettingForm;
 use app\models\forms\UserSettingForm;
 use app\models\Gallery;
@@ -46,10 +47,12 @@ class ProfileController extends BaseController {
         parent::action($endpoint, ...$args);
     }
 
+    /** Displays the users profile */
     function actionIndex() {
         return Response::redirect(['/profile/:profile/decks', 'profile' => $this->profile->getUsername()]);
     }    
     
+    /** Manages the users Decks */
     function actionDecks() {
         /** @var User $profile */
         $profile = $this->profile;
@@ -65,6 +68,7 @@ class ProfileController extends BaseController {
         ]);
     }
 
+    /** Manages the user Games */
     function actionGames() {
         /** @var User $profile */
         $profile = $this->profile;
@@ -84,7 +88,7 @@ class ProfileController extends BaseController {
 
             if ($access == null) 
                 throw new HttpException(HTTP::NOT_FOUND, 'Replay could not be found');
-//884493
+                
             $filename = preg_replace("[^\w\s\d\.\-_~,;:\[\]\(\]]", '', $access->game->descr);
             $blob = $access->replay->replay;
             return Response::file($filename . '.cor', $blob);
@@ -108,13 +112,18 @@ class ProfileController extends BaseController {
             return Response::redirect(['games']);
         }
 
-        $replays = ReplayAccess::findByAccount($this->profile->getAccount())->all();
+        // Find replays
+        $replays = ReplayGame::findByAccount($this->profile->getAccount())
+                                    ->orderByDesc('time_started')
+                                    ->all();
+
         return $this->render('replays', [
             'profile'   => $profile,
             'replays'   => $replays,
         ]);
     }
 
+    /** Manages the user account settings */
     function actionSettings() {
         //Verified they are logged in
         if (!Chickatrice::$app->loggedIn())

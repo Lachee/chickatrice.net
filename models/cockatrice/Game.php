@@ -1,15 +1,21 @@
 <?php namespace app\models\cockatrice;
 
+use kiss\db\ActiveQuery;
 use kiss\db\ActiveRecord;
 use kiss\Kiss;
 
-/** @property string[] players */
+/** 
+ * @property string[] players 
+ * @property Replay $replay
+ * 
+ * @property string $description
+*/
 class Game extends ActiveRecord {
     public static function tableName() { return "cockatrice_games"; }
 
     public $id;
     public $room_name;
-    public $descr;
+    protected $descr;
 
     public $creator_name;
     /** @var bool $password is the room password protected */
@@ -21,6 +27,11 @@ class Game extends ActiveRecord {
     public $time_ended;
 
     private $_players;
+
+    /** @var string gets the description */
+    public function getDescription() {
+        return $this->descr;
+    }
 
     /** @var string[] get all the players in the game */
     public function getPlayers() {
@@ -41,15 +52,25 @@ class Game extends ActiveRecord {
         return $this->_players;
     }
 
+        
+    private $_replay;
+    public function getReplay() {
+        if ($this->_replay != null)
+            return $this->_replay;
+
+        return $this->_replay = Replay::findByGame($this->id_game)->one();
+    }
+
+
     /** @return ActiveQuery|Game[] finds all the games by the player */
     public static function findByPlayer($playerName) {
-        return self::find()
+        return static::find()
                         ->leftJoin('cockatrice_games_players', ['id' => 'id_game'])
                         ->where(['player_name', $playerName]);
     }
 
     /** @return ActiveQuery|Game[] finds all the games by the player */
     public static function findByAccount(Account $account) {
-        return self::findByPlayer($account->name);
+        return static::findByPlayer($account->name);
     }
 }

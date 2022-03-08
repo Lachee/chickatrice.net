@@ -14,7 +14,7 @@ use kiss\helpers\HTTP;
 /** @var Deck[] $decks */
 
 $decksAvailable = count($decks);
-$maxDecksAvailable = 100;
+$maxDecksAvailable = $profile->max_allowed_decks;
 
 ?>
 
@@ -27,17 +27,16 @@ $maxDecksAvailable = 100;
 
 <section class="section container is-max-desktop">
     <nav class="breadcrumb" aria-label="breadcrumbs">
-    <ul>
-        <li><a href="<?= HTTP::url(['/profile/:profile/', 'profile' => $profile->getUsername()]) ?>"><span class="icon"><i class="fal fa-user"></i></span><?= HTML::encode($profile->getUsername()) ?></a></li>
-        <li class="is-active"><a href="#" aria-current="page">Decks</a></li>
-    </ul>
+        <ul>
+            <li><a href="<?= HTTP::url(['/profile/:profile/', 'profile' => $profile->getUsername()]) ?>"><span class="icon"><i class="fal fa-user"></i></span><?= HTML::encode($profile->getUsername()) ?></a></li>
+            <li class="is-active"><a href="#" aria-current="page">Decks</a></li>
+        </ul>
     </nav>
 
     <p class="block">
-    <p>Storing <strong><?= $decksAvailable ?></strong> of <strong><?= $maxDecksAvailable ?></strong> decks</p>
-    <p><I>Exceeding the capacity will result in newer decks being deleted within a week of upload.</I></p>
-    <progress class="progress is-primary" value="<?= $decksAvailable ?>" max="<?= $maxDecksAvailable ?>"><?= intval(($decksAvailable / $maxDecksAvailable) * 100) ?>%</progress>
-
+        <p>Storing <strong><?= $decksAvailable ?></strong> of <strong><?= $maxDecksAvailable ?></strong> decks</p>
+        <p><I>Exceeding the capacity will result in <strong>NEWER</strong> decks being deleted within a week of upload.</I></p>
+        <progress class="progress is-primary" value="<?= $decksAvailable ?>" max="<?= $maxDecksAvailable ?>"><?= intval(($decksAvailable / $maxDecksAvailable) * 100) ?>%</progress>
     </p>
 
     <div class="box">
