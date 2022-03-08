@@ -104,37 +104,65 @@ class MainController extends BaseController {
                 return Response::redirect($referal ?? [ '/login' ]);
             }
 
-            //Get the user, otherwise create one.
+            // Find matching user
             /** @var User $user */
             $user = User::findBySnowflake($duser->id)->one();
-            if ($user == null) {
-                $user = User::createUser($duser->username, $duser->email, $duser->id);
-                Chickatrice::$app->session->addNotification('Your account has been created');
+            
+            // Check if we are already loggedin or not. 
+            // If we are logged in, we are linking. If not, creating / logging in
+            if (Chickatrice::$app->loggedIn()) {
+
+                // Throw an error because user already exists
+                if ($user != null || Chickatrice::$app->user->getSnowflake() > 0) {
+                    throw new \Exception('Discord Account already linked.');
+                }
+
+                // Assign the new user
+                $user = Chickatrice::$app->user;
+                $user->setSnowflake($duser->id);
+                if (!$user->save(false, ['snowflake'])) {
+                    throw new \Exception('Failed to link discord snowflake id');
+                }
+
+                Chickatrice::$app->session->addNotification('Linked and Logged In with Discord', 'success');
+                Chickatrice::$app->user = User::findByKey($user->getKey())->flush()->one();
+            } else {
+                
+                // Create a new user if it doesnt exist
+                if ($user == null) {
+                    $user = User::createUser($duser->username, $duser->email, $duser->id);
+                    Chickatrice::$app->session->addNotification('Your account has been created');
+                }
+                
+                //Add the user to each guild
+                // $guilds = Chickatrice::$app->discord->getGuilds($tokens);
+                // $guilds = Arrays::map($guilds, function($g) { return $g['id']; });
+                // $guilds = Guild::find()->where(['snowflake', $guilds ])->all();
+                // if ($guilds == null || count($guilds) == 0) { 
+                //     Chickatrice::$app->session->addNotification('Cannot possibly logged in because you do not share a server', 'danger');
+                //     throw new Exception('Not in any guilds');
+                // }
+
+                // foreach($guilds as $guild) {
+                //     $user->addGuild($guild);
+                // }
+
             }
 
-            //Store the tokens
-            Chickatrice::$app->discord->getStorage($user->uuid)->setTokens($tokens);
-            
-            // Update the avatar
-            $user->setDiscordUserCache($duser);
-            $user->synchroniseDiscordAvatar();
-            
-            //Add the user to each guild
-            // $guilds = Chickatrice::$app->discord->getGuilds($tokens);
-            // $guilds = Arrays::map($guilds, function($g) { return $g['id']; });
-            // $guilds = Guild::find()->where(['snowflake', $guilds ])->all();
-            // if ($guilds == null || count($guilds) == 0) { 
-            //     Chickatrice::$app->session->addNotification('Cannot possibly logged in because you do not share a server', 'danger');
-            //     throw new Exception('Not in any guilds');
-            // }
+            // Update user deets
+            if ($user != null) {
+                
+                //Store the tokens
+                Chickatrice::$app->discord->getStorage($user->uuid)->setTokens($tokens);
 
-            // foreach($guilds as $guild) {
-            //     $user->addGuild($guild);
-            // }
+                // Update the avatar
+                $user->setDiscordUserCache($duser);
+                $user->synchroniseDiscordAvatar();
 
-            //Actually login
-            if (!$user->login()) {         
-                Kiss::$app->session->addNotification('Failed to login for some reason', 'danger');
+                //Actually login. We do this either way because we want to upgrade login to discord account
+                if (!$user->login())
+                    Kiss::$app->session->addNotification('Failed to login for some reason', 'danger');
+                
             }
         } 
         catch(\Exception $e) 

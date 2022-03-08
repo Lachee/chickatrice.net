@@ -71,6 +71,15 @@ class User extends Identity {
         return $this->snowflake; 
     }
 
+    /** Updates the current discord snowflake of the logged in user.
+     * @param string $snowflake discord ID
+     * @return $this. */
+    public function setSnowflake($snowflake) {
+        $this->snowflake = $snowflake;
+        $this->_discordUser = null;
+        return $this;
+    }
+
     /** Finds by snowflake */
     public static function findBySnowflake($snowflake) {
         return self::find()->where(['snowflake', $snowflake]);
@@ -80,6 +89,7 @@ class User extends Identity {
      * @return \app\components\discord\User the discord user
      */
     public function getDiscordUser() {
+        if ($this->snowflake <= 0) return null;
         if ($this->_discordUser != null) return $this->_discordUser;
         $storage = Chickatrice::$app->discord->getStorage($this->uuid);
         $this->_discordUser = Chickatrice::$app->discord->identify($storage);

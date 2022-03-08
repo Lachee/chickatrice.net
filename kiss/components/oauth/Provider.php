@@ -59,7 +59,7 @@ class Provider extends BaseObject {
         return new Storage([ 'identity' => $identity, 'provider' => $this ]);
     }
 
-    /** Gets teh state for the current session 
+    /** Gets the state for the current session 
      * @param bool $regenerate should the state be regenerated.
      * @return string|false returns the current state, unless the session is unavialable.
     */

@@ -174,6 +174,7 @@ class ProfileController extends BaseController {
         return $this->render('settings', [
             'profile'       => $this->profile,
             'discord'       => $this->profile->getDiscordUser(),
+            'discordUrl'    => Chickatrice::$app->discord->getAuthUrl(),
             'model'         => $form,
             'key'           => $this->api_key = $this->profile->apiToken([ 'scopes' => $scopes ]),
             'fullwidth'     => false,

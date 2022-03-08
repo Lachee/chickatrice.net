@@ -22,12 +22,10 @@ $rules = [
 $form->fastForm($rules);
 */
 
+if (KISS_DEBUG) {
+    echo HTML::tag('style', 'input[name="email"] { color: black; filter: blur(4px); transition: linear 0.25s filter; }');
+}
 ?>
-
-<style>
-    input[name="email"] { color: black; filter: blur(4px); transition: linear 0.25s filter; }
-    /* input[name="email"]:hover { filter: blur(0px); } */
-</style>
 
 <div class="columns">
     <!-- Settings -->
@@ -94,21 +92,20 @@ $form->fastForm($rules);
                 </div>
             </div>
         <?php else : ?>
-            <form method='POST' class='m-0'>
+            <div class='column'>
                 <div class="card">
                     <div class="card-content">
-                        <div class="content">
-                            <?= $model->render(); ?>
-                        </div>
+                        <p class="title">Third-Party</p>
+                        <p class="subtitle">Sign-in using your Discord Account</p>
+                        <p>Link a Discord Account to this profile. This won't change your name, but will allow you to sign in to edit and manage your account in the future via Discord</p>
+                        <br>
+                        <a class="button is-fullwidth has-text-left" id="login-button" href="<?= $discordUrl ?>" data-tooltip="Login">
+                            <span class="icon"><i class="fab fa-discord"></i></span>
+                            <span>Discord</span>
+                        </a>
                     </div>
-                    <footer class="card-footer">
-                        <button class="card-footer-item" type="submit">
-                            <span class="icon"><i class="fal fa-save"></i></span>
-                            <span>Save</span>
-                        </button>
-                    </footer>
                 </div>
-            </form>
+            </div>
         <?php endif; ?>
     </div>
 </div>
