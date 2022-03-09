@@ -18,6 +18,7 @@ $theme = HTTP::get('theme', 'lumen');
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="<?= Kiss::$app->themeColor; ?>">
 
+    <meta property="og:title" content="<?= HTML::$title ?>" />
     <meta property="og:description" content="<?= Kiss::$app->description ?>" />
     <meta property="og:url" content="<?= Kiss::$app->baseURL() ?>" />
     <meta property="og:image" content="<?= HTTP::url(Kiss::$app->logo, true) ?>" />
