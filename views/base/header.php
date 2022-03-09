@@ -3,6 +3,7 @@
 use kiss\controllers\Controller;
 use kiss\helpers\HTML;
 use kiss\helpers\HTTP;
+use kiss\helpers\Strings;
 use kiss\Kiss;
 
 $theme = HTTP::get('theme', 'lumen');
@@ -11,12 +12,21 @@ $theme = HTTP::get('theme', 'lumen');
     <title><?= HTML::$title ?></title>
     <base href="<?= Kiss::$app->baseURL()?>">
     
+    <!-- Meta Data -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#17181c">
+    <meta name="theme-color" content="<?= Kiss::$app->themeColor; ?>">
 
-    <link rel="icon" href="<?= Kiss::$app->favicon ?: Kiss::$app->logo ?>" sizes="16x16" type="image/png">
+    <meta property="og:description" content="<?= Kiss::$app->description ?>" />
+    <meta property="og:url" content="<?= Kiss::$app->baseURL() ?>" />
+    <meta property="og:image" content="<?= HTTP::url(Kiss::$app->logo, true) ?>" />
+
+    <?php if (Strings::endsWith(Kiss::$app->favicon ?: '', '.ico')): ?>
+        <link rel="icon" href="<?= Kiss::$app->favicon ?>" type="image/x-icon">
+    <?php else: ?>
+        <link rel="icon" href="<?= Kiss::$app->favicon ?: Kiss::$app->logo ?>" sizes="128x128" type="image/png">
+    <?php endif; ?>
 
     <!-- JQuery -->
     <script
@@ -57,7 +67,6 @@ $theme = HTTP::get('theme', 'lumen');
     <!-- <link rel="stylesheet" href="/dist/app/app.css">   -->
     <script src="/dist/app.js"></script>
     <link rel="stylesheet" href="/dist/app.css">
-    
 
     <!-- JS Variables -->
     <?= $this->renderJsVariables(Controller::POS_START); ?>

@@ -29,11 +29,14 @@ class Kiss extends BaseObject {
 
     /** @var string the title of the application */
     public $title = 'KISS';
-
+    /** @var string the description of the application. Used in OpenGraph tags */
+    public $description = '';
     /** @var string the path to the logo */
     public $logo = '/images/logo.png';
     /** @var string the path to the favicon */
     public $favicon = null;
+    /** @var string colour code for the website theme. Used in some browsers. */
+    public $themeColor = '#ff6666';
     
     /** @var string the base URL */
     protected $baseUrl;
