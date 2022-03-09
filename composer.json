@@ -18,6 +18,7 @@
         "php-ffmpeg/php-ffmpeg": "^0.17.0",
         "mailgun/mailgun-php": "^3.5",
         "symfony/http-client": "^5.4",
-        "nyholm/psr7": "^1.5"
+        "nyholm/psr7": "^1.5",
+        "amphp/http-client": "^4.6"
     }
 }
