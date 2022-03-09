@@ -235,7 +235,7 @@ class User extends Identity {
 
             'max_allowed_decks'     => Chickatrice::$app->defaultAllowedDecks,
             'max_allowed_replays'   => Chickatrice::$app->defaultAllowedReplays,
-            'deck_privacy'          => 1
+            'deck_privacy'          => Chickatrice::$app->defaultDeckPrivacy
         ]);
         
         // Find cockatrice accounts associated with the email
