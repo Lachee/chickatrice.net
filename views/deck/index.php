@@ -64,8 +64,8 @@ use kiss\helpers\HTTP;
                 <span class="icon"><i class="fal fa-share-alt"></i></span>
                 <span>Share</span>
             </button>
-
-            <?php if ($profile->id === Chickatrice::$app->user->id): ?>
+            
+            <?php if (Chickatrice::$app->loggedIn() && $profile->id === Chickatrice::$app->user->id): ?>          
                 <a class="button level-item has-icon" href="<?= HTTP::url(['/profile/:profile/decks/:deck/remove', 'profile' => $profile->getUsername(), 'deck' => $deck->id]) ?>" onclick="return confirm('Are you sure? This cannot be undone!')">
                     <span class="icon"><i class="fal fa-trash"></i></span>
                     <span>Delete</span>

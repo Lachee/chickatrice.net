@@ -34,7 +34,7 @@ $precentage = $decksAvailable / $maxDecksAvailable;
         </ul>
     </nav>
 
-    <?php if ($profile->id === Chickatrice::$app->user->id): ?>
+    <?php if (Chickatrice::$app->loggedIn() && $profile->id === Chickatrice::$app->user->id): ?>
     <p class="block">
         <p>Storing <strong><?= $decksAvailable ?></strong> of <strong><?= $maxDecksAvailable ?></strong> decks</p>
         <p><I>Exceeding the capacity will result in <strong>NEWER</strong> decks being deleted within a week of upload.</I></p>
@@ -43,7 +43,7 @@ $precentage = $decksAvailable / $maxDecksAvailable;
     <?php endif; ?>
 
     <!-- Account Size Advert -->
-    <?php if ($profile->id === Chickatrice::$app->user->id): ?>
+    <?php if (Chickatrice::$app->loggedIn() && $profile->id === Chickatrice::$app->user->id): ?>
     <?php if ($precentage >= 1): ?>
     <section class="notification hero has-gradient is-info is-small">
         <div class="hero-body">
@@ -93,13 +93,15 @@ $precentage = $decksAvailable / $maxDecksAvailable;
                                     <i class="fal fa-share-alt"></i>
                                 </span>
                             </button>
-                            
+
+                            <?php if (Chickatrice::$app->loggedIn() && $profile->id === Chickatrice::$app->user->id): ?>
                             <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/remove', 'profile' => $profile->getUsername(), 'deck' => $deck->id]) ?>" onclick="return confirm('Are you sure? This cannot be undone!')">
                                 <span class="icon">
                                     <i class="fal fa-trash"></i>
                                 </span>
                             </a>
-
+                            <?php endif; ?>
+                            
                             <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/', 'profile' => $profile->getUsername(), 'deck' => $deck]) ?>">
                                 <span class="icon">
                                     <i class="fal fa-eye"></i>
