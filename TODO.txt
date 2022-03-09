@@ -1,5 +1,6 @@
 TODO:
 Must Do
+- Redirect <filename>.php to index @ route /<filename>
 - Stat Graph
 
 Should Do
