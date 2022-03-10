@@ -166,7 +166,7 @@ class ProfileController extends BaseController {
         if (HTTP::hasPost()) {
             if ($form->load(HTTP::post()) && $form->save()) {
                 Kiss::$app->session->addNotification('Updated profile settings', 'success');
-                return Response::redirect([ '/profile/@me/settings' ]);
+                return Response::redirect([ '/profile/@me/settings' ], HTTP::OK);
             } else {                
                 Kiss::$app->session->addNotification('Failed to load: ' . $form->errorSummary(), 'danger');
             }

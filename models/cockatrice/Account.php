@@ -10,6 +10,24 @@ use kiss\exception\InvalidOperationException;
 use kiss\helpers\HTTP;
 use kiss\helpers\Strings;
 
+/**
+ * @property string $id;
+ * @property int $admin;
+ * @property string $name;
+ * @property string $realname;
+ * @property string $password_sha512;
+ * @property string $email;
+ * @property string $country;
+ * @property mixed $avatar_bmp;
+ * @property string $registrationDate;
+ * @property boolean $active;
+ * @property string $token;
+ * @property string $clientid;
+ * @property string $privlevel;
+ * @property string $privlevelStartDate;
+ * @property string $privlevelEndDate;
+ * @package app\models\cockatrice
+ */
 class Account extends ActiveRecord {
  
     const ADMIN_LEVEL_USER = 0;
@@ -18,10 +36,10 @@ class Account extends ActiveRecord {
 
     public static function tableName() { return "cockatrice_users"; }
 
-    public $id;
-    public $admin;
-    public $name;
-    public $realname;
+    protected $id;
+    protected $admin;
+    protected $name;
+    protected $realname;
 
     // /** @deprecated Gender has been removed. */
     // public $gender;
