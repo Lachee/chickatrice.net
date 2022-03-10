@@ -22,6 +22,9 @@ use Ramsey\Uuid\Uuid;
 class MainController extends BaseController {
     public static function route() { return "/main"; }
 
+    /** @var string homepage for a profile */
+    private const PROFILE_HOME = '/profile/@me/settings';
+
     /** Checks the authorization of the user
      * @return bool true if they are allowed here. False if they should be redirected to login first.
      * You can also throw exceptions here if requried to tell the user off.
@@ -71,14 +74,14 @@ class MainController extends BaseController {
     /** Logs In */
     function actionLogin() {
         if (Kiss::$app->loggedIn())
-            return Response::redirect(['/index']);
+            return Response::redirect(self::PROFILE_HOME);
 
         $loginForm      = new LoginForm(['formName' => 'login']);
         $registerForm   = new RegisterForm(['formName' => 'register']);
         if (HTTP::hasPost()) {
             if ($loginForm->load(HTTP::post())) {
                 if ($loginForm->save()) {
-                    return Response::redirect(['/profile/@me/settings']);
+                    return Response::redirect(self::PROFILE_HOME);
                 } else {
                     Kiss::$app->session->addNotification('Failed to login: ' . $loginForm->errorSummary(), 'danger');
                 }
@@ -202,6 +205,6 @@ class MainController extends BaseController {
         }         
         
         $referal = Kiss::$app->session->get('LOGIN_REFERRAL', HTTP::referral());
-        return Response::redirect($referal ?? [ '/']);
+        return Response::redirect($referal ?? self::PROFILE_HOME);
     }
 }
