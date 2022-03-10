@@ -178,21 +178,24 @@ class HTTP {
      * 
      * @param string|array|null $action
      * Prefix determines how it works.
+     * | Prefix | Result |
+     * |--------|--------|
+     * |  | Action |
+     * | / | Controller/Action |
+     * | \ | Class |
+     * | [a-z]:// | Absolute |
      * 
-     *   => Action
-     * / => Controller/Action
-     * \ => Class
-     * [a-z]:// => Absolute
-     * 
-     * 
-     * if the page is currently /project/index:
-     * update => /project/update
-     * /update => /update
-     * /update/test => /update/test
-     * /api/project/:id => /api/project/{id}
-     * http://index.com/ => http://index.com/
+     * For example, if the page is currently `/project/index`:     * 
+     * | $action | Result |
+     * |--------|--------|
+     * | update | /project/update |
+     * | /update | /update |
+     * | /update/test | /update/test |
+     * | /api/project/:id | /api/project/{id} |
+     * | http://index.com/ | http://index.com/ |
      * 
      * @param boolean $absolute include the absolute URL or not.
+     * @param boolean $includeQuery include the built queries in the url
      */
     public static function url($action, $absolute = false, $includeQuery = true) {
 

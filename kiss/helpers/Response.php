@@ -136,16 +136,16 @@ class Response {
     /** Creates a new redirect response 
      * @return Response the response
     */
-    public static function redirect($location) {
-        return (new Response(HTTP::OK, [], "redirecting", HTTP::CONTENT_TEXT_PLAIN))->setLocation($location);
+    public static function redirect($location, $status = HTTP::TEMPORARY_REDIRECT) {
+        return (new Response($status, [], "Redirecting to {$location}...", HTTP::CONTENT_TEXT_PLAIN))->setLocation($location);
     }
 
     /** Creates a new redirect response to the current route
      * @return Response the response */
-    public static function refresh($time = false) {
+    public static function refresh($time = false, $status = HTTP::TEMPORARY_REDIRECT) {
         if ($time === false || $time <= 0)
-            return (new Response(HTTP::OK, [], "refreshing", HTTP::CONTENT_TEXT_PLAIN))->setLocation(HTTP::route());
-        return (new Response(HTTP::OK, [], "Redirecting in " . $time .'s...', HTTP::CONTENT_TEXT_PLAIN))->setRefresh(HTTP::route(), $time);
+            return (new Response($status, [], "Reloading...", HTTP::CONTENT_TEXT_PLAIN))->setLocation(HTTP::route());
+        return (new Response($status, [], "Reloading in " . $time .'s...', HTTP::CONTENT_TEXT_PLAIN))->setRefresh(HTTP::route(), $time);
     }
 
     /** Sets a header and returns the response. */

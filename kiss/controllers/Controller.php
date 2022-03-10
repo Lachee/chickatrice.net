@@ -215,6 +215,10 @@ class Controller extends Route {
             throw new HttpException(HTTP::NOT_FOUND, 'Action not found');
         }
 
+        //If this was a PHP file, perma redirect
+        if (Strings::endsWith($endpoint, '.php'))
+            return Response::redirect(HTTP::url(lcfirst(substr($action, strlen('action')))), HTTP::PERMANENTLY_REDIRECT);
+
         //verify our authentication
         $this->authenticate(Kiss::$app->user);
 
@@ -250,10 +254,15 @@ class Controller extends Route {
 
     /** Gets the action name */
     protected function getAction($endpoint) {
-        $endpoint = ucfirst(strtolower($endpoint));
+        $endpoint = ucfirst(Strings::toLowerCase($endpoint));
         $action = "action{$endpoint}";
-        if (!method_exists($this, $action)) { return false; }
-        return $action;
+        if (method_exists($this, $action))
+            return $action;
+
+        if (Strings::endsWith($endpoint, '.php'))
+            return $this->getAction(substr($endpoint, 0,-4));
+
+        return false;
     }
 
     /** Exports all the variables */
