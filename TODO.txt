@@ -1,5 +1,6 @@
 TODO:
 Must Do
+- Cannot set real name
 - Redirect <filename>.php to index @ route /<filename>
 - Stat Graph
 
