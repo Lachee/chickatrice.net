@@ -1,6 +1,5 @@
 TODO:
 Must Do
-- Cannot set real name
 - Stat Graph
 
 Should Do
@@ -15,6 +14,7 @@ If Possible
 - Add cron cli to synchronise discord avatars*  (requires game to work)
 
 Done:
+- Cannot set real name
 - Redirect <filename>.php to index @ route /<filename>
 - Add email checks
 - Add cron cli to delete replay_access for those who exceed limit
