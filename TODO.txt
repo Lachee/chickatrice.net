@@ -3,7 +3,6 @@ Must Do
 - Stat Graph
 
 Should Do
-- Add buddy / ignore list
 
 Could Do
 - Implement ban header
@@ -14,6 +13,7 @@ If Possible
 - Add cron cli to synchronise discord avatars*  (requires game to work)
 
 Done:
+- Add buddy / ignore list
 - Cannot set real name
 - Redirect <filename>.php to index @ route /<filename>
 - Add email checks

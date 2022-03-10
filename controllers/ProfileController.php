@@ -1,4 +1,6 @@
-<?php namespace app\controllers;
+<?php
+
+namespace app\controllers;
 
 use app\components\mixer\Mixer;
 use app\helpers\Country;
@@ -28,21 +30,26 @@ use Ramsey\Uuid\Uuid;
 /**
  * @property User $profile
  */
-class ProfileController extends BaseController {
+class ProfileController extends BaseController
+{
 
     public const DBEUG_USERS = [
         '130973321683533824', // Lachee
     ];
 
     /** Scopes while debugging */
-    public const DEBUG_SCOPES = [ ];    
+    public const DEBUG_SCOPES = [];
     /** Scopes to give to normal users */
-    public const SCOPES = [ ];
+    public const SCOPES = [];
 
     public $profile_name;
-    public static function route() { return "/profile/:profile_name"; }
+    public static function route()
+    {
+        return "/profile/:profile_name";
+    }
 
-    function action($endpoint, ...$args) {
+    function action($endpoint, ...$args)
+    {
         if ($this->profile_name == '@me' && !Chickatrice::$app->loggedIn())
             throw new HttpException(HTTP::UNAUTHORIZED, 'Need to be logged in to see your own profile.');
 
@@ -50,13 +57,39 @@ class ProfileController extends BaseController {
     }
 
     /** Displays the users profile */
-    function actionIndex() {
+    function actionIndex()
+    {
         return Response::redirect(['/profile/:profile/decks', 'profile' => $this->profile->getUsername()]);
-    }    
-    
+    }
+
+    /** Manages the user buddies */
+    function actionRelations()
+    {
+        //Verify its their own profile
+        if ($this->profile->id != Kiss::$app->user->id)
+            throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own friends.');
+
+        if (HTTP::get('rf', false)) {
+            $this->profile->account->removeFriend(HTTP::get('rf'));
+            return Response::redirect('relations');
+        }
+
+        if (HTTP::get('ri', false)) {
+            $this->profile->account->removeIgnore(HTTP::get('ri'));
+            return Response::redirect('relations');
+        }
+
+        return $this->render('relations', [
+            'profile' => $this->profile,
+            'buddies' => $this->profile->account->friends,
+            'ignores'  => $this->profile->account->ignores
+        ]);
+    }
+
     /** Manages the users Decks */
-    function actionDecks() {
-        
+    function actionDecks()
+    {
+
         /** @var User $profile */
         $profile = $this->profile;
 
@@ -76,12 +109,13 @@ class ProfileController extends BaseController {
     }
 
     /** Manages the user Games */
-    function actionGames() {
+    function actionGames()
+    {
         /** @var User $profile */
         $profile = $this->profile;
 
         //Verify its their own profile
-        if ($this->profile->id != Kiss::$app->user->id) 
+        if ($this->profile->id != Kiss::$app->user->id)
             throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own games.');
 
         // Download the replay
@@ -90,12 +124,12 @@ class ProfileController extends BaseController {
 
             /** @var ReplayAccess $access */
             $access = ReplayAccess::findByAccount($this->profile->getAccount())
-                                        ->andWhere(['id_game', $download_id ])
-                                        ->one();
+                ->andWhere(['id_game', $download_id])
+                ->one();
 
-            if ($access == null) 
+            if ($access == null)
                 throw new HttpException(HTTP::NOT_FOUND, 'Replay could not be found');
-                
+
             $filename = preg_replace("[^\w\s\d\.\-_~,;:\[\]\(\]]", '', $access->game->descr);
             $blob = $access->replay->replay;
             return Response::file($filename . '.cor', $blob);
@@ -107,22 +141,22 @@ class ProfileController extends BaseController {
 
             // Remove access for this game with this account
             $count = ReplayAccess::findByAccount($this->profile->getAccount())
-                                        ->andWhere(['id_game', $remove_id ])
-                                        ->delete()
-                                        ->execute();
+                ->andWhere(['id_game', $remove_id])
+                ->delete()
+                ->execute();
             if ($count > 0) {
                 Chickatrice::$app->session->addNotification('Replay Removed', 'success');
             } else {
                 Chickatrice::$app->session->addNotification('Failed to remove replay', 'danger');
             }
-            
+
             return Response::redirect(['games']);
         }
 
         // Find replays
         $replays = ReplayGame::findByAccount($this->profile->getAccount())
-                                    ->orderByDesc('time_started')
-                                    ->all();
+            ->orderByDesc('time_started')
+            ->all();
 
         return $this->render('replays', [
             'profile'   => $profile,
@@ -131,16 +165,17 @@ class ProfileController extends BaseController {
     }
 
     /** Manages the user account settings */
-    function actionSettings() {
+    function actionSettings()
+    {
         //Verified they are logged in
         if (!Chickatrice::$app->loggedIn())
             throw new HttpException(HTTP::UNAUTHORIZED, 'Need to be logged in to edit your settings.');
 
         //Verify its their own profile
         /** @var User $profile */
-        if ($this->profile->id != Kiss::$app->user->id) 
+        if ($this->profile->id != Kiss::$app->user->id)
             throw new HttpException(HTTP::FORBIDDEN, 'Can only edit your own settings');
-        
+
         //Regenerate the API key if we are told to
         if (HTTP::get('regen', false, FILTER_VALIDATE_BOOLEAN)) {
             if ($this->profile->regenerateApiKey()) {
@@ -150,7 +185,7 @@ class ProfileController extends BaseController {
             }
             return Response::refresh();
         }
-    
+
         if (HTTP::get('sync', false, FILTER_VALIDATE_BOOLEAN)) {
             if ($this->profile->synchroniseDiscordAvatar()) {
                 Kiss::$app->session->addNotification('Avatar Synchronised', 'success');
@@ -162,19 +197,19 @@ class ProfileController extends BaseController {
         }
 
         // Show the profile
-        $form = new UserSettingForm([ 'user' => $this->profile ]);
+        $form = new UserSettingForm(['user' => $this->profile]);
         if (HTTP::hasPost()) {
             if ($form->load(HTTP::post()) && $form->save()) {
                 Kiss::$app->session->addNotification('Updated profile settings', 'success');
-                return Response::redirect([ '/profile/@me/settings' ], HTTP::OK);
-            } else {                
+                return Response::redirect(['/profile/@me/settings'], HTTP::OK);
+            } else {
                 Kiss::$app->session->addNotification('Failed to load: ' . $form->errorSummary(), 'danger');
             }
         }
 
         //Setup the scopes
         $scopes = self::SCOPES;
-        if (KISS_DEBUG || in_array($this->profile->snowflake, self:: DBEUG_USERS)) 
+        if (KISS_DEBUG || in_array($this->profile->snowflake, self::DBEUG_USERS))
             $scopes = self::DEBUG_SCOPES;
 
         //Render the page
@@ -183,27 +218,28 @@ class ProfileController extends BaseController {
             'discord'       => $this->profile->getDiscordUser(),
             'discordUrl'    => Chickatrice::$app->discord->getAuthUrl(false),
             'model'         => $form,
-            'key'           => $this->api_key = $this->profile->apiToken([ 'scopes' => $scopes ]),
+            'key'           => $this->api_key = $this->profile->apiToken(['scopes' => $scopes]),
             'fullwidth'     => false,
         ]);
     }
 
-    function actionDelete() {
+    function actionDelete()
+    {
         //Verified they are logged in
         if (!Chickatrice::$app->loggedIn())
             throw new HttpException(HTTP::UNAUTHORIZED, 'Need to be logged in to edit your settings.');
 
         //Verify its their own profile
         /** @var User $profile */
-        if ($this->profile->id != Kiss::$app->user->id && $this->profile->account->admin != Account::ADMIN_LEVEL_OWNER) 
+        if ($this->profile->id != Kiss::$app->user->id && $this->profile->account->admin != Account::ADMIN_LEVEL_OWNER)
             throw new HttpException(HTTP::FORBIDDEN, 'You cannot delete someone\'s else account! You cheeky bastard.');
-        
+
         // Mark their account inactive and ready to delete in the next cron-job
         $account = $this->profile->account;
         $this->profile->account->active = false;
         $this->profile->account->token = null;
         $this->profile->account->setPassword(Strings::token(32));
-        if (!$this->profile->account->save()) 
+        if (!$this->profile->account->save())
             throw new HttpException(HTTP::INTERNAL_SERVER_ERROR, 'Failed to mark account for deletion');
 
         // Delete their user account and logout
@@ -215,23 +251,24 @@ class ProfileController extends BaseController {
     }
 
     private $_profile;
-    public function getProfile() {
+    public function getProfile()
+    {
 
-        if ($this->profile_name == '@me' && !Chickatrice::$app->loggedIn()) 
+        if ($this->profile_name == '@me' && !Chickatrice::$app->loggedIn())
             throw new HttpException(HTTP::UNAUTHORIZED, 'Need to be logged in');
-        
-        if ($this->_profile != null) 
-            return $this->_profile;        
+
+        if ($this->_profile != null)
+            return $this->_profile;
 
         if ($this->profile_name == '@me')
             return $this->_profile = Chickatrice::$app->user;
 
         $this->_profile = User::findByUsername($this->profile_name)
-                                    ->orWhere(['uuid', $this->profile_name])
-                                    ->one();
+            ->orWhere(['uuid', $this->profile_name])
+            ->one();
         if ($this->_profile != null)
-            return $this->_profile;        
-     
+            return $this->_profile;
+
 
 
         //This is bunk, we found nudda

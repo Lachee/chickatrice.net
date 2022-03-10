@@ -69,7 +69,7 @@ $precentage = $decksAvailable / $maxDecksAvailable;
     <div class="box">
         <h1 class="title is-4 mb-2">Decks</h1>
 
-        <div class="list has-hoverable-list-items  has-visible-pointer-controls has-overflow-ellipsis">
+        <div class="list has-hoverable-list-items">
             <?php foreach ($decks as $index => $deck) : ?>
                 <div class="list-item <?= $index >= $maxDecksAvailable ? 'has-background-danger-light' : '' ?>">
                     <div class="list-item-image">

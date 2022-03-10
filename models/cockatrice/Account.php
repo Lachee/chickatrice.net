@@ -1,5 +1,6 @@
 <?php namespace app\models\cockatrice;
 
+use Chickatrice;
 use kiss\db\ActiveQuery;
 use kiss\db\ActiveRecord;
 use kiss\exception\QueryException;
@@ -94,6 +95,46 @@ class Account extends ActiveRecord {
         $this->query()->delete('cockatrice_replays_access')->where(['id_player', $this->id])->execute();
         $this->query()->delete('cockatrice_warnings')->where(['user_id', $this->id])->execute();        
     }
+
+    /** @return ActiveQuery|Account[] finds all the friends of the user */
+    public function getFriends() {
+        return Account::find()
+                ->leftJoin('cockatrice_buddylist', [ 'id' => 'id_user2' ])
+                ->where(['id_user1', $this->id]);
+    }
+
+    /** Removes a friend
+     * @param Account|int $account the friend to remove
+     * @return $this
+     */
+    public function removeFriend($account) {
+        Chickatrice::$app->db()->createQuery()
+            ->delete('cockatrice_buddylist')
+            ->where(['id_user1', $this->id ])
+            ->andWhere(['id_user2', $account])
+            ->execute();
+        return $this;
+    }
+
+    /** @return ActiveQuery|Account[] finds all the accounts this user is ignoring */
+    public function getIgnores() {
+        return Account::find()
+            ->leftJoin('cockatrice_ignorelist', [ 'id' => 'id_user2' ])
+            ->where(['id_user1', $this->id]);
+    }    
+    
+    /** Removes a ignore
+    * @param Account|int $account the ignore to remove
+    * @return $this
+    */
+   public function removeIgnore($account) {
+       Chickatrice::$app->db()->createQuery()
+           ->delete('cockatrice_ignorelist')
+           ->where(['id_user1', $this->id ])
+           ->andWhere(['id_user2', $account])
+           ->execute();
+       return $this;
+   }
 
     /** @return ActiveQuery|Account[] finds accounts with the given email */
     public static function findByEmail($email) {

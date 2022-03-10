@@ -28,6 +28,10 @@ $user = Kiss::$app->getUser();
                     <span class="icon"><i class="fal fa-album-collection"></i></span>
                     <span>Decks</span>
                 </a>
+                <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/profile/@me/relations') ?: 'is-active' ?>" data-tooltip="Relations" href="<?= HTTP::url('/profile/@me/relations')?>">
+                    <span class="icon"><i class="fal fa-album-collection"></i></span>
+                    <span>Relations</span>
+                </a>
             <?php else: ?>
                     <a class="navbar-item has-icon is-tab is-hidden-desktop <?= !Strings::endsWith(HTTP::route(), '/login') ?: 'is-active' ?>" data-tooltip="Submissions" href="<?= HTTP::url('/login')?>"><i class="fal fa-user"></i></a>    
             <?php endif; ?>
