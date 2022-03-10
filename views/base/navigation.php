@@ -29,7 +29,7 @@ $user = Kiss::$app->getUser();
                     <span>Decks</span>
                 </a>
                 <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/profile/@me/relations') ?: 'is-active' ?>" data-tooltip="Relations" href="<?= HTTP::url('/profile/@me/relations')?>">
-                    <span class="icon"><i class="fal fa-album-collection"></i></span>
+                    <span class="icon"><i class="fal fa-user-group"></i></span>
                     <span>Relations</span>
                 </a>
             <?php else: ?>
