@@ -137,7 +137,7 @@ class Response {
      * @return Response the response
     */
     public static function redirect($location, $status = HTTP::TEMPORARY_REDIRECT) {
-        return (new Response($status, [], "Redirecting to {$location}...", HTTP::CONTENT_TEXT_PLAIN))->setLocation($location);
+        return (new Response($status, [], "Redirecting...", HTTP::CONTENT_TEXT_PLAIN))->setLocation($location);
     }
 
     /** Creates a new redirect response to the current route
