@@ -3,9 +3,7 @@
 use kiss\helpers\HTML;
 use kiss\helpers\HTTP;
 use kiss\Kiss;
-
 ?>
-
 
 <section class="hero is-medium is-primary is-bold is-fullheight-with-navbar">
     <div class="hero-body">

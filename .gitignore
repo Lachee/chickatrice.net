@@ -3,6 +3,7 @@ node_modules/*
 config.php
 public/dist/*
 public/cache/*
+public/webatrice/*
 .npmrc
 *.key
 *.env

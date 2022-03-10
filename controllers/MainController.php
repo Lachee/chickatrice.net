@@ -3,6 +3,7 @@
 use app\components\mixer\Mixer;
 use app\models\Ban;
 use app\models\cockatrice\Account;
+use app\models\cockatrice\Replay;
 use app\models\forms\LoginForm;
 use app\models\forms\RegisterForm;
 use app\models\Guild;

@@ -53,6 +53,8 @@ $navbar-margin: 0 !default;
 @import '~bulma-carousel/dist/css/bulma-carousel.min.css';
 @import '~bulma-list/sass/bulma-list.sass';
 
+
+
 $scrollbar-width: 12px;
 $scrollbar-color: #e9e9e9 !default;
 $scrollbar-thumb-color: #999999 !default;
@@ -61,6 +63,11 @@ $scrollbar-thumb-color: #999999 !default;
 // $scrollbar-thumb-color-dark: #0a0a0a !default;
 // $scrollbar-color: $scrollbar-color-dark;
 // $scrollbar-thumb-color: $scrollbar-thumb-color-dark;
+
+/** Fixes navbar offseting the fullheight stuff */
+.hero.is-fullheight-with-navbar .hero-body {
+    padding-top: 9rem - $navbar-height;
+}
 
 .has-background-transparent {
     background-color: transparent;

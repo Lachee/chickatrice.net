@@ -13,7 +13,7 @@ $user = Kiss::$app->getUser();
 ?>
 
 <!-- START NAV -->
-<nav class="navbar">
+<nav class="navbar ">
     <div class="container">
         <!-- BRAND -->
         <div class="navbar-brand is-justify-content-space-evenly">
