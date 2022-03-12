@@ -1,0 +1,63 @@
+@use 'sass:list';
+@use 'sass:string';
+
+
+@mixin clip-parallelogram() {  
+    -webkit-clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%); 
+    clip-path: polygon(25% 0%, 100% 0%, 75% 100%, 0% 100%);
+    margin-left: -25px;
+    margin-right: -14px;
+}
+
+@mixin gradient($direction, $list) { 
+    background: -webkit-linear-gradient($direction, $list);
+    background: -moz-linear-gradient($direction, $list);
+    background: -o-linear-gradient($direction, $list);
+    background: linear-gradient($direction, $list);  
+}
+
+@mixin solid-gradient($direction, $list) {
+    $size: list.length($list);
+    $gradient: ();
+    $line: '';
+
+    $previousEnd: 0;
+    $index: 1;
+    @each $color in $list {
+        $gradient: list.join($gradient, string.unquote('#{$color} #{$previousEnd*100}%'), $separator: comma);
+        $previousEnd: $index / $size;
+        $gradient: list.join($gradient, string.unquote('#{$color} #{$previousEnd*100}%'), $separator: comma);
+        $index: $index + 1;
+    }
+    @include gradient($direction, $gradient);
+}
+
+@mixin banner($colors) {    
+    @include solid-gradient(180deg, $colors);
+    @include clip-parallelogram();
+}
+
+
+.support-flags {
+    width: 200px;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    div, span { 
+        display: inline-block;
+        width: 100px;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+    }
+
+    .ukraine {
+        @include banner(#0057b7 #ffd700);
+    }
+    .trans {
+        @include banner(#5BCFFB #F5ABB9 #FFF #F5ABB9 #5BCFFB );
+    }
+}
+
+

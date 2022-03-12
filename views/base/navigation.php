@@ -14,6 +14,11 @@ $user = Kiss::$app->getUser();
 
 <!-- START NAV -->
 <nav class="navbar ">
+    <div class="support-flags">
+        <div class="ukraine"></div>
+        <div class="ukraine"></div>
+        <!-- <div class="trans"></div> -->
+    </div>
     <div class="container">
         <!-- BRAND -->
         <div class="navbar-brand is-justify-content-space-evenly">
