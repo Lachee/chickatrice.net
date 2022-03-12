@@ -21,16 +21,36 @@ use kiss\Kiss;
                         <span class="icon"><i class="fab fa-discord"></i></span>
                         <span>Join Discord</span>
                     </a>
+
+
                 </div>
                 <div class="column is-one-third">
-                <div class="card">
-                    <div class="card-content">
-                        <div class="content">
-                            <canvas id="chart-uptime"></canvas>    
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="content">
+                                <canvas id="chart-uptime"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="content">
+                                <div class="field">
+                                    <label class="label">Connect with Cockatrice!</label>
+                                    <div class="columns">
+                                        <div class="control column">
+                                            <input class="input" type="text" value="mtg.chickatrice.net" readonly>
+                                        </div>
+                                        <div class="control column is-one-third">
+                                            <input class="input" type="text" value="4748" readonly>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 </section>
