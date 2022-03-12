@@ -45,7 +45,7 @@ use kiss\helpers\HTTP;
                 </div>
                 <div class="column is-one-third">
                     <figure class="image">
-                        <img src="/images/cards.png" />
+                        <img src="/images/cards-small.png" />
                     </figure>
                 </div>
             </div>
