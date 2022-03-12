@@ -5,6 +5,7 @@ use app\models\Ban;
 use app\models\cockatrice\Account;
 use app\models\cockatrice\Replay;
 use app\models\forms\LoginForm;
+use app\models\forms\RecoverForm;
 use app\models\forms\RegisterForm;
 use app\models\Guild;
 use kiss\exception\HttpException;
@@ -72,6 +73,28 @@ class MainController extends BaseController {
         return Response::redirect(['/login']);
     }
 
+    function actionRecover() {
+        
+        if (Chickatrice::$app->loggedIn())
+            return Response::redirect(['/profile/@me/settings']);
+
+        $token = HTTP::post('token', HTTP::get('token', ''));
+        if (empty($token)) 
+            throw new HttpException(HTTP::BAD_REQUEST, 'Invalid token provided');
+        
+        $form = new RecoverForm(['token' => $token]);
+        if (HTTP::hasPost()) {
+            if ($form->load(HTTP::post()) && $form->save()) {
+                Chickatrice::$app->session->addNotification('Account recovered successfully', 'success');
+                return Response::redirect(['/login']);
+            } else {                
+                Chickatrice::$app->session->addNotification('Failed to recover. ' . $form->errorSummary(), 'danger');
+            }
+        }
+        
+        return $this->render('recover', ['form' => $form ]);
+    }
+
     /** Logs In */
     function actionLogin() {
         if (Kiss::$app->loggedIn())
@@ -82,7 +105,12 @@ class MainController extends BaseController {
         if (HTTP::hasPost()) {
             if ($loginForm->load(HTTP::post())) {
                 if ($loginForm->save()) {
-                    return Response::redirect(self::PROFILE_HOME);
+                    if ($loginForm->btn_recover) {
+                        Kiss::$app->session->addNotification('Recovery emailed', 'success');
+                        return Response::redirect(['/login']);
+                    } else {
+                        return Response::redirect(self::PROFILE_HOME);
+                    }
                 } else {
                     Kiss::$app->session->addNotification('Failed to login: ' . $loginForm->errorSummary(), 'danger');
                 }

@@ -501,4 +501,15 @@ class HTTP {
     public static function json($assoc = true) {
         return json_decode(self::body(), $assoc);
     }
+
+    /** @return string the current IP address of the user */
+    public static function ip() {
+        return HTTP::header('X-Forwarded-For', HTTP::header('CF-Connecting-IP', $_SERVER['REMOTE_ADDR']));
+    }
+
+    /** @return string the current user agent */
+    public static function userAgent() {
+        return HTTP::header('user-agent', null);
+    }
+
 }

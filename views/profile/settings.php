@@ -36,6 +36,7 @@ if (KISS_DEBUG) {
                 <h2 class="subtitle">
                     Your account has not been activated. Please check your emails for a activation code before you start playing.
                 </h2>
+                <a href="<?= HTTP::url(['resend']) ?>"><i class="fal fa-mail-bulk"></i> Resend Activation</a>
             </div>
         </div>
     </section>

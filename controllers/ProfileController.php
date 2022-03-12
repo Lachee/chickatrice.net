@@ -11,6 +11,7 @@ use app\models\cockatrice\Replay;
 use app\models\cockatrice\ReplayAccess;
 use app\models\cockatrice\ReplayGame;
 use app\models\forms\ProfileSettingForm;
+use app\models\forms\RegisterForm;
 use app\models\forms\UserSettingForm;
 use app\models\Gallery;
 use app\models\Identifier;
@@ -64,6 +65,24 @@ class ProfileController extends BaseController
             'fullWidth' => true,
             'wrapContents' => false
         ]);
+    }
+
+    /** Displays the users profile */
+    function actionResend()
+    {
+        //Verify its their own profile
+        if ($this->profile->id != Kiss::$app->user->id)
+            throw new HttpException(HTTP::FORBIDDEN, 'Cannot resend someone else\'s activation.');
+    
+        $activation = Chickatrice::$app->redis()->get($this->profile->id . ':activation');
+        if ($activation) {
+            Chickatrice::$app->session->addNotification('Activation code was already sent! Please wait 15 minutes.', 'danger');
+        } else {
+            RegisterForm::sendAccountActivation($this->profile->account);
+            Chickatrice::$app->redis()->set($this->profile->id . ':activation', 'true');
+            Chickatrice::$app->redis()->expire($this->profile->id . ':activation', 15 * 60);
+        }
+        return Response::redirect(['settings']);
     }
 
     /** Manages the user buddies */

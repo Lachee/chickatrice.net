@@ -89,10 +89,14 @@ class UserSettingForm extends Form {
 
         // Account options
         $this->account->realname = $this->realname;
-        $this->account->country = $this->country;        
+        $this->account->country = $this->country;    
         if (!empty($this->password)) {
             $this->account->setPassword($this->password);
             Chickatrice::$app->session->addNotification('Your password has been changed.');
+        }
+
+        if ($this->account->active) {
+            $this->account->token = '';
         }
 
         // User options

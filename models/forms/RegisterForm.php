@@ -96,39 +96,7 @@ class RegisterForm extends Form {
         $user = User::createUser($this->username, $this->email, 0);
         $account = $user->getAccount();
         $account->setPassword($this->password);
-        $account->active = 0;
-        $account->token = Strings::token();
-        $account->save();       
-
-        $name = $this->username;
-        $token = HTTP::url(['/activate', 'token' => $account->token], true);
-
-$message = <<<TXT
-
-Welcome $name,
-
-    Thank you for registering your account on Chickatrice.net. 
-    
-    Before you can play, you need to activate your account. This can be done by following the
-    link in this email or signing in with Discord.    
-    I was too lazy to make a fancy email, so have this plain text one instead! Its very
-    doubtful that anyone reads these anyways. 
-    
-
-    Please activate your account by going to the following link:
-    $token
-
-Cheers,
-    Lachee
-TXT;
-
-        Chickatrice::$app->mail->messages()->send('mg.chickatrice.net', [
-            'from'      => 'no-reply@chickatrice.net',
-            'to'        => $this->email,
-            'subject'   => 'Chickatrice Activation',
-            'text'      => $message
-        ]);
-
+        static::sendAccountActivation($account);
         Chickatrice::$app->session->addNotification('Your account has been created. Please check your emails before you can use it.');
         return true;
     }
@@ -200,4 +168,39 @@ TXT;
         return true;
     }
 
+    public static function sendAccountActivation($account) {
+        $account->active = 0;
+        $account->token = Strings::token();
+        $account->save();       
+
+        $name = $account->name;
+        $token = HTTP::url(['/activate', 'token' => $account->token], true);
+
+$message = <<<TXT
+
+Welcome $name,
+
+    Thank you for registering your account on Chickatrice.net. 
+    
+    Before you can play, you need to activate your account. This can be done by following the
+    link in this email or signing in with Discord.    
+    I was too lazy to make a fancy email, so have this plain text one instead! Its very
+    doubtful that anyone reads these anyways. 
+    
+
+    Please activate your account by going to the following link:
+    $token
+
+Cheers,
+    Lachee
+TXT;
+
+        Chickatrice::$app->mail->messages()->send('mg.chickatrice.net', [
+            'from'      => 'no-reply@chickatrice.net',
+            'to'        => $account->email,
+            'subject'   => 'Chickatrice Activation',
+            'text'      => $message
+        ]);
+
+    }
 }

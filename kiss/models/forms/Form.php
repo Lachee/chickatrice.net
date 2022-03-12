@@ -216,8 +216,6 @@ class Form extends BaseObject {
     /** @inheritdoc */
     public function load($data = null)
     {
-     
-
         $subdata = $data;
         if (!empty($this->formName))
             $subdata = Arrays::value($data, $this->formName, null);

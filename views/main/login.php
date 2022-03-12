@@ -25,7 +25,7 @@ use kiss\Kiss;
                             </p>
                         </div>
                         <footer class="card-footer">
-                            <!--<button class="card-footer-item" type="submit" name="login[btn_recover]"><span><i class="fal fa-envelope"></i> Recover</span></button>-->
+                            <button class="card-footer-item" type="submit" name="login[btn_recover]"><span><i class="fal fa-life-ring"></i> Recover</span></button>
                             <button class="card-footer-item" type="submit" name="login[btn_login]"><span><i class="fal fa-sign-in"></i> Login</span></button>
                         </footer>
                     </form>
