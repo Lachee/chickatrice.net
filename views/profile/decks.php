@@ -108,7 +108,7 @@ $precentage = $decksAvailable / $maxDecksAvailable;
                                 </span>
                             </a>
 
-                            <a class="button is-hidden-touch" href="<?= HTTP::url(['/profile/:profile/decks/:deck/analytics',  'profile' => $profile->getUsername(), 'deck' => $deck]) ?>">
+                            <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/analytics',  'profile' => $profile->getUsername(), 'deck' => $deck]) ?>">
                                 <span class="icon">
                                     <i class="fal fa-analytics"></i>
                                 </span>
