@@ -24,7 +24,7 @@ use kiss\helpers\HTTP;
             <div class="columns">
                 <div class="column is-one-fifth"></div>
                 <div class="column" id="site-heading">
-                    <h1 class="title is-size-1"><?= HTML::encode($profile->username) ?>'s Profile</h1>
+                    <h1 class="title is-size-1"><?= HTML::encode(ucfirst($profile->username)) ?>'s Profile</h1>
                     <h2 class="subtitle is-size-3">Coming Soon&trade;</h2>
                     <div class="block">
                         <p>Public user profiles are coming soon. View common colours, deck types, favourite cards and more.</p>
