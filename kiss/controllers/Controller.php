@@ -115,12 +115,7 @@ class Controller extends Route {
      * @return string 
     */
     public function getContentJSPath() {
-        $route = get_called_class()::route();
-        $route = preg_replace('/:\\w*\\/?/', '', $route);
-        
-        $l = strrpos($route, '/');
-        if ($l == strlen($route) - 1) $route = substr($route, 0, $l);
-        return $route . "/src";
+        return substr($this->getContentViewPath('src'), strlen('@/views'));
     }
 
     /** @return string the path to the content */
