@@ -49,8 +49,6 @@ class LoginForm extends Form {
     }
 
     private function recover() {
-        $err_msg = 'Incorrect username or password';
-
         // Get the accounts
         /** @var Account $account */
         $account = Account::findByName($this->username)->one();
@@ -64,9 +62,21 @@ class LoginForm extends Form {
             $this->addError('Cannot recover Discord accounts');
             return false;
         }
+      
+        // Use redis to prevent spam recoveries
+        $recovery = Chickatrice::$app->redis()->get($this->profile->id . ':recovery');
+        if ($recovery) {
+            $this->addError('Account already recovered. Wait 15 minutes.');
+            return false;
+        }
+        Chickatrice::$app->redis()->set($this->profile->id . ':recovery', 'true');
+        Chickatrice::$app->redis()->expire($this->profile->id . ':recovery', 15 * 60);
 
+        // Update Recovery
         $account->token = Strings::token(16);
         if ($account->save(false, ['token'])) {
+            
+
             $name = $account->name;
             $ip = HTTP::ip();
             $agent = HTTP::userAgent();
