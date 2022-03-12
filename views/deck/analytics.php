@@ -13,8 +13,6 @@ use kiss\helpers\HTTP;
 /** @var Deck $deck */
 ?>
 
-
-
 <section class="hero is-info is-fullheight-with-navbar">
     <div class="hero-body">
         <div class="container">
@@ -44,7 +42,7 @@ use kiss\helpers\HTTP;
 
                 </div>
                 <div class="column is-one-third">
-                    <figure class="image">
+                    <figure class="image is-bobbing">
                         <img src="/images/cards-small.png" />
                     </figure>
                 </div>

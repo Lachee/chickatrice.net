@@ -1,0 +1,45 @@
+.is-bobbing {
+    animation: bobbing 6s ease-in-out infinite;
+
+    &::after {
+        content: "";
+        display: block;
+        margin: auto;
+        width: 100%;
+        height: 25%;
+        background: rgb(25, 57, 84);
+        border-radius: 100%;
+        box-shadow: -1px 7px 14px 20px rgba(0, 0, 0, 0.6);
+        animation: bobbing-after 6s ease-in-out infinite;
+    }
+
+    @keyframes bobbing {
+        0% {
+            transform: translatey(0px);
+        }
+        50% {
+            transform: translatey(-20px);
+        }
+        100% {
+            transform: translatey(0px);
+        }
+    }
+
+    @keyframes bobbing-after {
+        0% {
+            transform: translatey(0px);
+            width: 50%;
+            height: 15%;
+        }
+        50% {
+            transform: translatey(20px);
+            width: 35%;
+            height: 10%;
+        }
+        100% {
+            transform: translatey(0px);
+            width: 50%;
+            height: 15%;
+        }
+    }
+}

@@ -39,7 +39,7 @@ use kiss\helpers\HTTP;
 
                 </div>
                 <div class="column is-one-third">
-                    <figure class="image">
+                    <figure class="image is-bobbing">
                         <img src="/images/cards-small.png" />
                     </figure>
                 </div>
