@@ -59,7 +59,11 @@ class ProfileController extends BaseController
     /** Displays the users profile */
     function actionIndex()
     {
-        return Response::redirect(['/profile/:profile/decks', 'profile' => $this->profile->getUsername()]);
+        return $this->render('index', [
+            'profile' => $this->profile ,
+            'fullWidth' => true,
+            'wrapContents' => false
+        ]);
     }
 
     /** Manages the user buddies */
