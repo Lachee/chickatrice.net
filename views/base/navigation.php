@@ -16,8 +16,6 @@ $user = Kiss::$app->getUser();
 <nav class="navbar ">
     <div class="support-flags">
         <div class="ukraine"></div>
-        <div class="ukraine"></div>
-        <!-- <div class="trans"></div> -->
     </div>
     <div class="container">
         <!-- BRAND -->
