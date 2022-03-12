@@ -1,7 +1,6 @@
 console.log('IM INDEX.JS!');
 
 import Chart from 'chart.js/auto';
-
 import 'chartjs-adapter-moment';
 
 
@@ -87,11 +86,8 @@ class UptimeChart {
     }
 
     async fetch(endpoint) {
-        console.log('fetching data...');
         let response = await fetch(endpoint);
         let message = await response.json();
-
-        console.log('fetched stats:', message);
 
         this.clear();
         for(let stat of message.data) {
