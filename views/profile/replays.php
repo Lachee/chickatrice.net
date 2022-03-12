@@ -96,6 +96,12 @@ $precentage = $replaysAvailable / $maxReplaysAvailable;
                                     <i class="fal fa-download"></i>
                                 </span>
                             </a>
+
+                            <a class="button is-hidden-touch" href="<?= HTTP::url(['/profile/@me/games/:game/analytics', 'game' => $replay->id]) ?>">
+                                <span class="icon">
+                                    <i class="fal fa-analytics"></i>
+                                </span>
+                            </a>
                         </div>
                     </div>
                 </div>

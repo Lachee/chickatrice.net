@@ -41,6 +41,19 @@ class DeckController extends BaseController {
         ]);
     }    
 
+    function actionAnalytics() {
+        if ($this->profile->deck_privacy >= 2 && $this->profile->id != Chickatrice::$app->user->id)
+            throw new HttpException(HTTP::FORBIDDEN, 'User has hidden their decks');
+
+        return $this->render('analytics', [            
+            'profile'       => $this->profile,
+            'deck'          => $this->deck,
+            
+            'fullWidth' => true,
+            'wrapContents' => false,
+        ]);
+    }
+
     function actionRemove() {
         if ($this->profile->id != Chickatrice::$app->user->id)
             throw new HttpException(HTTP::FORBIDDEN, 'Cannot delete other people\'s decks! Cheeky!');
