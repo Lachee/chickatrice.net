@@ -14,8 +14,8 @@ class UserSettingForm extends Form {
 
     const DECK_PRIVACY = [
         0 => 'Public',
-        1 => 'Public Copy-Protected',
-        2 => 'Private'
+        1 => 'Copy-Protected',
+        // 2 => 'Private' // Removed Private because they can just not upload decks. 
     ];
 
     /** @var User $user */
