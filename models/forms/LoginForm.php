@@ -64,13 +64,13 @@ class LoginForm extends Form {
         }
       
         // Use redis to prevent spam recoveries
-        $recovery = Chickatrice::$app->redis()->get($this->profile->id . ':recovery');
+        $recovery = Chickatrice::$app->redis()->get($user->id . ':recovery');
         if ($recovery) {
             $this->addError('Account already recovered. Wait 15 minutes.');
             return false;
         }
-        Chickatrice::$app->redis()->set($this->profile->id . ':recovery', 'true');
-        Chickatrice::$app->redis()->expire($this->profile->id . ':recovery', 15 * 60);
+        Chickatrice::$app->redis()->set($user->id . ':recovery', 'true');
+        Chickatrice::$app->redis()->expire($user->id . ':recovery', 15 * 60);
 
         // Update Recovery
         $account->token = Strings::token(16);
