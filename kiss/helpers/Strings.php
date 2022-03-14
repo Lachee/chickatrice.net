@@ -41,13 +41,31 @@ class Strings {
     }
 
     /**
-     * Converts the string into printable characters only (ASCII)
+     * Converts the string into printable characters only
      * @param string $str 
      * @param string $replace optional string to replace
      * @return string the resulting string
      */
     public static function printable($str, $replace = '') {
         return preg_replace('/[[:^print:]]/', $replace, $str);
+    }
+
+    /** Strips all non-alpha numeric characters from the given string
+     * @param string $str 
+     * @param string $replace optional string to replace
+     * @return string the resulting string
+     */
+    public static function alphanumeric($str, $replace = '') {
+        return preg_replace('/[^A-Za-z0-9]/','',$str);
+    }
+
+    /** Strip stuff to make it filename safe
+     * @param string $str
+     * @return string
+     */
+    public static function safe($str) {
+        $str = preg_replace('/\s|-/','_',$str);
+        return preg_replace('/[^A-Za-z0-9_]/','',$str);
     }
 
     /** Converts a string to lower case, respecting the encoding and not destroying UTF-8 

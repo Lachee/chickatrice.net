@@ -17,6 +17,7 @@ use Exception;
 use Chickatrice;
 use kiss\exception\ArgumentException;
 use kiss\helpers\Arrays;
+use kiss\helpers\Strings;
 use kiss\Kiss;
 use Mailgun\Mailgun;
 use Ramsey\Uuid\Uuid;
@@ -32,6 +33,12 @@ class MainController extends BaseController {
      * You can also throw exceptions here if requried to tell the user off.
      */
     public function authorize($action) { return true; }
+
+    function actionTest() {
+        $name = '[KonKlave]DÐ';
+        echo Strings::safe($name);
+        exit;
+    }
 
     function actionIndex() {
         return $this->render('index', [

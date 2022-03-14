@@ -40,6 +40,15 @@ class RegisterForm extends Form {
         return parent::render($options);
     }
 
+    public function load($data = null)
+    {
+        if (!parent::load($data)) {
+            return false;
+        }
+
+        $this->username = Strings::safe($this->username);
+    }
+
     public function validate()
     {
         if (!self::ALLOW_REGISTRATION)

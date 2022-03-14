@@ -174,6 +174,9 @@ class Account extends ActiveRecord {
      * @throws InvalidOperationException 
      */
     public static function createAccount($username, $email, $password) {
+        // Stip messy characters
+        $username = Strings::safe($username);
+
         // Create a new account
         $account = new Account([
             'admin'             => 0,
