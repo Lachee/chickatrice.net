@@ -60,6 +60,12 @@ use kiss\helpers\HTTP;
         </div>
         <div class="level-right">
 
+             <?php if (!empty($deck->publicUrl)): ?>
+                <a class="button level-item has-image is-moxfield" href="<?= HTML::encode($deck->publicUrl) ?>" target="_BLANK">
+                    <img src="/images/moxfield.svg" />
+                </a>
+            <?php endif; ?>
+
             <button class="button level-item has-icon" onclick="navigator.share({url: `<?= HTTP::url(['#'], true) ?>`});">
                 <span class="icon"><i class="fal fa-share-alt"></i></span>
                 <span>Share</span>

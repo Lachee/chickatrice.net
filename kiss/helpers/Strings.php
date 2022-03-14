@@ -40,6 +40,16 @@ class Strings {
         return rtrim($str, $charlist);
     }
 
+    /**
+     * Converts the string into printable characters only (ASCII)
+     * @param string $str 
+     * @param string $replace optional string to replace
+     * @return string the resulting string
+     */
+    public static function printable($str, $replace = '') {
+        return preg_replace('/[[:^print:]]/', $replace, $str);
+    }
+
     /** Converts a string to lower case, respecting the encoding and not destroying UTF-8 
      * @return string the lowercase string*/
     public static function toLowerCase($str) {

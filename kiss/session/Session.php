@@ -28,7 +28,7 @@ abstract class Session extends BaseObject {
     private $claims = null;
 
     /** @var int how long sessions last for in seconds by default. */
-    public $sessionDuration = 24*60*60;
+    public $sessionDuration = 7*24*60*60;
 
     /** Initializes the session from JWT. Throws if unable. */
     protected function init() {

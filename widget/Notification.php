@@ -16,8 +16,11 @@ class Notification extends Widget {
             foreach($notifications as $notification) {
                 $content = $notification['content'];
                 $type = $notification['type'];
-                if (isset($notification['html']) && $notification['html'] == true) 
+                if (isset($notification['html']) && $notification['html'] == true) {
                     $content = $notification['raw'];
+                } else {
+                    $content = HTML::encode($content);
+                }
 
                 echo "<div class='notification is-{$type}'>";
                 echo '<button class="delete" onclick="this.parentNode.classList.add(\'is-closed\')"></button>';

@@ -200,9 +200,13 @@ class Kiss extends BaseObject {
     public function getBaseNamespace() { return $this->baseNamespace; }
 
     /** The base directory  of the application
-     * @return string
+    * @param string optional sub directory to prepend
+    * @return string
     */
-    public function baseDir() { return KISS_AUTOLOAD_DIR; }
+    public function baseDir($subdir = false) { 
+        $base = KISS_AUTOLOAD_DIR;
+        return $base . ($subdir ? '/' . $subdir : '');
+    }
     
     /** The base URL 
      * @return string

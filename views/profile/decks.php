@@ -35,11 +35,31 @@ $precentage = $decksAvailable / $maxDecksAvailable;
     </nav>
 
     <?php if (Chickatrice::$app->loggedIn() && $profile->id === Chickatrice::$app->user->id): ?>
-    <p class="block">
-        <p>Storing <strong><?= $decksAvailable ?></strong> of <strong><?= $maxDecksAvailable ?></strong> decks</p>
-        <p><I>Exceeding the capacity will result in <strong>NEWER</strong> decks being deleted within a week of upload.</I></p>
-        <progress class="progress is-primary" value="<?= $decksAvailable ?>" max="<?= $maxDecksAvailable ?>"><?= intval($precentage * 100) ?>%</progress>
-    </p>
+        <p class="block">
+            <p>Storing <strong><?= $decksAvailable ?></strong> of <strong><?= $maxDecksAvailable ?></strong> decks</p>
+            <p><I>Exceeding the capacity will result in <strong>NEWER</strong> decks being deleted within a week of upload.</I></p>
+            <progress class="progress is-primary" value="<?= $decksAvailable ?>" max="<?= $maxDecksAvailable ?>"><?= intval($precentage * 100) ?>%</progress>
+        </p>
+    
+        <form method="GET" action="<?= HTTP::url(['importDeck']) ?>">
+            <nav class="level">
+                <div class="level-left"></div>
+                <div class="level-right">
+                    <div class="level-item field has-addons is-fullwidth" >
+                        <div class="control">
+                            <input class="input" name="mox" type="text" placeholder="Moxfield url or id...">
+                        </div>
+                        <div class="control">
+                            <button class="button is-secondary has-icon" type="submit">
+                                <span class="icon"><i class="fal fa-file-import"></i></span>
+                                <span>Moxfield</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </form>
+    
     <?php endif; ?>
 
     <!-- Account Size Advert -->

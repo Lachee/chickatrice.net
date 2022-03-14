@@ -258,6 +258,10 @@ kbd {
     }
 }
 
+/** Buttons with Images */
+.button.has-image img {
+    height: 80%;
+}
 
 
 @keyframes fadein {

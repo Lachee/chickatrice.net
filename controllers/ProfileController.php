@@ -131,6 +131,37 @@ class ProfileController extends BaseController
         ]);
     }
 
+    /** Imports a Moxfield deck */
+    function actionImportDeck() {
+        
+        //Verify its their own profile
+        if ($this->profile->id != Kiss::$app->user->id)
+            throw new HttpException(HTTP::FORBIDDEN, 'You can only import to your own decks.');
+
+        $mox = HTTP::get('mox', null);
+        if (empty($mox)) {
+            throw new HttpException(HTTP::BAD_REQUEST, 'mox needs to be supplied');
+        }
+
+        $moxId = preg_replace('/https:\/\/(www\.)?moxfield.com\/decks\//', '', $mox);
+        $deck = null;
+        try  {
+            $deck = Deck::importMoxfield($moxId);
+        } catch(\Exception $e) {
+            Chickatrice::$app->session->addNotification('Failed to import the deck.', 'danger');
+            return Response::redirect(['/profile/@me/decks']);
+        }
+
+        $deck->id_user = $this->profile->account->id;
+        if ($deck->save()) {
+            Chickatrice::$app->session->addNotification('Imported the deck ' . $deck->name, 'success');
+            return Response::redirect(['/profile/@me/decks/:deck/', 'deck' => $deck->id ]);
+        } else {
+            Chickatrice::$app->session->addNotification('Failed to import the deck.', 'danger');
+            return Response::redirect(['/profile/@me/decks']);
+        }
+    }
+
     /** Manages the user Games */
     function actionGames()
     {

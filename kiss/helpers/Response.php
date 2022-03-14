@@ -92,6 +92,14 @@ class Response {
         return new Response($status, [], $data, HTTP::CONTENT_APPLICATION_JSON);
     }
 
+
+    /** Creates a new xml response
+     * @return Response the response
+     */
+    public static function xml($status, $data) {
+        return new Response($status, [], $data, HTTP::CONTENT_APPLICATION_XML);
+    }
+
     /** Creates a new html response 
      * @return Response the response
      */

@@ -78,6 +78,7 @@ class HTTP {
     const CONTENT_TEXT_HTML = 'text/html';
     const CONTENT_TEXT_PLAIN = 'text/plain';
     const CONTENT_APPLICATION_JSON = 'application/json';
+    const CONTENT_APPLICATION_XML = 'application/xml';
     const CONTENT_APPLICATION_JAVASCRIPT = 'application/javascript';
     const CONTENT_APPLICATION_OCTET_STREAM = 'application/octet-stream';
 
