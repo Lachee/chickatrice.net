@@ -45,7 +45,7 @@ class UptimeChart {
                         time: {
                             unit: 'minute',
                             displayFormats: {
-                            }
+                            },
                         },
                         scaleLabel: { display: false },
                         gridLines: { drawBorder: false, display: false, color: "#333447" },
@@ -132,5 +132,23 @@ const chart = new UptimeChart(uptime, {
         borderColor: '#8c8c75',
     },
 });
-chart.startPolling(STATUS_ENDPOINT,  15 * 1000);
-chart.fetch(STATUS_ENDPOINT);
+
+
+
+function pollStatus() {
+    const timeElm = document.getElementById("server-time");
+    if (timeElm) {
+        timeElm.textContent = new Intl.DateTimeFormat('en-AU', {
+            timeZone: 'Australia/Sydney',
+            weekday: 'long',
+            hour: 'numeric', 
+            minute: 'numeric',
+        }).format();
+    }
+
+    chart.fetch(STATUS_ENDPOINT);
+}
+
+//chart.startPolling(STATUS_ENDPOINT,  60 * 1000);
+setInterval(pollStatus, 10 * 1000);
+pollStatus();

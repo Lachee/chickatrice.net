@@ -25,6 +25,9 @@ use kiss\Kiss;
 
                 </div>
                 <div class="column is-one-third">
+                    <div class="block has-text-centered">
+                        Server Time: <time id="server-time"></time>
+                    </div>
                     <div class="card">
                         <div class="card-content">
                             <div class="content">
