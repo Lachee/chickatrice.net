@@ -22,7 +22,7 @@ class StatusRoute extends BaseApiRoute {
     // Throw an exception to send exceptions back.
     // Supports get, delete
     public function get() {
-        $count = HTTP::get('count', 30);
+        $count = HTTP::get('count', 60);
         if ($count > self::MAX_COUNT)
             throw new HttpException(HTTP::BAD_REQUEST, 'Cannot exceed ' . self::MAX_COUNT);
 

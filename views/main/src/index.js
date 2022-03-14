@@ -32,6 +32,11 @@ class UptimeChart {
             type: 'line',
             data: { datasets },
             options: {
+                elements: { 
+                    point: {
+                        radius: 0
+                    }
+                },
                 legend: { labels: { fontColor: 'white' } },
                 scales: {
                     x: {
