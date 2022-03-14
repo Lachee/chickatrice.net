@@ -33,6 +33,9 @@ use kiss\Kiss;
                             <div class="content">
                                 <canvas id="chart-uptime"></canvas>
                             </div>
+                            <div class="block has-text-centered">
+                                <time id="uptime"></time>
+                            </div>
                         </div>
                     </div>
                     <br>

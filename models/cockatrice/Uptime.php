@@ -1,5 +1,6 @@
 <?php namespace app\models\cockatrice;
 
+use DateTime;
 use kiss\db\ActiveQuery;
 use kiss\db\ActiveRecord;
 use kiss\exception\QueryException;
@@ -10,6 +11,9 @@ use kiss\exception\InvalidOperationException;
 use kiss\helpers\HTTP;
 use kiss\helpers\Strings;
 
+/** 
+ * @property int $timeUnix unix epoch
+ */
 class Uptime extends ActiveRecord {
     public static function tableName() { return "cockatrice_uptime"; }
 
@@ -22,6 +26,12 @@ class Uptime extends ActiveRecord {
     public $games_count;
     public $rx_bytes;
     public $tx_bytes;
+
+    /** @return int gets the unix epoch */
+    public function getTimeUnix() {
+        $dt = DateTime::createFromFormat('Y-m-d H:i:s', $this->timest);
+        return $dt->getTimestamp();
+    }
 
     /**
      * Gets all the uptimes that are longer than a second
