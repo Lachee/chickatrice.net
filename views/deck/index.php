@@ -11,6 +11,14 @@ use kiss\helpers\HTTP;
 
 /** @var User $profile */
 /** @var Deck $deck */
+
+HTML::$title = Chickatrice::$app->title . " || " . $deck->name;
+HTML::$meta = [
+    'description' => !empty($deck->comment ) ? $deck->comment : 'A deck uploaded by ' . $profile->getUsermame(),
+    'image'       => !empty($deck->getImageUrl()) ? $deck->getImageUrl() : HTTP::url(Chickatrice::$app->logo, true),
+];
+
+
 ?>
 
 <style>

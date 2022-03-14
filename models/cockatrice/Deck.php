@@ -3,6 +3,7 @@
 namespace app\models\cockatrice;
 
 use app\models\Identifier;
+use Chickatrice;
 use Exception;
 use kiss\db\ActiveQuery;
 use kiss\db\ActiveRecord;
@@ -80,17 +81,26 @@ class Deck extends ActiveRecord
     /** @return string Gets the deck preview image */
     public function getImageUrl()
     {
-        $zones = array_values($this->zones);
+        $redisKey = "decks:{$this->id}:image";
+        $image = Chickatrice::$app->redis()->get($redisKey);
+        if (!empty($image)) 
+            return $image;
 
+        $zones = array_values($this->zones);
         for ($i = 0; $i < count($zones[0]); $i++) {
             $card = $zones[0][$i];
             if (!isset($card['identifier']))
                 $card['identifier'] = Identifier::findByName($card['name'])->one();
 
-            if ($card['identifier'] != null)
-                return $card['identifier']->getImageUrl();
+            if ($card['identifier'] != null) {
+                $image = $card['identifier']->getImageUrl();
+                break;
+            }
         }
-        return '';
+
+        Chickatrice::$app->redis()->set($redisKey, $image);
+        Chickatrice::$app->redis()->expire($redisKey, (empty($image) ? 60 : 24 * 60 * 60));
+        return $image;
     }
 
     /** @return int counts the total cards */

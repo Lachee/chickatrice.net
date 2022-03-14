@@ -58,6 +58,16 @@ class ProfileController extends BaseController
         parent::action($endpoint, ...$args);
     }
 
+    function actionAvatar() {
+        // We need to transcode
+        $bmp = $this->profile->account->avatar_bmp;
+        if ($bmp !== null) 
+            return Response::image($bmp, 'bmp');
+
+        // We can just return directly
+        return Response::redirect(HTTP::url($this->profile->avatarUrl, true));
+    }
+
     /** Displays the users profile */
     function actionIndex()
     {

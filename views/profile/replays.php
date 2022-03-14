@@ -18,6 +18,12 @@ use kiss\helpers\HTTP;
 $replaysAvailable = count($replays);
 $maxReplaysAvailable = $profile->max_allowed_replays;
 $precentage = $replaysAvailable / $maxReplaysAvailable;
+
+HTML::$title = Chickatrice::$app->title . " || " . $profile->username;
+HTML::$meta = [
+    'description' => 'List of public replays on ' . ucfirst($profile->username) . '\'s account',
+    'image'       => HTTP::url(['/profile/:profile/avatar', 'profile' => $profile->uuid], true),
+];
 ?>
 
 <style>

@@ -14,6 +14,13 @@ use kiss\models\BaseObject;
 /** @var User $profile */
 /** @var Form $model */
 
+
+HTML::$title = Chickatrice::$app->title . " || Settings";
+HTML::$meta = [
+    'description' => 'Setup your Cockatrice password and link your Discord account here.'
+];
+
+
 /*
 $form = new Formr('bulma');
 $rules = [

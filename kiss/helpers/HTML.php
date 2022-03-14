@@ -5,7 +5,14 @@ use kiss\exception\ArgumentException;
 use kiss\Kiss;
 
 class HTML {
+
+    /** @var string title of the page */
     public static $title = 'KISS Dev';
+
+    /** @var string[string] metadata of the page. Keys set override the defaults */
+    public static $meta = [];
+
+    /** @var string the current route */
     public static $route = '';
 
 
@@ -15,6 +22,27 @@ class HTML {
      */
     public static function comment($comment) {
         return '<!-- ' . str_replace('-->', '→', $comment) . ' -->';
+    }
+
+    /** Creates all the HTML meta tags for open graph
+     * @return string
+    */    
+    public static function openGraphMeta() {
+        $meta = array_merge([
+            'title'         => HTML::$title,
+            'description'   => Kiss::$app->description,
+            'url'           => Kiss::$app->baseURL(),
+            'image'         => HTTP::url(Kiss::$app->logo, true),
+        ], HTML::$meta);
+
+        $html = '';
+        foreach($meta as $name => $value) {
+            $html .= HTML::tag('meta', '', [
+                'property' => 'og:' . $name,
+                'content' => HTML::encode($value)
+            ]);
+        }
+        return $html;
     }
 
     /** Prepares a URL with special prefix:
