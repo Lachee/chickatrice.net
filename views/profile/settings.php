@@ -56,7 +56,7 @@ if (KISS_DEBUG) {
             <div class="card">
                 <header class="card-header">
                     <p class="card-header-title">
-                        <span class="icon"><i class="fal fa-user-cog"></i></span> Account Settings
+                        <span class="icon"><i class="fal fa-user-cog"></i></span> Cockatrice Settings
                     </p>
                 </header>
                 <div class="card-content">
