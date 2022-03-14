@@ -34,12 +34,6 @@ class MainController extends BaseController {
      */
     public function authorize($action) { return true; }
 
-    function actionTest() {
-        $name = '[KonKlave]DÐ';
-        echo Strings::safe($name);
-        exit;
-    }
-
     function actionIndex() {
         return $this->render('index', [
             'fullWidth' => true,

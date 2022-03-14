@@ -176,6 +176,8 @@ class Account extends ActiveRecord {
     public static function createAccount($username, $email, $password) {
         // Stip messy characters
         $username = Strings::safe($username);
+        if (strlen($username) > 30)
+            $username = substr($username, 0, 30);
 
         // Create a new account
         $account = new Account([
