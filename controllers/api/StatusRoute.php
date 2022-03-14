@@ -2,6 +2,9 @@
 
 use app\models\cockatrice\Uptime;
 use kiss\controllers\api\ApiRoute;
+use kiss\db\ActiveQuery;
+use kiss\exception\HttpException;
+use kiss\helpers\HTTP;
 use kiss\Kiss;
 use kiss\router\Route;
 use kiss\router\RouteFactory;
@@ -9,6 +12,7 @@ use kiss\router\RouteFactory;
 class StatusRoute extends BaseApiRoute {
     use \kiss\controllers\api\Actions;
 
+    const MAX_COUNT = 200;
 
     //We are going to return our routing. Any segment that starts with : is a property.
     // Note that more explicit routes get higher priority. So /example/apple will take priority over /example/:fish
@@ -18,8 +22,14 @@ class StatusRoute extends BaseApiRoute {
     // Throw an exception to send exceptions back.
     // Supports get, delete
     public function get() {
-        return Uptime::getUptimes()
+        $count = HTTP::get('count', 60);
+        if ($count > self::MAX_COUNT)
+            throw new HttpException(HTTP::BAD_REQUEST, 'Cannot exceed ' . self::MAX_COUNT);
+
+        $query = Uptime::getMinutelyUptimes()
                 ->fields(['timest', 'uptime', 'users_count', 'games_count'])
-                ->all(true);
+                ->limit($count);
+                
+        return $query->all(true);
     }
 }
