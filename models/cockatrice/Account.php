@@ -151,6 +151,16 @@ class Account extends ActiveRecord {
         return self::find()->where([ 'token',  $token ]);
     }
     
+    /** @return ActiveQuery|Account[] finds accounts that have active sessions */
+    public static function findByOnline() {
+        $date = date("Y-m-d H:i:s",strtotime("-1 month"));
+        return self::find()
+                    ->leftJoin('cockatrice_sessions', ['name' => 'user_name' ])
+                    ->where(['end_time', null])
+                    ->andWhere(['start_time', '>', $date])
+                    ->orderByDesc('start_time');
+    }
+
     /**
      * Creates a new account
      * @param string $username username of the account

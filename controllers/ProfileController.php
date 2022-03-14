@@ -23,6 +23,7 @@ use kiss\models\BaseObject;
 use app\models\User;
 use app\widget\Notification;
 use Chickatrice;
+use kiss\helpers\Arrays;
 use kiss\helpers\HTML;
 use kiss\helpers\Strings;
 use kiss\Kiss;
@@ -102,10 +103,38 @@ class ProfileController extends BaseController
             return Response::redirect('relations');
         }
 
+        // Fetch the Ignores, Buddies, and Online Accounts who are also buddies
+        $ignore = $this->profile->account->ignores;
+        $friends = $this->profile->account->friends;
+        $friend_ids = array_values(Arrays::map($friends, function($v) { return $v->id; }));
+        $online = Arrays::map(
+                        Account::findByOnline()
+                            ->andWhere(['cockatrice_users.id', $friend_ids])
+                            ->fields('cockatrice_users.id')
+                            ->all(true),
+                        function($account) {
+                            return $account['id'];
+                        }
+                    );
+
+        // Lets do a really bad naive shuffle so online buddies are on top
+        // This is terrible and i could probably do this with one lookup in SQL... but lets be honest, who cares?
+        $online_buddies = [];
+        $offline_buddies = [];
+        foreach($friends as $friend) {
+            if (in_array($friend->id, $online)) {
+                $online_buddies[] = $friend;
+            } else {
+                $offline_buddies[] = $friend;
+            }
+        }
+
+        // Render it all out
         return $this->render('relations', [
-            'profile' => $this->profile,
-            'buddies' => $this->profile->account->friends,
-            'ignores'  => $this->profile->account->ignores
+            'profile'           => $this->profile,
+            'buddies'           => $online_buddies + $offline_buddies,
+            'online_ids'        => $online,
+            'ignores'           => $ignore,
         ]);
     }
 

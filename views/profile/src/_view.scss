@@ -21,4 +21,15 @@
         filter: saturate(0.25) blur(2px);
         clip-path: inset(0.1% 0.1% 0.1% 0.1%);
     }
+
+    .badge.is-online {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 16px;
+        height: 16px;
+        background: #68f500;
+        border-radius: 100%;
+    }
 }
+
