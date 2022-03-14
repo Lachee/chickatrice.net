@@ -12,7 +12,7 @@ use kiss\router\RouteFactory;
 class StatusRoute extends BaseApiRoute {
     use \kiss\controllers\api\Actions;
 
-    const MAX_COUNT = 200;
+    const MAX_COUNT = 60*4;
 
     //We are going to return our routing. Any segment that starts with : is a property.
     // Note that more explicit routes get higher priority. So /example/apple will take priority over /example/:fish
@@ -22,14 +22,14 @@ class StatusRoute extends BaseApiRoute {
     // Throw an exception to send exceptions back.
     // Supports get, delete
     public function get() {
-        $count = HTTP::get('count', 60);
+        $count = HTTP::get('count', 30);
         if ($count > self::MAX_COUNT)
             throw new HttpException(HTTP::BAD_REQUEST, 'Cannot exceed ' . self::MAX_COUNT);
 
         $query = Uptime::getMinutelyUptimes()
                 ->fields(['timest', 'uptime', 'users_count', 'games_count'])
                 ->limit($count);
-                
+
         return $query->all(true);
     }
 }

@@ -38,11 +38,8 @@ class UptimeChart {
                         type: 'time',
                         display: true,
                         time: {
+                            unit: 'minute',
                             displayFormats: {
-                                'second': 'HH:MM',
-                                'minute': 'HH:MM',
-                                'hour': 'HH:MM',
-                                'day': 'HH:MM'
                             }
                         },
                         scaleLabel: { display: false },
