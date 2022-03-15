@@ -84,4 +84,32 @@ class BaseApiRoute extends ApiRoute {
             }
         }
     }
+
+    /**  caches the result of the callback. 
+     * @param Callable $callback function used to set the cache
+     * @param int $ttl how long the cache lasts for
+     * @return mixed the object data
+     */
+    protected function cache($callback, $ttl = 15) {
+        $key = $this->cacheKey();
+
+        $result = Chickatrice::$app->redis()->get($key);
+        if ($result !== null) 
+            return unserialize($result);
+
+        $result = call_user_func($callback);
+        Chickatrice::$app->redis()->set($key, serialize($result));
+        Chickatrice::$app->redis()->expire($key, $ttl);
+        return $result;
+    }
+
+    /** @return string calculates the recommended key for the cache */
+    protected function cacheKey() {
+        $keys = [
+            HTTP::method(),
+            $this->route(),
+            http_build_query(HTTP::get())
+        ];
+        return 'api:cache:' . md5(join(":", $keys));
+    }
 }

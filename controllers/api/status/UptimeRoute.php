@@ -24,19 +24,12 @@ class UptimeRoute extends BaseApiRoute {
     // Throw an exception to send exceptions back.
     // Supports get, delete
     public function get() {
-        $key = 'api:cache:'. md5(http_build_query(HTTP::get()));
-        $result = Chickatrice::$app->redis()->get($key);
-        if ($result !== null) 
-            return json_decode($result, true);
-
-        $deep = HTTP::get('deep', false);
-        $result = $deep !== false ? 
-            $this->getDeepUptime() : 
-            $this->getShallowUptime();
-            
-        Chickatrice::$app->redis()->set($key, json_encode($result));
-        Chickatrice::$app->redis()->expire($key, 15);
-        return $result;
+        return $this->cache(function() {
+            $deep = HTTP::get('deep', false);
+            return $deep !== false ? 
+                $this->getDeepUptime() : 
+                $this->getShallowUptime();
+        }, $this->maxTimeSinceLastUptime);
     }
 
     /** Gets the deep uptime for the stats page */

@@ -263,6 +263,12 @@ kbd {
     height: 80%;
 }
 
+.is-overflow-auto {
+    overflow: auto;
+}
+.is-overflow-hidden {
+    overflow: hidden;
+}
 
 @keyframes fadein {
     from { opacity: 0; }
