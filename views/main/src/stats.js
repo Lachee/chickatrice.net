@@ -34,7 +34,7 @@ async function createCharts() {
         if (!elm) continue;
 
         const chart = new google.visualization.LineChart(elm);
-        const options = { hAxis: { title: 'Time (EST)' }, vAxis: { title: tables[tableName][0][1] }, legend: { position: 'none' } };
+        const options = { hAxis: { title: tables[tableName][0][0] }, vAxis: { title: tables[tableName][0][1] }, legend: { position: 'none' } };
         const data = new google.visualization.arrayToDataTable(tables[tableName]);
         
         console.log('Loading Chart', tableName, elm, tables[tableName]);
