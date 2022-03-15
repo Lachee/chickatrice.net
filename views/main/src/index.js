@@ -90,8 +90,17 @@ class UptimeChart {
                     },
                     y: {
                         gridLines: { drawBorder: false, display: false, color: "#333447" },
+                        position: 'left',
+                        beginAtZero: true,
                         ticks: {
-                            beginAtZero: true,
+                            fontColor: "white",
+                        }
+                    },
+                    y_alt: {
+                        gridLines: { drawBorder: false, display: false, color: "#333447" },
+                        position: 'right',
+                        beginAtZero: true,
+                        ticks: {
                             fontColor: "white",
                         }
                     }
@@ -164,8 +173,8 @@ const chart = new UptimeChart(uptime, {
     },
     'users_count': {
         label: 'Users',
-        backgroundColor: '#dadab6',
-        borderColor: '#8c8c75',
+        backgroundColor: '#ff6666',
+        borderColor: '#db1f1f',
     },
 });
 
