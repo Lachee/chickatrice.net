@@ -28,12 +28,12 @@ $user = Kiss::$app->getUser();
             </a>
 
             <?php if ($user): ?>
-                <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/profile/@me/games') ?: 'is-active' ?>" data-tooltip="Games" href="<?= HTTP::url('/profile/@me/games')?>">
-                    <span class="icon"><i class="fal fa-chess-clock"></i></span>
-                    <span class="is-hidden-touch">Games</span>
+                <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/profile/@me/replays') ?: 'is-active' ?>" data-tooltip="Replays" href="<?= HTTP::url('/profile/@me/replays')?>">
+                    <span class="icon"><i class="fal fa-cassette-tape"></i></span>
+                    <span class="is-hidden-touch">Replays</span>
                 </a>
                 <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/profile/@me/decks') ?: 'is-active' ?>" data-tooltip="Decks" href="<?= HTTP::url('/profile/@me/decks')?>">
-                    <span class="icon"><i class="fal fa-album-collection"></i></span>
+                    <span class="icon"><i class="fal fa-book-spells"></i></span>
                     <span class="is-hidden-touch">Decks</span>
                 </a>
                 <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/profile/@me/relations') ?: 'is-active' ?>" data-tooltip="Relations" href="<?= HTTP::url('/profile/@me/relations')?>">

@@ -20,7 +20,7 @@ use kiss\helpers\HTTP;
                     <nav class="breadcrumb" aria-label="breadcrumbs">
                         <ul>
                             <li><a href="<?= HTTP::url(['/profile/:profile/', 'profile' => $profile->getUsername()]) ?>"><span class="icon"><i class="fal fa-user"></i></span><?= HTML::encode($profile->getUsername()) ?></a></li>
-                            <li><a href="<?= HTTP::url(['/profile/:profile/games', 'profile' => $profile->getUsername()]) ?>">Games</a></li>
+                            <li><a href="<?= HTTP::url(['/profile/:profile/replays', 'profile' => $profile->getUsername()]) ?>">Replays</a></li>
                             <li class="is-active"><a href="#" aria-current="page">Analysis</a></li>
                         </ul>
                     </nav>

@@ -21,7 +21,7 @@ $precentage = $replaysAvailable / $maxReplaysAvailable;
 
 HTML::$title = Chickatrice::$app->title . " || " . $profile->username;
 HTML::$meta = [
-    'description' => 'List of public replays on ' . ucfirst($profile->username) . '\'s account',
+    'description' => 'Replays store to your account',
     'image'       => HTTP::url(['/profile/:profile/avatar', 'profile' => $profile->uuid], true),
 ];
 ?>
@@ -37,7 +37,7 @@ HTML::$meta = [
     <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
             <li><a href="<?= HTTP::url(['/profile/:profile/', 'profile' => $profile->getUsername()]) ?>"><span class="icon"><i class="fal fa-user"></i></span><?= HTML::encode($profile->getUsername()) ?></a></li>
-            <li class="is-active"><a href="#" aria-current="page">Games</a></li>
+            <li class="is-active"><a href="#" aria-current="page">Replays</a></li>
         </ul>
     </nav>
 
@@ -103,7 +103,7 @@ HTML::$meta = [
                                 </span>
                             </a>
 
-                            <a class="button" href="<?= HTTP::url(['/profile/@me/games/:game/analytics', 'game' => $replay->id]) ?>">
+                            <a class="button" href="<?= HTTP::url(['/profile/@me/replays/:game/analytics', 'game' => $replay->id]) ?>">
                                 <span class="icon">
                                     <i class="fal fa-analytics"></i>
                                 </span>

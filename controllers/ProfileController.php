@@ -202,7 +202,7 @@ class ProfileController extends BaseController
     }
 
     /** Manages the user Games */
-    function actionGames()
+    function actionReplays()
     {
         /** @var User $profile */
         $profile = $this->profile;

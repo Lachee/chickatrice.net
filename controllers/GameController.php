@@ -30,10 +30,10 @@ class GameController extends BaseController {
     public $profile_name;
     public $game_id;
 
-    public static function route() { return "/profile/:profile_name/games/:game_id"; }
+    public static function route() { return "/profile/:profile_name/replays/:game_id"; }
 
     function actionIndex() {
-        return Response::redirect(['/profile/@me/games']);
+        return Response::redirect(['/profile/@me/replays']);
     }    
 
     function actionAnalytics() {
