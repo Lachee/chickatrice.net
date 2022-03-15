@@ -25,7 +25,7 @@ class CronCommand extends Command {
     public function cmdDeleteLogs() {
         self::print('Clearing Logs, Uptimes, and Sessions...');
 
-        $date = date("Y-m-d H:i:s",strtotime("-1 week"));
+        $date = date("Y-m-d H:i:s",strtotime("-1 month"));
         Chickatrice::$app->db()->createQuery()->delete('cockatrice_uptime')->where(['timest', '<', $date])->execute();
         Chickatrice::$app->db()->createQuery()->delete('cockatrice_sessions')->where(['start_time', '<', $date])->execute();
 
