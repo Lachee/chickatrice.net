@@ -4,11 +4,6 @@ use kiss\helpers\HTML;
 use kiss\helpers\HTTP;
 use kiss\Kiss;
 
-HTML::$title = Chickatrice::$app->title . " || Statistics";
-HTML::$meta = [
-    'description' => 'Collection of interesting and useful statistics about Chickatrice.net.',
-];
-
 ?>
 
 <section class="section container">
