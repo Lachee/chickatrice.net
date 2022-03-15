@@ -14,6 +14,10 @@ use SimpleXMLElement;
 
 class Deck extends ActiveRecord
 {
+    const ZONE_MAIN = 'main';
+    const ZONE_SIDE = 'side';
+    const ZONE_TOKENS = 'tokens';
+
     public static function tableName()
     {
         return "cockatrice_decklist_files";
@@ -30,6 +34,8 @@ class Deck extends ActiveRecord
     public $zones;
     public $publicUrl;
 
+    protected $isDecomposed = false;
+
     /** @inheritdoc */
     public function afterQueryLoad($data)
     {
@@ -38,8 +44,9 @@ class Deck extends ActiveRecord
     }
 
     /** decomposes the data into its basic form */
-    private function decomposeData()
+    protected function decomposeData()
     {
+        $this->isDecomposed = true;
 
         $xml = new SimpleXMLElement($this->content);
         $this->comment = $xml->comments;
@@ -113,6 +120,45 @@ class Deck extends ActiveRecord
             }
         }
         return $count;
+    }
+
+    /** calculates the hash of the deck 
+     * @return string Deck's hash
+     * @see https://github.com/Cockatrice/Cockatrice/blob/88a8ee09bdb18a59025a6ce0e4153b7208aaadb4/common/decklist.cpp#L800-L833
+    */
+    public function calculateHash() {
+        if (!$this->isDecomposed)
+            $this->decomposeData();
+
+        $isValidDeckList    = true;
+        $cardList           = [];
+        $hashZones          = [ self::ZONE_MAIN, self::ZONE_SIDE ];
+        $optionalZones      = [ self::ZONE_TOKENS ];
+
+        foreach($this->zones as $zoneName => $zoneList) {
+            foreach($zoneList as $j => $card) {
+                if (in_array($zoneName, $hashZones)) {
+                    for ($k = 0; $k < $card['count']; $k++) {
+                        $cardList[] = ($zoneName === self::ZONE_SIDE ? 'SB:' : '') . Strings::toLowerCase($card['name']);
+                    }
+                } else if (!in_array($zoneName, $optionalZones)) {
+                    $isValidDeckList = false;
+                }
+            }
+        }
+
+        sort($cardList);
+        $deckHashArray = sha1(join(';', $cardList), true);
+        $deckHashBinary = unpack('C*', $deckHashArray);
+        $number =   (($deckHashBinary[1+0]) << 32) +
+                    (($deckHashBinary[1+1]) << 24) +
+                    (($deckHashBinary[1+2]) << 16) +
+                    (($deckHashBinary[1+3]) << 8) +
+                    (($deckHashBinary[1+4]));
+                    
+        $number = base_convert($number, 10, 32);
+        $deckHash = $isValidDeckList ? str_pad(strval($number), 8, "0", STR_PAD_RIGHT) : 'INVALID';
+        return $deckHash;
     }
 
     /** Finds the decks for the user

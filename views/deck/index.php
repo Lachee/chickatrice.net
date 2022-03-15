@@ -62,7 +62,7 @@ HTML::$meta = [
                 <ul>
                     <li><a href="<?= HTTP::url(['/profile/:profile/', 'profile' => $profile->getUsername()]) ?>"><span class="icon"><i class="fal fa-user"></i></span><?= HTML::encode($profile->getUsername()) ?></a></li>
                     <li><a href="<?= HTTP::url(['/profile/:profile/decks', 'profile' => $profile->getUsername()]) ?>">Decks</a></li>
-                    <li class="is-active"><a href="#" aria-current="page"><?= HTML::encode($deck->name) ?></a></li>
+                    <li class="is-active"><a href="#" aria-current="page"><?= HTML::encode($deck->name) ?> <code><?= $deck->calculateHash() ?></code></a></li>
                 </ul>
             </nav>
         </div>
