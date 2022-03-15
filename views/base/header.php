@@ -48,10 +48,7 @@ $theme = HTTP::get('theme', 'lumen');
     <link rel="stylesheet" href="https://unpkg.com/@tarekraafat/autocomplete.js@8.3.0/dist/css/autoComplete.css">
     <script src="https://unpkg.com/@tarekraafat/autocomplete.js@8.3.0/dist/js/autoComplete.min.js"></script>
 
-
     <!-- Webpacks -->
-    <!--<script src="/dist/kiss/kiss.js"></script>          -->
-    <!--<link rel="stylesheet" href="/dist/kiss/kiss.css">  -->
     <script src="/dist/kiss/kiss.js"></script>
     <link rel="stylesheet" href="/dist/kiss/kiss.css">
 
@@ -59,13 +56,8 @@ $theme = HTTP::get('theme', 'lumen');
     <?= $this->renderJsVariables(Controller::POS_HEAD); ?>
 
     <!-- Dependencies -->
+    <?= $this->renderDependencies(); ?>
     
-    <!-- App -->
-    <!-- <script src="/dist/app/app.js"></script>           -->
-    <!-- <link rel="stylesheet" href="/dist/app/app.css">   -->
-    <script src="/dist/app.js"></script>
-    <link rel="stylesheet" href="/dist/app.css">
-
     <!-- JS Variables -->
     <?= $this->renderJsVariables(Controller::POS_START); ?>
 </head>

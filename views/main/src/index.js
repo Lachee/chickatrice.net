@@ -154,7 +154,7 @@ class UptimeChart {
     }
 }
 
-const STATUS_ENDPOINT = '/api/status';
+const STATUS_ENDPOINT = '/api/status/uptime';
 const uptime = document.getElementById('chart-uptime');
 const chart = new UptimeChart(uptime, {
     'games_count': {

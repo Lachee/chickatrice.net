@@ -41,6 +41,14 @@ class MainController extends BaseController {
         ]);
     }
 
+    /** Displays statistics */
+    public function actionStats() {
+        $this->registerDependency('https://www.gstatic.com/charts/loader.js');
+        return $this->render('stats', [
+           
+        ]);
+    }
+
     /** View the JWT */
     function actionJWT() {
         return $this->render('jwt', [

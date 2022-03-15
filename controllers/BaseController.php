@@ -25,6 +25,8 @@ class BaseController extends Controller {
     public function action($endpoint, ...$args) {
         
         HTML::$title = Kiss::$app->title;
+        $this->registerDependency('/dist/app.js');
+        $this->registerDependency('/dist/app.css');
 
         //Force a check on the mixer user, validating the oauth. We dont want to apply this rule to the /auth endpoint tho.
         if (Chickatrice::$app->loggedIn()) {
@@ -63,10 +65,5 @@ class BaseController extends Controller {
 
         $response = parent::action($endpoint, ...$args);
         return $response;
-    }
-
-    public function render($action, $options = []) {
-        //$this->registerJsVariable("mixy", "new mixlib.Mixy(" . json_encode($mixyDefaults) . ")", Controller::POS_START, 'const', false);
-        return parent::render($action, $options);
     }
 }

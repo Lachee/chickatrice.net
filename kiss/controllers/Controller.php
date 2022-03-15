@@ -6,12 +6,14 @@ use kiss\exception\AggregateException;
 use kiss\exception\HttpException;
 use kiss\exception\MissingViewException;
 use kiss\exception\UncaughtException;
+use kiss\helpers\HTML;
 use kiss\helpers\HTTP;
 use kiss\helpers\Response;
 use kiss\helpers\Strings;
 use kiss\Kiss;
 use kiss\models\Identity;
 use kiss\router\Route;
+use RuntimeException;
 use Throwable;
 
 class Controller extends Route {
@@ -20,10 +22,14 @@ class Controller extends Route {
     public const POS_START = 1;
     public const POS_END = 2;
 
+    public const DEPENDENCY_SCRIPT = 0;
+    public const DEPENDENCY_STYLE = 1;
+
     /** @var Controller $current current controller */
     public static $current;
 
     private $js = [];
+    private $deps = [];
 
     private $uncaughtException = null;
 
@@ -73,6 +79,28 @@ class Controller extends Route {
         $key = $key ?? md5($js);
         $this->js[$position][$key] = $js;
     }
+
+    /** Registers a JavaScript or CSS dependency 
+     * @param string $source the source URL for the object
+     * @param int $type the type of the dependency. See DEPENDENCY_SCRIPT or DEPENDENCY_STYLE. 
+     * If -1, then it will try to determien the best one from the given extension of source
+     * @return $this
+    */
+    public function registerDependency($source, $type = -1) {
+
+        if ($type === -1) {
+            $extension = Strings::extension($source);
+            if ($extension === '.js') $type = self::DEPENDENCY_SCRIPT;
+            else if($extension === '.css') $type = self::DEPENDENCY_STYLE;
+        }
+
+        $this->deps[] = [
+            'source'    => $source,
+            'type'      => $type
+        ];
+        return $this;
+    }
+
 
     //protected $headerFile = "@/views/base/header.php";
     //protected $contentFile = "@/views/base/content.php";
@@ -152,6 +180,24 @@ class Controller extends Route {
             $lines[] = $def;
 
         return '<script>' . join("\n", $lines) . '</script>';
+    }
+
+    /** Renders all the additional dependencies */
+    protected function renderDependencies() {
+        $lines = [];
+        foreach($this->deps as $hash => $dep) {
+            switch($dep['type']) {
+                default:
+                    throw new RuntimeException('Dependency of invalid type ' . $dep['type']);
+                case self::DEPENDENCY_SCRIPT:
+                    $lines[] = HTML::tag('script', '', [ 'src' => $dep['source'] ]);
+                    break;
+                case self::DEPENDENCY_STYLE:
+                    $lines[] = HTML::tag('link', '', [ 'rel' => 'stylesheet', 'href' => $dep['source']]);
+                    break;
+            }
+        }
+        return join("\n", $lines);
     }
 
     //protected function setHeaderTemplate($file) { $this->headerFile = $file; return $this; }

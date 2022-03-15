@@ -144,7 +144,10 @@ class Strings {
     /** Gets the extension in the filename
      * @param string $str the filename
      * @param bool $lower converts the extension to lowercase
-     * @return string|false the extension, otherwise false if it cannot find it. Starts with .
+     * @return string|false the extension, otherwise false if it cannot find it. It is prefixed with the period:
+     * ```
+     * "/some/file/extension.png" => ".png"
+     * ```
      */
     public static function extension($str, $lower = true) {
         $url = $str;
