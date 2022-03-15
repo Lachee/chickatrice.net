@@ -90,8 +90,8 @@ class BaseApiRoute extends ApiRoute {
      * @param int $ttl how long the cache lasts for
      * @return mixed the object data
      */
-    protected function cache($callback, $ttl = 15) {
-        $key = $this->cacheKey();
+    protected function cache($callback, $ttl = 15, $version = 1) {
+        $key = $this->cacheKey("$version@$ttl");
 
         $result = Chickatrice::$app->redis()->get($key);
         if (!KISS_DEBUG && $result !== null) 
@@ -104,8 +104,9 @@ class BaseApiRoute extends ApiRoute {
     }
 
     /** @return string calculates the recommended key for the cache */
-    protected function cacheKey() {
+    protected function cacheKey($version = '') {
         $keys = [
+            $version,
             HTTP::method(),
             $this->route(),
             http_build_query(HTTP::get())

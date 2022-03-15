@@ -1,7 +1,7 @@
 async function createCharts() {
 
     // Load the charts
-    await google.charts.load('current', {packages: ['corechart', 'line']});
+    await google.charts.load('current', {packages: ['corechart', 'line', 'geochart']});
     await Promise.all([
         createUptimeCharts(),
         createDailyCharts()
@@ -14,10 +14,11 @@ async function createDailyCharts() {
     const response = await fetch('/api/status/daily');
     const data = (await response.json()).data;
     
-    createChart('visitor_count', data.users, 'Date', 'Visitors');
-    createChart('total_games_count', data.games, 'Date', 'Games');
+    createLineChart('visitor_count', data.users, 'Date', 'Visitors');
+    createLineChart('total_games_count', data.games, 'Date', 'Games');
+    createGeoChart('country_map', data.countries, 'Country', 'Players');
 
-    function createChart(elmId, data, xAxisLabel, yAxisLabel) {   
+    function createLineChart(elmId, data, xAxisLabel, yAxisLabel) {   
         const elm = document.getElementById(elmId);
         if (!elm) return;
         
@@ -35,10 +36,30 @@ async function createDailyCharts() {
             ]);
         }
 
-        console.log(elmId, entries);
-
         const chart = new google.visualization.LineChart(elm);
         const options = { hAxis: { title: entries[0][0] }, vAxis: { title: entries[0][1] }, legend: 'none', series: [ { color: '#ff6666' } ] };
+        const table = new google.visualization.arrayToDataTable(entries);
+        chart.draw(table, options);
+    }
+
+    function createGeoChart(elmId, data, xAxisLabel, yAxisLabel) {         
+        const elm = document.getElementById(elmId);
+        if (!elm) return;
+
+        let entries = [ [ xAxisLabel, yAxisLabel ] ];
+        for(let entry of data) {
+            entries.push([
+                entry.country,
+                +entry.value
+            ]);
+        }
+
+        const chart = new google.visualization.GeoChart(elm);
+        const options = { 
+            colorAxis: {
+                colors: ['#FFFFFF', '#ff6666']
+            },
+        };
         const table = new google.visualization.arrayToDataTable(entries);
         chart.draw(table, options);
     }

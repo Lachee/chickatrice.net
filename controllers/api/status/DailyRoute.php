@@ -30,10 +30,27 @@ class DailyRoute extends BaseApiRoute {
         $this->fromDate = HTTP::get('from', date("Y-m-d 00:00:00", strtotime("-2 weeks")));
         return $this->cache(function() {
             return [
-                'users' => $this->countDailyUsers(),
-                'games' => $this->countDailyGames(),
+                'users'     => $this->countDailyUsers(),
+                'games'     => $this->countDailyGames(),
+                'countries' => $this->countCountries(),
             ];
-        }, 60);
+        }, 60, 2);
+    }
+
+    public function countCountries() {
+        return Chickatrice::$app->db()->createQuery()
+            ->select('cockatrice_sessions', [
+                'COUNT(*) as value',
+                '`cockatrice_users`.`country`'
+            ])
+            ->leftJoin('cockatrice_users', [ 'user_name' => 'name' ])
+            ->groupBy('country')
+            ->orderByDesc('start_time')
+            ->where(['start_time', '>', $this->fromDate])
+            ->andWhere([['country', '<>', '']])
+            ->andWhere(['country', 'IS NOT', null])
+            ->limit(1000)
+            ->execute(true);
     }
 
     public function countDailyGames() {

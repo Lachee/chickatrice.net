@@ -37,6 +37,12 @@ use kiss\Kiss;
                 <div class="subtitle">Number of total games per day</div>
                 <div id="total_games_count" class="graph"></div>
             </div>
+            
+            <div class="box is-overflow-auto">
+                <div class="title">Countries</div>
+                <div class="subtitle">Users around the world from the past 2 weeks</div>
+                <div id="country_map" class="graph"></div>
+            </div>
         </div>
     </div>
 </section>
