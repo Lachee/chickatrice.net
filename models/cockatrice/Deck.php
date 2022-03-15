@@ -34,7 +34,7 @@ class Deck extends ActiveRecord
     public $zones;
     public $publicUrl;
 
-    protected $isDecomposed = false;
+    protected $_isDecomposed = false;
 
     /** @inheritdoc */
     public function afterQueryLoad($data)
@@ -46,7 +46,7 @@ class Deck extends ActiveRecord
     /** decomposes the data into its basic form */
     protected function decomposeData()
     {
-        $this->isDecomposed = true;
+        $this->_isDecomposed = true;
 
         $xml = new SimpleXMLElement($this->content);
         $this->comment = $xml->comments;
@@ -127,7 +127,7 @@ class Deck extends ActiveRecord
      * @see https://github.com/Cockatrice/Cockatrice/blob/88a8ee09bdb18a59025a6ce0e4153b7208aaadb4/common/decklist.cpp#L800-L833
     */
     public function calculateHash() {
-        if (!$this->isDecomposed)
+        if (!$this->_isDecomposed)
             $this->decomposeData();
 
         $isValidDeckList    = true;
