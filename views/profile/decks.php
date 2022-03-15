@@ -122,6 +122,14 @@ HTML::$meta = [
                                 </span>
                             </button>
 
+                            <?php if ($profile->deck_privacy >= 1 || $profile->id === Chickatrice::$app->user->id): ?>
+                            <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/download', 'profile' => $profile->getUsername(), 'deck' => $deck->id]) ?>">
+                                <span class="icon">
+                                    <i class="fal fa-download"></i>
+                                </span>
+                            </a>
+                            <?php endif; ?>
+
                             <?php if (Chickatrice::$app->loggedIn() && $profile->id === Chickatrice::$app->user->id): ?>
                             <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/remove', 'profile' => $profile->getUsername(), 'deck' => $deck->id]) ?>" onclick="return confirm('Are you sure? This cannot be undone!')">
                                 <span class="icon">

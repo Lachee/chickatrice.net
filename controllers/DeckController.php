@@ -16,6 +16,7 @@ use app\models\User;
 use app\widget\Notification;
 use Chickatrice;
 use kiss\helpers\HTML;
+use kiss\helpers\Strings;
 use kiss\Kiss;
 use Ramsey\Uuid\Uuid;
 
@@ -74,6 +75,14 @@ class DeckController extends BaseController {
         $deck->markNewRecord();
         $deck->save();
         return Response::redirect(['/profile/@me/decks/:deck/', 'deck' => $deck->id ]);
+    }
+
+    function actionDownload() {       
+        if ($this->profile->deck_privacy >= 1 && $this->profile->id != Chickatrice::$app->user->id)
+            throw new HttpException(HTTP::FORBIDDEN, 'User has copy-protected their decks');
+
+        $filename = Strings::safe($this->deck->name);
+        return Response::file("$filename.cod", $this->deck->content);
     }
 
     private $_profile;
