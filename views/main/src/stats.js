@@ -38,7 +38,7 @@ async function createDailyCharts() {
         console.log(elmId, entries);
 
         const chart = new google.visualization.LineChart(elm);
-        const options = { hAxis: { title: entries[0][0] }, vAxis: { title: entries[0][1] }, legend: { position: 'none' } };
+        const options = { hAxis: { title: entries[0][0] }, vAxis: { title: entries[0][1] }, legend: 'none', series: [ { color: '#ff6666' } ] };
         const table = new google.visualization.arrayToDataTable(entries);
         chart.draw(table, options);
     }
@@ -73,7 +73,7 @@ async function createUptimeCharts() {
         if (!elm) continue;
 
         const chart = new google.visualization.LineChart(elm);
-        const options = { hAxis: { title: tables[tableName][0][0] }, vAxis: { title: tables[tableName][0][1] }, legend: { position: 'none' } };
+        const options = { hAxis: { title: tables[tableName][0][0] }, vAxis: { title: tables[tableName][0][1] }, legend: 'none', series: [ { color: '#ff6666' } ] };
         const data = new google.visualization.arrayToDataTable(tables[tableName]);
         chart.draw(data, options);
     }
