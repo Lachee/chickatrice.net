@@ -21,7 +21,12 @@ $user = Kiss::$app->getUser();
         <!-- BRAND -->
         <div class="navbar-brand is-justify-content-space-evenly">
             <a class="navbar-item brand-text is-tab <?= HTTP::route() != '/' ?: 'is-active' ?>" href="<?= HTTP::url('/')?>"><img src="<?= Kiss::$app->logo ?>" data-tooltip="Home" /></a>
-            
+           
+            <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/stats') ?: 'is-active' ?>" data-tooltip="Stats" href="<?= HTTP::url('/stats')?>">
+                <span class="icon"><i class="fal fa-chart-area"></i></span>
+                <span>Statistics</span>
+            </a>
+
             <?php if ($user): ?>
                 <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/profile/@me/games') ?: 'is-active' ?>" data-tooltip="Games" href="<?= HTTP::url('/profile/@me/games')?>">
                     <span class="icon"><i class="fal fa-chess-clock"></i></span>
@@ -36,7 +41,7 @@ $user = Kiss::$app->getUser();
                     <span>Relations</span>
                 </a>
             <?php else: ?>
-                    <a class="navbar-item has-icon is-tab is-hidden-desktop <?= !Strings::endsWith(HTTP::route(), '/login') ?: 'is-active' ?>" data-tooltip="Submissions" href="<?= HTTP::url('/login')?>"><i class="fal fa-user"></i></a>    
+                    <a class="navbar-item has-icon is-tab is-hidden-desktop <?= !Strings::endsWith(HTTP::route(), '/login') ?: 'is-active' ?>" data-tooltip="Login" href="<?= HTTP::url('/login')?>"><i class="fal fa-user"></i></a>    
             <?php endif; ?>
         </div>
 

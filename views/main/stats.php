@@ -5,7 +5,7 @@ use kiss\helpers\HTTP;
 use kiss\Kiss;
 ?>
 
-<section class="section container is-max-desktop">
+<section class="section container">
     <div class="columns">
     <div class="column">
             <div class="box is-overflow-auto">
