@@ -76,13 +76,19 @@ HTML::$meta = [
 
             <button class="button level-item has-icon" onclick="navigator.share({url: `<?= HTTP::url(['#'], true) ?>`});">
                 <span class="icon"><i class="fal fa-share-alt"></i></span>
-                <span>Share</span>
             </button>
-            
+
+            <?php if ($profile->deck_privacy >= 1 || $profile->id === Chickatrice::$app->user->id): ?>
+                <a class="button level-item has-icon" href="<?= HTTP::url(['/profile/:profile/decks/:deck/download', 'profile' => $profile->getUsername(), 'deck' => $deck->id]) ?>">
+                    <span class="icon">
+                        <i class="fal fa-download"></i>
+                    </span>
+                </a>
+            <?php endif; ?>
+                
             <?php if (Chickatrice::$app->loggedIn() && $profile->id === Chickatrice::$app->user->id): ?>          
                 <a class="button level-item has-icon" href="<?= HTTP::url(['/profile/:profile/decks/:deck/remove', 'profile' => $profile->getUsername(), 'deck' => $deck->id]) ?>" onclick="return confirm('Are you sure? This cannot be undone!')">
                     <span class="icon"><i class="fal fa-trash"></i></span>
-                    <span>Delete</span>
                 </a>
             <?php elseif (Chickatrice::$app->loggedIn() && $profile->deck_privacy == 0): ?>
                 <a class="button level-item has-icon" href="<?= HTTP::url(['/profile/:profile/decks/:deck/copy', 'profile' => $profile->getUsername(), 'deck' => $deck->id]) ?>">
