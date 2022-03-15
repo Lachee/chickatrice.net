@@ -157,7 +157,7 @@ class Deck extends ActiveRecord
                     (($deckHashBinary[1+4]));
                     
         $number = base_convert($number, 10, 32);
-        $deckHash = $isValidDeckList ? str_pad(strval($number), 8, "0", STR_PAD_RIGHT) : 'INVALID';
+        $deckHash = $isValidDeckList ? str_pad(strval($number), 8, "0", STR_PAD_LEFT) : 'INVALID';
         return $deckHash;
     }
 
