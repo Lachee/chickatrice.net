@@ -94,7 +94,7 @@ class BaseApiRoute extends ApiRoute {
         $key = $this->cacheKey();
 
         $result = Chickatrice::$app->redis()->get($key);
-        if ($result !== null) 
+        if (!KISS_DEBUG && $result !== null) 
             return unserialize($result);
 
         $result = call_user_func($callback);
