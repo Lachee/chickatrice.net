@@ -28,7 +28,7 @@ use kiss\Kiss;
         <div class="column">
             <div class="box is-overflow-auto">
                 <div class="title">Unique Visitors</div>
-                <div class="subtitle">Number of unique usernames that appear each day</div>
+                <div class="subtitle">Number of unique visitors per day</div>
                 <div id="visitor_count" style="width:100%"></div>
             </div>
         </div>
