@@ -24,29 +24,37 @@ $user = Kiss::$app->getUser();
            
             <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/stats') ?: 'is-active' ?>" data-tooltip="Stats" href="<?= HTTP::url('/stats')?>">
                 <span class="icon"><i class="fal fa-chart-area"></i></span>
-                <span>Statistics</span>
+                <span class="is-hidden-touch">Statistics</span>
             </a>
 
             <?php if ($user): ?>
                 <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/profile/@me/games') ?: 'is-active' ?>" data-tooltip="Games" href="<?= HTTP::url('/profile/@me/games')?>">
                     <span class="icon"><i class="fal fa-chess-clock"></i></span>
-                    <span>Games</span>
+                    <span class="is-hidden-touch">Games</span>
                 </a>
                 <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/profile/@me/decks') ?: 'is-active' ?>" data-tooltip="Decks" href="<?= HTTP::url('/profile/@me/decks')?>">
                     <span class="icon"><i class="fal fa-album-collection"></i></span>
-                    <span>Decks</span>
+                    <span class="is-hidden-touch">Decks</span>
                 </a>
                 <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/profile/@me/relations') ?: 'is-active' ?>" data-tooltip="Relations" href="<?= HTTP::url('/profile/@me/relations')?>">
                     <span class="icon"><i class="fal fa-user-friends"></i></span>
-                    <span>Relations</span>
+                    <span class="is-hidden-touch">Relations</span>
                 </a>
+
+                <!-- Profile ( Hidden Desktop ) -->
+                <a class="navbar-item has-icon is-tab is-hidden-desktop <?= !Strings::endsWith(HTTP::route(), '/profile/@me/settings') ?: 'is-active' ?>" data-tooltip="Settings" href="<?= HTTP::url('/profile/@me/settings')?>">
+                    <i class="fal fa-cogs"></i>
+                </a>    
             <?php else: ?>
-                    <a class="navbar-item has-icon is-tab is-hidden-desktop <?= !Strings::endsWith(HTTP::route(), '/login') ?: 'is-active' ?>" data-tooltip="Login" href="<?= HTTP::url('/login')?>"><i class="fal fa-user"></i></a>    
+                <!-- Login for mobile only -->
+                <a class="navbar-item has-icon is-tab is-hidden-desktop <?= !Strings::endsWith(HTTP::route(), '/login') ?: 'is-active' ?>" data-tooltip="Login" href="<?= HTTP::url('/login')?>">
+                    <i class="fal fa-user"></i>
+                </a>    
             <?php endif; ?>
         </div>
 
-        <!-- RHS ITEMS -->
-        <div id="navMenu" class="navbar-end  is-hidden-touch">
+        <!-- RHS ITEMS ( Hidden Mobile ) -->
+        <div id="navMenu" class="navbar-end is-hidden-touch">
             <div class="navbar-start">
                 <div class="navbar-item">
                     <?php if ($user): ?>
