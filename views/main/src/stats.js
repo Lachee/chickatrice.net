@@ -57,7 +57,7 @@ async function createDailyCharts() {
         const chart = new google.visualization.GeoChart(elm);
         const options = { 
             colorAxis: {
-                colors: ['#FFFFFF', '#ff6666']
+                colors: ['#ffc7c7', '#ff6666', '#ff4747']
             },
         };
         const table = new google.visualization.arrayToDataTable(entries);
