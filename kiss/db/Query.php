@@ -454,7 +454,7 @@ class Query extends BaseObject{
                 $keys   = \array_keys($join['on']);
                 $lhs    = $keys[0];
                 $rhs    = $join['on'][$lhs];
-                $joins .= "{$join['type']} `{$table}` ON {$lhs} = `{$table}`.{$rhs} ";
+                $joins .= "{$join['type']} `{$table}` ON `{$this->from}`.`{$lhs}` = `{$table}`.`{$rhs}`";
             }
         }
         $query .= $joins;

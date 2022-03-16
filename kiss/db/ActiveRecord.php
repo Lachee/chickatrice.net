@@ -4,11 +4,14 @@ use kiss\exception\ArgumentException;
 use kiss\Kiss;
 use kiss\models\BaseObject;
 
+/** @property Connection $db */
 class ActiveRecord extends BaseObject{
 
     private $_columns   = null;
     private $_dirty     = [];
     private $_newRecord = true;
+
+    protected $_db = null;
 
     /** The name of the table */
     public static function tableName() 
@@ -23,6 +26,10 @@ class ActiveRecord extends BaseObject{
     /** TODO Implement validation */
     public function validate() { return true; }
 
+    /** @return Connection the DB used by this record */
+    public function getDb() {
+        return $this->_db ?: Kiss::$app->db();
+    }
 
     /** Marks a variable as dirty. Maybe required when manually setting variables.
      * @return $this
@@ -144,7 +151,7 @@ class ActiveRecord extends BaseObject{
         $this->beforeLoad($data);
         
         //Prepare the query
-        $query = Kiss::$app->db()->createQuery()->select(self::tableName())->limit(1);
+        $query = $this->db->createQuery()->select(self::tableName())->limit(1);
         
         //Add the table keys as the where condition
         $condition = self::whereByKeys($this);
@@ -210,10 +217,10 @@ class ActiveRecord extends BaseObject{
 
         //Prepare the query and execute
         if ($this->isNewRecord()) {
-            $query = Kiss::$app->db()->createQuery()
+            $query = $this->db->createQuery()
                                         ->insertOrUpdate($values, $table);
         } else {
-            $query = Kiss::$app->db()->createQuery()
+            $query = $this->db->createQuery()
                                         ->update($values, $table)
                                         ->where(self::whereByKeys($this));
         }
@@ -267,7 +274,7 @@ class ActiveRecord extends BaseObject{
         $table = $class::tableName();
 
         //Prepare the query and execute
-        $query = Kiss::$app->db()->createQuery()
+        $query = $this->db->createQuery()
                                     ->delete($table)
                                     ->where(self::whereByKeys($this));
 
@@ -332,14 +339,16 @@ class ActiveRecord extends BaseObject{
      * @return ActiveQuery
     */
     public static function find() {
-        return get_called_class()::query()->select(get_called_class()::tableName());
+        return static::query()->select(get_called_class()::tableName());
     }
 
     /** Creates an active query
+     * @param Connection $db
      * @return ActiveQuery
      */
-    public static function query() {
-        return BaseObject::new(ActiveQuery::class, [ 'conn' => Kiss::$app->db(), 'className' => get_called_class(), 'cacheDuration' => 0 ]);
+    public static function query($db = null) {
+        $db = $db ?: Kiss::$app->db();
+        return BaseObject::new(ActiveQuery::class, [ 'conn' => $db, 'className' => get_called_class(), 'cacheDuration' => 0 ]);
     }
 
     /** Finds the query by keys.
