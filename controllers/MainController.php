@@ -43,7 +43,7 @@ class MainController extends BaseController {
 
     /** Displays statistics */
     public function actionStats() {
-        $this->registerDependency('https://www.gstatic.com/charts/loader.js');
+        $this->registerDependency('https://www.gstatic.com/charts/loader.js', self::POS_START);
         return $this->render('stats', [
            
         ]);

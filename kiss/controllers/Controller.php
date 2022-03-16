@@ -82,11 +82,12 @@ class Controller extends Route {
 
     /** Registers a JavaScript or CSS dependency 
      * @param string $source the source URL for the object
+     * @param int $position position of the array 
      * @param int $type the type of the dependency. See DEPENDENCY_SCRIPT or DEPENDENCY_STYLE. 
      * If -1, then it will try to determien the best one from the given extension of source
      * @return $this
     */
-    public function registerDependency($source, $type = -1) {
+    public function registerDependency($source, $position = self::POS_END, $type = -1) {
 
         if ($type === -1) {
             $extension = Strings::extension($source);
@@ -94,10 +95,17 @@ class Controller extends Route {
             else if($extension === '.css') $type = self::DEPENDENCY_STYLE;
         }
 
-        $this->deps[] = [
+        $item = [
             'source'    => $source,
             'type'      => $type
         ];
+
+        if ($position == self::POS_END) {
+            array_push($this->deps, $item);
+        } else {
+            array_unshift($this->deps, $item);
+        }
+
         return $this;
     }
 

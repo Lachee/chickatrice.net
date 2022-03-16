@@ -100,6 +100,6 @@ async function createUptimeCharts() {
     }
 }
 
-
-createCharts();
-
+window.addEventListener('load', function () {
+    createCharts();
+});
