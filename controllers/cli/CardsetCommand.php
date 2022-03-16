@@ -13,6 +13,21 @@ class CardsetCommand extends Command {
         self::print('Welcome to the default command');
     }
 
+    /** Downloads the cards */
+    public function cmdDownload() {
+        // Create stage directory
+        $stageDir =  Chickatrice::$app->baseDir() . '/_staging';
+        $stageFile = $stageDir . '/identifiers.json';
+        if (!file_exists($stageDir))
+            mkdir($stageDir);
+
+        if (!$this->download($stageFile)) {
+            return false;
+        }
+
+        self::print('done.');
+    }
+
     public function cmdImport() {
         // Create stage directory
         $stageDir =  Chickatrice::$app->baseDir() . '/_staging';
@@ -20,20 +35,8 @@ class CardsetCommand extends Command {
         if (!file_exists($stageDir))
             mkdir($stageDir);
 
-        $guzzle = new Client();
-        
-        // Download the resource
-        self::print('Downloading Identifier Database...');
-        $resource = fopen($stageFile, 'w');
-        $guzzle->request('GET', self::IDENTIFIER_URL, [ 'sink' => $resource ]);
-        
-        // Verify the download
-        self::print('Verifying Download...');
-        $response = $guzzle->request('GET', self::IDENTIFIER_URL . '.sha256');
-        $expected_sha = $response->getBody()->getContents();~
-        $resulting_sha = hash_file('sha256', $stageFile);
-        if ($expected_sha != $resulting_sha) {
-            self::print('Failed to download file. Mismatch SHA signatures. Expected ' . $expected_sha . ' but got ' . $resulting_sha);
+        if (!$this->download($stageFile)) {
+            return false;
         }
 
         // Convert to SQL
@@ -123,5 +126,25 @@ class CardsetCommand extends Command {
             fclose($resource);
         }
         self::print('Done.');
+    }
+
+    function download($destination) {        
+        $guzzle = new Client();
+        // Download the resource
+        self::print('Downloading Identifier Database...');
+        $resource = fopen($destination, 'w');
+        $guzzle->request('GET', self::IDENTIFIER_URL, [ 'sink' => $resource ]);
+        
+        // Verify the download
+        self::print('Verifying Download...');
+        $response = $guzzle->request('GET', self::IDENTIFIER_URL . '.sha256');
+        $expected_sha = $response->getBody()->getContents();~
+        $resulting_sha = hash_file('sha256', $destination);
+        if ($expected_sha != $resulting_sha) {
+            self::print('Failed to download file. Mismatch SHA signatures. Expected ' . $expected_sha . ' but got ' . $resulting_sha);
+            return false;
+        }
+
+        return true;
     }
 }
