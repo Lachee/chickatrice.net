@@ -630,7 +630,7 @@ class Query extends BaseObject{
         return self::createPreviewStatement($query, $bindings);
     }
 
-    /** @return string Gets teh statement for debugging purposes. */
+    /** @return string Gets the statement for debugging purposes. */
     private static function createPreviewStatement($query, $bindings) {
         foreach($bindings as $b) { 
             $index = strpos($query, '?');
