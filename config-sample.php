@@ -29,6 +29,7 @@ $config = function() {
 		],
         'components'    => [
             '$assoc' => true,
+            'tagger'    => [ '$class' => \app\components\ScryfallTagger::class ],
             'discord' => [
                 '$class'        => \app\components\discord\Discord::class,
                 'clientId'      => 'client id',     // The client ID assigned to you by the provider

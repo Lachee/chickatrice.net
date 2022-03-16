@@ -43,23 +43,12 @@ class DeckController extends BaseController {
     }    
 
     function actionTest() {
-        $this->deck->loadIdentifiers();
+        //$this->deck->downloadTags();
+        $tags = $this->deck->getTags()->all(true);
 
-        $guzzle = new \GuzzleHttp\Client([ 'cookies' => true ]);
-
-        //https://i.lu.je/2022/firefox_xvNYOLjULm.png
-
-        /** @var Identifier $card */
-        //$card = $this->deck->zones['main'][0]['identifier'];
-        $card = Identifier::findByKey('57c4a5d9-ad1b-5fc1-ac25-917e84364775')->one();
-        $tags = $card->getTags();
-
-        $debug = [
-            'card' => $card->getProperties(),
-            'tags' => $tags->all(true)
-        ];
-
-        return Response::json(HTTP::OK, $debug);
+        return Response::json(HTTP::OK, [
+            'tags' => $tags
+        ]);
     }
 
     function actionAnalytics() {

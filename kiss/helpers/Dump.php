@@ -1,5 +1,9 @@
 <?php namespace kiss\helpers;
 class Dump {
+    public static function dummy() {
+
+    }
+    
     public static function debug($input) {
         $collapse = false;
 

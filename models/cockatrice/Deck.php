@@ -3,10 +3,12 @@
 namespace app\models\cockatrice;
 
 use app\models\Identifier;
+use app\models\scryfall\Tag;
 use Chickatrice;
 use Exception;
 use kiss\db\ActiveQuery;
 use kiss\db\ActiveRecord;
+use kiss\helpers\Dump;
 use kiss\helpers\HTML;
 use kiss\helpers\HTTP;
 use kiss\helpers\Strings;
@@ -35,6 +37,7 @@ class Deck extends ActiveRecord
     public $publicUrl;
 
     protected $_isDecomposed = false;
+    protected $_hasIdentifiers = false;
 
     /** @inheritdoc */
     public function afterQueryLoad($data)
@@ -82,7 +85,60 @@ class Deck extends ActiveRecord
                 }
             }
         }
+        $this->_hasIdentifiers = true;
         return $this->zones;
+    }
+
+    /** Gets the tags for the deck, assuming it has been downloaded.
+     * @return ActiveQuery|Tag[] returns flag tag array. Cannot return a query because of how identifiers are loaded
+     */
+    public function getTags() {
+        if (!$this->_hasIdentifiers)
+            $this->loadIdentifiers();
+
+
+        $ids = [];
+        foreach ($this->zones as $name => $cards) {
+            foreach ($cards as $index => $card) {
+                // Skip unidentified cards
+                if (!isset($card['identifier']))
+                    continue;
+
+                /** @var Identifier $identifier */
+                $identifier = $card['identifier'];
+                $ids[] = $identifier->uuid;
+            }
+        }
+
+        return Tag::find()
+                ->leftJoin('$cards_tags', ['uuid'  => 'tag'])
+                ->where(['$cards_tags.uuid', $ids]);
+    }
+
+    /** Downloads all the tags for all the cards in the deck if it has no tags already */
+    public function downloadTags() {
+        if (!$this->_hasIdentifiers)
+            $this->loadIdentifiers();
+        
+        foreach ($this->zones as $name => $cards) {
+            foreach ($cards as $index => $card) {
+                // Skip unidentified cards
+                if (!isset($card['identifier']))
+                    continue;
+
+                /** @var Identifier $identifier */
+                $identifier = $card['identifier'];
+
+                try {
+                    if (!$identifier->getTags()->any()) {
+                        $identifier->downloadTags();
+                    }
+                }catch(\RuntimeException $e) {
+                    // Probably nothing, but we failed to download tags
+                    Dump::dummy();
+                }
+            }
+        }
     }
 
     /** @return string Gets the deck preview image */
