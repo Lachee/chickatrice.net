@@ -24,12 +24,12 @@ class UptimeRoute extends BaseApiRoute {
     // Throw an exception to send exceptions back.
     // Supports get, delete
     public function get() {
-        return $this->cache(function() {
-            $deep = HTTP::get('deep', false);
+        $deep = HTTP::get('deep', false);
+        return $this->cache(function() use ($deep) {
             return $deep !== false ? 
                 $this->getDeepUptime() : 
                 $this->getShallowUptime();
-        }, $this->maxTimeSinceLastUptime);
+        }, $deep ? 5 * 60 : $this->maxTimeSinceLastUptime);
     }
 
     /** Gets the deep uptime for the stats page */
