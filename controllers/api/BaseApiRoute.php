@@ -91,26 +91,11 @@ class BaseApiRoute extends ApiRoute {
      * @return mixed the object data
      */
     protected function cache($callback, $ttl = 15, $version = 1) {
-        $key = $this->cacheKey("$version@$ttl");
-
-        $result = Chickatrice::$app->redis()->get($key);
-        if (!KISS_DEBUG && $result !== null) 
-            return unserialize($result);
-
-        $result = call_user_func($callback);
-        Chickatrice::$app->redis()->set($key, serialize($result));
-        Chickatrice::$app->redis()->expire($key, $ttl);
-        return $result;
-    }
-
-    /** @return string calculates the recommended key for the cache */
-    protected function cacheKey($version = '') {
-        $keys = [
-            $version,
-            HTTP::method(),
-            $this->route(),
-            http_build_query(HTTP::get())
-        ];
-        return 'api:cache:' . md5(join(":", $keys));
+        return Kiss::$app->cache->getset([ 
+            'api', $version,
+            HTTP::method(), $this->route(),
+            http_build_query(HTTP::get()),
+            $ttl
+        ], $callback, $ttl);
     }
 }
