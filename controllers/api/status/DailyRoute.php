@@ -34,7 +34,7 @@ class DailyRoute extends BaseApiRoute {
                 'games'     => $this->countDailyGames(),
                 'countries' => $this->countCountries(),
             ];
-        }, 60, 2);
+        }, 60 * 60, 2);
     }
 
     public function countCountries() {
