@@ -13,9 +13,10 @@ interface CacheInterface
      * Sets the data in the cache
      * @param string|object|array $key The composite key of the cached data.
      * @param mixed $data The data to be stored
+     * @param int $ttl optional time to live
      * @return $this the cache
      */
-    public function set($key, $data);
+    public function set($key, $data, $ttl = -1);
 
     /**
      * Gets the data stored at the key
@@ -39,6 +40,7 @@ interface CacheInterface
      * @param string|object|array $key The composite key of the cached data.
      * @param Callable $callback Callback of the data to set
      * @return mixed The data at the cache, otherwise the callbacked data.
+     * @param int $ttl optional time to live
      * @example
      * ```
      * $entry = $cache->getset(['some', 'id'], function() {
@@ -46,7 +48,7 @@ interface CacheInterface
      *      return $result;
      * });
      */
-    public function getset($key, $callback);
+    public function getset($key, $callback, $ttl = -1);
 
     /**
      * Sets the time to live of the given record

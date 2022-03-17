@@ -8,9 +8,9 @@ class ArrayCache extends BaseObject implements CacheInterface {
     private $_cache = [];
 
     /** @inheritdoc */
-    public function set($key, $data) { 
+    public function set($key, $data, $ttl = -1) { 
         $hash = RedisCache::path($key);
-        $this->_cache[$hash] = [ $key, -1 ];
+        $this->_cache[$hash] = [ $key, $ttl < 0 ? $ttl : time() + $ttl ];
         return $this;
     }
 
@@ -31,13 +31,13 @@ class ArrayCache extends BaseObject implements CacheInterface {
     }
 
     /** @inheritdoc */
-    public function getset($key, $callback) {
+    public function getset($key, $callback, $ttl = -1) {
         if (!is_callable($callback))
             throw new ArgumentException('$callback must be callable');
 
         if (!$this->has($key)) {
             $result = call_user_func($callback);
-            $this->set($key, $result);
+            $this->set($key, $result, $ttl);
             return $result;
         } 
 

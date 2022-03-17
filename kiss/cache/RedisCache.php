@@ -25,12 +25,16 @@ class RedisCache extends BaseObject implements CacheInterface {
     }
 
     
-    public function set($key, $data) { 
+    /** @inheritdoc */
+    public function set($key, $data, $ttl = -1) { 
+        $path = static::path($key);
         $serialized = serialize($data);
-        $this->redis->set(static::path($key), $serialized);
+        $this->redis->set($path, $serialized);
+        $this->redis->expire($path, $ttl);
         return $this;
     }
 
+    /** @inheritdoc */
     public function get($key) { 
         $serialized = $this->redis->get(static::path($key));
         return unserialize($serialized);
@@ -42,13 +46,13 @@ class RedisCache extends BaseObject implements CacheInterface {
     }
 
     /** @inheritdoc */
-    public function getset($key, $callback) {
+    public function getset($key, $callback, $ttl = -1) {
         if (!is_callable($callback))
             throw new ArgumentException('$callback must be callable');
 
         if (!$this->has($key)) {
             $result = call_user_func($callback);
-            $this->set($key, $result);
+            $this->set($key, $result, $ttl);
             return $result;
         } 
 
