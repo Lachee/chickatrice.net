@@ -43,7 +43,7 @@ class ActiveRecord extends BaseObject{
      * @return string 
      */
     public function getKey() {
-        return join(',', static::tableKey());
+        return join(',', array_values($this->getKeys()));
     }
 
     /** Gets the list of keys
