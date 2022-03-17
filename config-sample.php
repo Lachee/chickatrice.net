@@ -28,9 +28,10 @@ $config = function() {
 			'publicKey'     => file_get_contents(__DIR__ . "/jwt-public.key"),
 		],
         'components'    => [
-            '$assoc' => true,
+            '$assoc'    => true,
+            'cache'     => [ '$class' => \kiss\cache\RedisCache::class ],
             'tagger'    => [ '$class' => \app\components\ScryfallTagger::class ],
-            'discord' => [
+            'discord'   => [
                 '$class'        => \app\components\discord\Discord::class,
                 'clientId'      => 'client id',     // The client ID assigned to you by the provider
                 'clientSecret'  => 'client secret', // The client password assigned to you by the provider

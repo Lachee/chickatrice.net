@@ -7,6 +7,8 @@ if (!defined('KISS_SESSIONLESS'))
     define('KISS_SESSIONLESS', false);
 
 use Exception;
+use kiss\cache\CacheInterface;
+use kiss\cache\RedisCache;
 use kiss\db\Connection;
 use kiss\exception\HttpException;
 use kiss\exception\InvalidOperationException;
@@ -21,7 +23,9 @@ use kiss\session\Session;
 use kiss\session\PhpSession;
 use Throwable;
 
-/** Base application */
+/** Base application 
+ * @property CacheInterface $cache
+*/
 class Kiss extends BaseObject {
     
     /** @var Kiss static instance of the current application */
@@ -97,7 +101,10 @@ class Kiss extends BaseObject {
             $this->db = new Connection($this->db['dsn'],$this->db['user'],$this->db['pass'], array(), $this->db['prefix']);
             $this->db->exec("SET NAMES 'utf8mb4'");
         }
-        
+
+        if (empty($this->components['cache']))
+            $this->components['cache'] = new RedisCache([ 'redis' => $this->redis ]);
+
         //Create the session
         if (KISS_SESSIONLESS) {
             $this->session = null;
