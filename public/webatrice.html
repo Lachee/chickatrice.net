@@ -1,0 +1,45 @@
+<!-- Use this script to auto-connect embedded clients -->
+<script>
+    const chickatrice = {
+    id: 1,
+    name: "Chickatrice",
+    host: "mtg.chickatrice.net/servatrice",
+    port: "443",
+    editable: false,
+    userName: "Lachee",
+    lastSelected: true,
+    remember: true,
+    hashedPassword: "< User Password >",
+}
+
+const settings = {
+    user: '*app',
+    autoConnect: true
+}
+
+function setupConnection() {
+  var request = indexedDB.open("Webatrice");
+  request.onerror = event => {
+    console.error("Database error: " + event.target.errorCode);
+  };
+  request.onsuccess = event => {
+    db = event.target.result;
+    console.log('Connected to Index', db.objectStoreNames);
+
+    // Clear the default
+    const transaction = db.transaction(['hosts', 'settings'], 'readwrite');
+    
+    const hostsStore = transaction.objectStore("hosts");
+    hostsStore.clear();
+    hostsStore.add(chickatrice);
+
+    // Setup auto connect
+    const settingsStore = transaction.objectStore("settings");
+    settingsStore.clear();
+    settingsStore.add(settings);
+
+  };
+}
+
+setupConnection();
+</script>
