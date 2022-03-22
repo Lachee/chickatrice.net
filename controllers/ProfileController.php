@@ -86,16 +86,16 @@ class ProfileController extends BaseController
     /** Displays the users profile */
     function actionResend() {
         //Verify its their own profile
-        if ($this->profile->id != Kiss::$app->user->id)
+        if ($this->user == null || $this->user->id != Kiss::$app->user->id)
             throw new HttpException(HTTP::FORBIDDEN, 'Cannot resend someone else\'s activation.');
     
-        $activation = Chickatrice::$app->redis()->get($this->profile->id . ':activation');
+        $activation = Chickatrice::$app->redis()->get($this->user->id . ':activation');
         if ($activation) {
             Chickatrice::$app->session->addNotification('Activation code was already sent! Please wait 15 minutes.', 'danger');
         } else {
-            RegisterForm::sendAccountActivation($this->profile->account);
-            Chickatrice::$app->redis()->set($this->profile->id . ':activation', 'true');
-            Chickatrice::$app->redis()->expire($this->profile->id . ':activation', 15 * 60);
+            RegisterForm::sendAccountActivation($this->account);
+            Chickatrice::$app->redis()->set($this->user->id . ':activation', 'true');
+            Chickatrice::$app->redis()->expire($this->user->id . ':activation', 15 * 60);
         }
         return Response::redirect(['settings']);
     }
