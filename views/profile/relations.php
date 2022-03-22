@@ -1,17 +1,9 @@
 <?php
 
-use app\models\cockatrice\Account;
-use app\models\cockatrice\Deck;
-use app\models\Gallery;
-use app\models\Identifier;
-use app\models\Image;
-use app\models\Tag;
-use app\widget\GalleryList;
-use app\widget\ProfileCard;
-use kiss\helpers\HTML;
-use kiss\helpers\HTTP;
-
-/** @var User $profile */
+use kiss\helpers\{ HTML, HTTP };
+use app\models\{ cockatrice\Account, User };
+/** @var User $user */
+/** @var Account $account */
 /** @var string[] $online_ids */
 /** @var Account[] $buddies */
 /** @var Account[] $ignores */
@@ -40,7 +32,7 @@ use kiss\helpers\HTTP;
 
     <nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
-            <li><a href="<?= HTTP::url(['/profile/:profile/', 'profile' => $profile->getUsername()]) ?>"><span class="icon"><i class="fal fa-user"></i></span><?= HTML::encode($profile->getUsername()) ?></a></li>
+            <li><a href="<?= HTTP::url(['/profile/:profile/', 'profile' => $user ? $user->getUsername() : $account->name ]) ?>"><span class="icon"><i class="fal fa-user"></i></span><?= HTML::encode($user ? $user->getUsername() : $account->name ) ?></a></li>
             <li class="is-active"><a href="#" aria-current="page">Relations</a></li>
         </ul>
     </nav>
@@ -71,7 +63,7 @@ use kiss\helpers\HTTP;
                             <div class="list-item-controls">
                                 <div class="buttons">
                                 
-                                    <?php if (Chickatrice::$app->loggedIn() && $profile->id === Chickatrice::$app->user->id): ?>
+                                    <?php if (Chickatrice::$app->loggedIn() && $user != null && $user->id === Chickatrice::$app->user->id): ?>
                                     <a class="button" href="<?= HTTP::url(['/profile/@me/relations', 'rf' => $buddy->id]) ?>" onclick="return confirm('Are you sure?')">
                                         <span class="icon">
                                             <i class="fal fa-trash"></i>
@@ -114,7 +106,7 @@ use kiss\helpers\HTTP;
                             <div class="list-item-controls">
                                 <div class="buttons">
                                 
-                                    <?php if (Chickatrice::$app->loggedIn() && $profile->id === Chickatrice::$app->user->id): ?>
+                                    <?php if (Chickatrice::$app->loggedIn() && $user != null && $user->id === Chickatrice::$app->user->id): ?>
                                     <a class="button" href="<?= HTTP::url(['/profile/@me/relations', 'rf' => $ignore->id]) ?>" onclick="return confirm('Are you sure?')">
                                         <span class="icon">
                                             <i class="fal fa-trash"></i>

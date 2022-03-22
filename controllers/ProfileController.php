@@ -103,22 +103,25 @@ class ProfileController extends BaseController
     /** Manages the user buddies */
     function actionRelations() {
         //Verify its their own profile
+        // TODO: In the future when moderations can see relations, remove the user null check
         if ($this->user == null || $this->user->id != Kiss::$app->user->id)
             throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own friends.');
 
+        // rf: Remove Friend
         if (HTTP::get('rf', false)) {
-            $this->profile->account->removeFriend(HTTP::get('rf'));
+            $this->account->removeFriend(HTTP::get('rf'));
             return Response::redirect('relations');
         }
 
+        // ri: Remove Ignore
         if (HTTP::get('ri', false)) {
-            $this->profile->account->removeIgnore(HTTP::get('ri'));
+            $this->account->removeIgnore(HTTP::get('ri'));
             return Response::redirect('relations');
         }
 
         // Fetch the Ignores, Buddies, and Online Accounts who are also buddies
-        $ignore = $this->profile->account->ignores;
-        $friends = $this->profile->account->friends;
+        $ignore = $this->account->ignores;
+        $friends = $this->account->friends;
         $friend_ids = array_values(Arrays::map($friends, function($v) { return $v->id; }));
         $online = Arrays::map(
                         Account::findByOnline()
@@ -144,7 +147,8 @@ class ProfileController extends BaseController
 
         // Render it all out
         return $this->render('relations', [
-            'profile'           => $this->profile,
+            'account'           => $this->account,
+            'user'              => $this->user,
             'buddies'           => $online_buddies + $offline_buddies,
             'online_ids'        => $online,
             'ignores'           => $ignore,
