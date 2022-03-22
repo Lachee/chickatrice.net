@@ -103,7 +103,7 @@ class ProfileController extends BaseController
     /** Manages the user buddies */
     function actionRelations() {
         //Verify its their own profile
-        if ($this->profile->id != Kiss::$app->user->id)
+        if ($this->user == null || $this->user->id != Kiss::$app->user->id)
             throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own friends.');
 
         if (HTTP::get('rf', false)) {
@@ -366,10 +366,17 @@ class ProfileController extends BaseController
                                 ->orWhere(['id', $this->name])
                                 ->one();
         
-        // Validate what we fetched. 
-        if ($this->account == null)                                                     // Account doesn't exist. We can skip if no user, but no account.
+        if ($this->account == null)                                                     
             throw new HttpException(HTTP::NOT_FOUND, 'Account does not exist');
-        if ($this->user != null && $this->user->cockatrice_id != $this->account->id)    // ID mismatch. Should basically never happen.
+            
+            
+        // Copy back user if its null but account isnt
+        if ($this->user === null && $this->account !== null)
+            $this->user = User::findByAccount($this->account)->one();
+
+        // If the user doesn't match the cockatrice account, throw an error.
+        // This should basically never happen, but failsafe.
+        if ($this->user != null && $this->user->cockatrice_id != $this->account->id)
             throw new HttpException(HTTP::CONFLICT, 'Account does not match the user\'s account. Contact Lachee');
     }
 }
