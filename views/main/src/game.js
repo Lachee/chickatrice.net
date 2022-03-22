@@ -99,10 +99,13 @@ async function loadWebatrice() {
         setTimeout(async () => {
             await storeAuthentication();
             if (allowReload) {
+                // We authed, so reload the page to auto connect
                 statusElement.textContent = 'Authenticating...';
+                window.onbeforeunload = {};
                 clientElement.setAttribute('src', `/webatrice/index.html`);
                 allowReload = false;
             } else {
+                // Join as normal
                 statusElement.textContent = 'Joining...';
                 setTimeout(() => {
                     clientElement.style.display = 'unset';

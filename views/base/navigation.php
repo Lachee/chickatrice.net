@@ -60,11 +60,13 @@ $user = Kiss::$app->getUser();
                     <?php if ($user): ?>
                         <!-- LOGGED IN USERS -->
                         <div class="field has-addons"> 
+                            <!-- Webatrice Control: Disabled on Zach's request
                             <p class="control">
                                 <a class="button" href="<?= HTTP::url(['/game']); ?>"  data-tooltip="Play on Webatrice">
                                     <span class="icon"><i class="fal fa-play"></i></span>
                                 </a>
                             </p>
+                            --> 
                             <p class="control">
                                 <a class="button" id="login-button" href="<?= HTTP::url(['/profile/@me/']); ?>"  data-tooltip="Profile">
                                     <span class="icon"><i class="fal fa-user"></i></span>
