@@ -1,21 +1,17 @@
 <?php
 
-use app\models\Gallery;
-use app\models\Identifier;
-use app\models\Image;
-use app\models\Tag;
-use app\widget\GalleryList;
-use app\widget\ProfileCard;
-use kiss\helpers\HTML;
-use kiss\helpers\HTTP;
-
-/** @var User $profile */
+use kiss\helpers\{ HTML, HTTP, Strings };
+use app\models\{ cockatrice\Account, User };
+/**
+ * @var User $user
+ * @var Account $account
+*/
 
 
-HTML::$title = Chickatrice::$app->title . " || " . $profile->username;
+HTML::$title = Chickatrice::$app->title . " || " . $account->name;
 HTML::$meta = [
-    'description' => ucfirst($profile->username) . '\'s public profile.',
-    'image'       => HTTP::url(['/profile/:profile/avatar', 'profile' => $profile->uuid], true),
+    'description' => ucfirst($account->name) . '\'s public profile.',
+    'image'       => HTTP::url(['/profile/:profile/avatar', 'profile' => $user ? $user->uuid : $account->id], true),
 ];
 
 ?>
@@ -32,7 +28,7 @@ HTML::$meta = [
             <div class="columns">
                 <div class="column is-one-fifth"></div>
                 <div class="column" id="site-heading">
-                    <h1 class="title is-size-1"><?= HTML::encode(ucfirst($profile->username)) ?>'s Profile</h1>
+                    <h1 class="title is-size-1"><?= HTML::encode(ucfirst($account->name)) ?>'s Profile</h1>
                     <h2 class="subtitle is-size-3">Coming Soon&trade;</h2>
                     <div class="block">
                         <p>Public user profiles are coming soon. View common colours, deck types, favourite cards and more.</p>
@@ -47,7 +43,7 @@ HTML::$meta = [
                 </div>
                 <div class="column is-one-third">
                     <figure class="image is-profile is-rounded ">
-                        <img  src="<?= $profile->getAvatarUrl() ?>" alt="">
+                        <img  src="<?= $user ? $user->getAvatarUrl() : $account->getAvatarDataUrl() ?>" alt="">
                     </figure>
                 </div>
             </div>

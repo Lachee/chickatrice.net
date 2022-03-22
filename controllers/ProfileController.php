@@ -30,7 +30,8 @@ use kiss\Kiss;
 use Ramsey\Uuid\Uuid;
 
 /**
- * @property User $profile
+ * @property User $user
+ * @property Account $account
  */
 class ProfileController extends BaseController
 {
@@ -44,43 +45,46 @@ class ProfileController extends BaseController
     /** Scopes to give to normal users */
     public const SCOPES = [];
 
-    public $profile_name;
-    public static function route()
-    {
-        return "/profile/:profile_name";
-    }
+    /** @var string name of the profile */
+    public $name;
+    /** @var User $user the user account being viewed */
+    public $user;
+    /** @var Account $account the account being viewed */
+    public $account;
 
+    public static function route() { return "/profile/:name"; }
     function action($endpoint, ...$args)
     {
-        if ($this->profile_name == '@me' && !Chickatrice::$app->loggedIn())
-            throw new HttpException(HTTP::UNAUTHORIZED, 'Need to be logged in to see your own profile.');
-
+        $this->loadRecords();
         parent::action($endpoint, ...$args);
     }
 
+    /** Gets the avatar for the given account */
     function actionAvatar() {
         // We need to transcode
-        $bmp = $this->profile->account->avatar_bmp;
+        $bmp = $this->account->avatar_bmp;
         if ($bmp !== null) 
             return Response::image($bmp, 'bmp');
 
+        if ($this->user === null)
+            throw new HttpException(HTTP::NOT_FOUND, 'Account does not have an avatar');
+
         // We can just return directly
-        return Response::redirect(HTTP::url($this->profile->avatarUrl, true));
+        return Response::redirect(HTTP::url($this->user->avatarUrl, true));
     }
 
     /** Displays the users profile */
-    function actionIndex()
-    {
+    function actionIndex() {
         return $this->render('index', [
-            'profile' => $this->profile ,
-            'fullWidth' => true,
-            'wrapContents' => false
+            'account'       => $this->account,
+            'user'          => $this->user,
+            'fullWidth'     => true,
+            'wrapContents'  => false
         ]);
     }
 
     /** Displays the users profile */
-    function actionResend()
-    {
+    function actionResend() {
         //Verify its their own profile
         if ($this->profile->id != Kiss::$app->user->id)
             throw new HttpException(HTTP::FORBIDDEN, 'Cannot resend someone else\'s activation.');
@@ -97,8 +101,7 @@ class ProfileController extends BaseController
     }
 
     /** Manages the user buddies */
-    function actionRelations()
-    {
+    function actionRelations() {
         //Verify its their own profile
         if ($this->profile->id != Kiss::$app->user->id)
             throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own friends.');
@@ -149,8 +152,7 @@ class ProfileController extends BaseController
     }
 
     /** Manages the users Decks */
-    function actionDecks()
-    {
+    function actionDecks() {
 
         /** @var User $profile */
         $profile = $this->profile;
@@ -202,8 +204,7 @@ class ProfileController extends BaseController
     }
 
     /** Manages the user Games */
-    function actionReplays()
-    {
+    function actionReplays() {
         /** @var User $profile */
         $profile = $this->profile;
 
@@ -258,8 +259,7 @@ class ProfileController extends BaseController
     }
 
     /** Manages the user account settings */
-    function actionSettings()
-    {
+    function actionSettings() {
         //Verified they are logged in
         if (!Chickatrice::$app->loggedIn())
             throw new HttpException(HTTP::UNAUTHORIZED, 'Need to be logged in to edit your settings.');
@@ -316,8 +316,7 @@ class ProfileController extends BaseController
         ]);
     }
 
-    function actionDelete()
-    {
+    function actionDelete() {
         //Verified they are logged in
         if (!Chickatrice::$app->loggedIn())
             throw new HttpException(HTTP::UNAUTHORIZED, 'Need to be logged in to edit your settings.');
@@ -343,28 +342,34 @@ class ProfileController extends BaseController
         return Response::redirect(Kiss::$app->baseURL());
     }
 
-    private $_profile;
-    public function getProfile()
-    {
-
-        if ($this->profile_name == '@me' && !Chickatrice::$app->loggedIn())
+    /** Reads the properties and fetches the records */
+    protected function loadRecords() {
+        if ($this->name == '@me' && !Chickatrice::$app->loggedIn())
             throw new HttpException(HTTP::UNAUTHORIZED, 'Need to be logged in');
 
-        if ($this->_profile != null)
-            return $this->_profile;
+        // We are just ourselves
+        if ($this->name == '@me') {
+            $this->user = Chickatrice::$app->user;
+            $this->account = $this->user->account;
+            return;
+        }
 
-        if ($this->profile_name == '@me')
-            return $this->_profile = Chickatrice::$app->user;
-
-        $this->_profile = User::findByUsername($this->profile_name)
-            ->orWhere(['uuid', $this->profile_name])
-            ->one();
-        if ($this->_profile != null)
-            return $this->_profile;
-
-
-
-        //This is bunk, we found nudda
-        throw new HttpException(HTTP::NOT_FOUND, 'Profile doesn\'t exist');
+        // Find the user with the associated name/uuid and pull its account.
+        // If we couldn't find the user, we will just pull the account directly
+        $this->user = User::findByUsername($this->name)
+                        ->orWhere(['uuid', $this->name])
+                        ->one();
+        
+        $this->account = $this->user != null ? 
+                            $this->user->account :
+                            Account::findByName($this->name)
+                                ->orWhere(['id', $this->name])
+                                ->one();
+        
+        // Validate what we fetched. 
+        if ($this->account == null)                                                     // Account doesn't exist. We can skip if no user, but no account.
+            throw new HttpException(HTTP::NOT_FOUND, 'Account does not exist');
+        if ($this->user != null && $this->user->cockatrice_id != $this->account->id)    // ID mismatch. Should basically never happen.
+            throw new HttpException(HTTP::CONFLICT, 'Account does not match the user\'s account. Contact Lachee');
     }
 }
