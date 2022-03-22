@@ -1,5 +1,4 @@
 import jwt from 'jsonwebtoken';
-import { openDB, deleteDB, wrap, unwrap } from 'idb';
 
 const MTG_SERVER = 'mtg.chickatrice.net';
 const HOST_SETTINGS = {
@@ -14,8 +13,8 @@ const HOST_SETTINGS = {
     lastSelected:   true,
 }
 
+let _jwtPublicKey = null;
 async function getAuthentication() {
-    let _jwtPublicKey = null;
     if (_jwtPublicKey == null) {
         const response = await fetch('/jwt', {
             method: 'POST',
@@ -44,43 +43,97 @@ async function storeAuthentication() {
     settings.userName = name;
     settings.hashedPassword = hash;
 
-    // Set up the IDB
-    const db = await openDB('Webatrice');
-    const transaction = db.transaction(['hosts', 'settings'], 'readwrite');
-    
-    function getOrCreateObjectStore(name, keyPath) {
-        try {
-            return transaction.objectStore(name);
-        }catch(e) {
-            return db.createObjectStore(name, { keyPath: keyPath });
-        }
-    }
-    
-    // Configure settings
-    const hostStore = getOrCreateObjectStore('hosts', 'id');
-    hostStore.clear();
-    hostStore.add(settings);
+    await new Promise((resolve, reject) => {            
+        // Set up the IDB
+        const request = indexedDB.open('Webatrice', 10);
+        request.onerror = event => {
+            console.error('Fialed to connected to IDB', event);
+            reject(event);
+        };
+        
+        // Create new DB
+        // request.onupgradeneeded = event => {
+        //     console.log('upgrading connection');
+        //     const db = event.target.result;
+        //     db.createObjectStore('hosts', { keyPath: 'id' });
+        //     db.createObjectStore('settings', { keyPath: 'user' });
+        // };
+        
+        // Setup auto connect
+        request.onsuccess = event => {
+            try {
+                const db = event.target.result;                    
+                const transaction = db.transaction(['hosts', 'settings'], 'readwrite');
+                const hostStore = transaction.objectStore('hosts');
+                hostStore.clear();
+                hostStore.add(settings);
+            
+                const settingStore = transaction.objectStore('settings');
+                settingStore.clear();
+                settingStore.add({
+                    user:           '*app',
+                    autoConnect:    true,
+                });
 
-    const settingStore = getOrCreateObjectStore('settings', 'user');
-    settingStore.clear();
-    settingStore.add({
-        user:           '*app',
-        autoConnect:    true,
+                resolve();
+            }catch(error) {
+                reject(error);
+            }
+        };
     });
-}
+};
+
 
 async function loadWebatrice() {
-    try {
+
+    const statusElement = document.getElementById('webatrice-status');
+    const clientElement = document.getElementById('webatrice');
+    clientElement.style.display = 'none';
+    
+    let allowReload = true;
+
+    statusElement.textContent = 'Loading Client...';
+    clientElement.setAttribute('src', `/webatrice/index.html`);
+    clientElement.addEventListener('load',() => {
+        statusElement.textContent = 'Connecting...';
+        setTimeout(async () => {
+            await storeAuthentication();
+            if (allowReload) {
+                statusElement.textContent = 'Authenticating...';
+                clientElement.setAttribute('src', `/webatrice/index.html`);
+                allowReload = false;
+            } else {
+                statusElement.textContent = 'Joining...';
+                setTimeout(() => {
+                    clientElement.style.display = 'unset';
+                }, 2500);
+            }
+        }, 10);
+    });
+    return;
+
+    try 
+    {   
         await storeAuthentication();
-        //await new Promise((resolve, reject) => setTimeout(resolve, 1));
-    }catch(error) {
-        console.error('Failed to store credentials. Probably logged out', error);
-        window.location = '/login?referer=/game';
-        return;
+        clientElement.setAttribute('src', `/webatrice/index.html`);
+    }
+    catch (error) 
+    {
+        console.warn('Error while loading: ', error);
+        let allowReload = true;
+        clientElement.setAttribute('src', `/webatrice/index.html`);
+        clientElement.addEventListener('load',() => {
+            setTimeout(async () => {
+                await storeAuthentication();
+                if (allowReload) {
+                    console.log('reloading...');
+                    clientElement.setAttribute('src', `/webatrice/index.html`);
+                    allowReload = false;
+                }
+            }, 100);
+        });
     }
 
-    const elm = document.getElementById('webatrice');
-    elm.setAttribute('src', `/webatrice/index.html`);
 }
 
 console.log('loaded game.js');
