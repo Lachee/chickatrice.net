@@ -278,7 +278,7 @@ class HTTP {
     public static function setReferral($referal = null) {
         
         if (Kiss::$app->session != null) {
-            self::$_REFERAL = $referal ?? Kiss::$app->session->get('REFERRAL', HTTP::header('Referer', null));
+            self::$_REFERAL = $referal ?? Kiss::$app->session->get('REFERRAL', HTTP::header('Referer', HTTP::get('referer', null)));
             Kiss::$app->session->set('REFERRAL', HTTP::route());
         } else {
             self::$_REFERAL = $referal ?? HTTP::header('Referer', null);

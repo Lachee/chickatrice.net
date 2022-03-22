@@ -70,8 +70,14 @@ async function storeAuthentication() {
 }
 
 async function loadWebatrice() {
-    await storeAuthentication();
-    //await new Promise((resolve, reject) => setTimeout(resolve, 1));
+    try {
+        await storeAuthentication();
+        //await new Promise((resolve, reject) => setTimeout(resolve, 1));
+    }catch(error) {
+        console.error('Failed to store credentials. Probably logged out', error);
+        window.location = '/login?referer=/game';
+        return;
+    }
 
     const elm = document.getElementById('webatrice');
     elm.setAttribute('src', `/webatrice/index.html`);
