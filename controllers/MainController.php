@@ -49,8 +49,33 @@ class MainController extends BaseController {
         ]);
     }
 
+    /** Logs into a webatrice instance */
+    public function actionGame() {
+        $auth = '';
+        if (Chickatrice::$app->loggedIn() && Chickatrice::$app->user->account != null) {
+            $username = Chickatrice::$app->user->account->name;
+            $password = Chickatrice::$app->user->account->password_sha512;
+
+            $auth = Chickatrice::$app->user->jwt([
+                'name' => $username,
+                'auth' => base64_encode(time() . ":$username:$password")
+            ], 3600);
+        }
+
+        $this->registerJsVariable('authentication', $auth, self::POS_START, 'kiss');
+        return $this->render('webatrice', [
+            'authentication'    => $auth,
+            'fullWidth'         => true,
+            'wrapContents'      => false,
+        ]);
+    }
+
     /** View the JWT */
     function actionJWT() {
+        if (HTTP::method() === 'POST') {
+            return Response::json(HTTP::OK, [ 'publicKey' => Kiss::$app->jwtProvider->publicKey ]);
+        }
+
         return $this->render('jwt', [
             'key' => Kiss::$app->jwtProvider->publicKey,
             'fullWidth' => true,

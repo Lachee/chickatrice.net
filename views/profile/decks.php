@@ -118,7 +118,7 @@ HTML::$meta = [
                         <div class="buttons">
         
                             <?php if ($profile->deck_privacy >= 1 || $profile->id === Chickatrice::$app->user->id): ?>
-                            <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/download', 'profile' => $profile->getUsername(), 'deck' => $deck->id]) ?>">
+                            <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/download', 'profile' => $profile->getUsername(), 'deck' => $deck]) ?>">
                                 <span class="icon">
                                     <i class="fal fa-download"></i>
                                 </span>

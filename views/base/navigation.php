@@ -21,7 +21,7 @@ $user = Kiss::$app->getUser();
         <!-- BRAND -->
         <div class="navbar-brand is-justify-content-space-evenly">
             <a class="navbar-item brand-text is-tab <?= HTTP::route() != '/' ?: 'is-active' ?>" href="<?= HTTP::url('/')?>"><img src="<?= Kiss::$app->logo ?>" data-tooltip="Home" /></a>
-           
+
             <a class="navbar-item has-icon is-tab <?= !Strings::startsWith(HTTP::route(), '/stats') ?: 'is-active' ?>" data-tooltip="Stats" href="<?= HTTP::url('/stats')?>">
                 <span class="icon"><i class="fal fa-chart-area"></i></span>
                 <span class="is-hidden-touch">Statistics</span>
@@ -61,6 +61,11 @@ $user = Kiss::$app->getUser();
                         <!-- LOGGED IN USERS -->
                         <div class="field has-addons"> 
                             <p class="control">
+                                <a class="button" href="<?= HTTP::url(['/game']); ?>"  data-tooltip="Play on Webatrice">
+                                    <span class="icon"><i class="fal fa-play"></i></span>
+                                </a>
+                            </p>
+                            <p class="control">
                                 <a class="button" id="login-button" href="<?= HTTP::url(['/profile/@me/']); ?>"  data-tooltip="Profile">
                                     <span class="icon"><i class="fal fa-user"></i></span>
                                     <span><?= HTML::encode($user->username) ?></span>
@@ -71,6 +76,7 @@ $user = Kiss::$app->getUser();
                                     <span class="icon"><i class="fal fa-cog"></i></span>
                                 </a>
                             </p>
+
                             <p class="control">
                                 <a class="button" href="<?= HTTP::url(['/logout']); ?>"  data-tooltip="Logout">
                                     <span class="icon"><i class="fal fa-sign-out"></i></span>

@@ -61,7 +61,15 @@ class Controller extends Route {
         return $route;
     }
 
-    /** Registers a constant variable to be declared */
+    /**
+     * Registers
+     * @param string $name Name of the JS variable
+     * @param mixed $value Value to store. This will be JSON encoded by default unless explicitly disabled
+     * @param int $position Position of the register.
+     * @param string $scope Scope of the variable. Supports `const`, `let`, `var`, or a custom object such as `Kiss` (which turns into `Kiss.set()`)
+     * @param bool $encode encode the $value as JSON
+     * @return void 
+     */
     public function registerJsVariable($name, $value, $position = self::POS_START, $scope = 'const', $encode = true) {
         
         //Force the scope if we are setting to the kiss object.

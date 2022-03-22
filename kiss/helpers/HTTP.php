@@ -152,7 +152,7 @@ class HTTP {
         return 'Unkown Exception';
     }
 
-    /** @return string the HTTP method */
+    /** @return string the HTTP method in upper case */
     public static function method() {
         return strtoupper($_SERVER['REQUEST_METHOD']);
     }

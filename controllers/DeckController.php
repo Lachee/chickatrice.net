@@ -46,10 +46,6 @@ class DeckController extends BaseController {
         //$this->deck->downloadTags();
         $query = $this->deck->getTags();
         die($query->previewStatement());
-
-        return Response::json(HTTP::OK, [
-            'tags' => $tags
-        ]);
     }
 
     function actionAnalytics() {
