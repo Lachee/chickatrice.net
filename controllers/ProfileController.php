@@ -60,7 +60,7 @@ class ProfileController extends BaseController
         ]);
     }
 
-#region Deck Functions
+    #region Deck Functions
     /** Manages the users Decks */
     function actionDecks()
     {
@@ -107,14 +107,17 @@ class ProfileController extends BaseController
             return Response::redirect(['/profile/@me/decks']);
         }
     }
-#endregion
+    #endregion
 
-#region Relation Functions
+    #region Relation Functions
     /** Manages the user buddies */
     function actionRelations()
     {
         //Verify its their own profile
-        if ($this->user->id != Kiss::$app->user->id)
+        if (
+            !$this->account->isAdmin() &&
+            $this->user->id != Kiss::$app->user->id
+        )
             throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own friends.');
 
         if (HTTP::get('rf', false)) {
@@ -163,9 +166,9 @@ class ProfileController extends BaseController
             'ignores'           => $ignore,
         ]);
     }
-#endregion
+    #endregion
 
-#region Replay Functions
+    #region Replay Functions
     /** Manages the user Games */
     function actionReplays()
     {
@@ -221,9 +224,9 @@ class ProfileController extends BaseController
             'replays'   => $replays,
         ]);
     }
-#endregion
+    #endregion
 
-#region Setting Functions
+    #region Setting Functions
     /** Manages the user account settings */
     function actionSettings()
     {
@@ -341,9 +344,9 @@ class ProfileController extends BaseController
         // We can just return directly
         return Response::redirect(HTTP::url($this->user->avatarUrl, true));
     }
-#endregion
+    #endregion
 
-#region Getters
+    #region Getters
     /** @return User gets the user */
     public function getUser()
     {
@@ -386,5 +389,5 @@ class ProfileController extends BaseController
     {
         return $this->getUser()->getAccount();
     }
-#endregion
+    #endregion
 }
