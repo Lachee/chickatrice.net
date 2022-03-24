@@ -70,31 +70,26 @@ class ProfileController extends BaseController
         ]);
     }
 
+#region Deck Functions
     /** Manages the users Decks */
     function actionDecks()
     {
         // Make sure we dont list other people's decks (unless we are judges)
         if (
-            !$this->user->account->isJudge() &&
+            !$this->account->isJudge() &&
             $this->user->deck_privacy >= User::DECK_PRIVACY_PRIVATE && $this->user->id != Chickatrice::$app->user->id
         )
             throw new HttpException(HTTP::FORBIDDEN, 'User has hiden their decks');
 
-        //Verify its their own profile
-        // if ($this->user->id != Kiss::$app->user->id) 
-        //     throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own decks.');
-
-        $decks = Deck::findByAccount($this->user->account)->orderByAsc('id')->all();
+        $decks = Deck::findByAccount($this->account)->orderByAsc('id')->all();
         return $this->render('decks', [
             'profile'   => $this->user,
             'decks'     => $decks,
         ]);
     }
-
     /** Imports a Moxfield deck */
     function actionImportDeck()
     {
-
         //Verify its their own profile
         if ($this->user->id != Kiss::$app->user->id)
             throw new HttpException(HTTP::FORBIDDEN, 'You can only import to your own decks.');
@@ -122,7 +117,9 @@ class ProfileController extends BaseController
             return Response::redirect(['/profile/@me/decks']);
         }
     }
+#endregion
 
+#region Relation Functions
     /** Manages the user buddies */
     function actionRelations()
     {
@@ -176,7 +173,9 @@ class ProfileController extends BaseController
             'ignores'           => $ignore,
         ]);
     }
+#endregion
 
+#region Replay Functions
     /** Manages the user Games */
     function actionReplays()
     {
@@ -232,7 +231,9 @@ class ProfileController extends BaseController
             'replays'   => $replays,
         ]);
     }
+#endregion
 
+#region Setting Functions
     /** Manages the user account settings */
     function actionSettings()
     {
@@ -338,8 +339,9 @@ class ProfileController extends BaseController
         }
         return Response::redirect(['settings']);
     }
+#endregion
 
-
+#region Getters
     /** @return User gets the user */
     public function getUser()
     {
@@ -382,4 +384,5 @@ class ProfileController extends BaseController
     {
         return $this->getUser()->getAccount();
     }
+#endregion
 }
