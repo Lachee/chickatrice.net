@@ -158,20 +158,20 @@ class ProfileController extends BaseController
     /** Manages the users Decks */
     function actionDecks() {
 
-        /** @var User $profile */
-        $profile = $this->profile;
-
         // Make sure we dont list other people's decks
-        if ($this->profile->deck_privacy >= 2 && $this->profile->id != Chickatrice::$app->user->id)
+        $privacy = $this->user ? $this->user->deck_privacy : Chickatrice::$app->defaultDeckPrivacy;
+        if ($privacy >= 2 && $this->account->id != Chickatrice::$app->user->accountId)
             throw new HttpException(HTTP::FORBIDDEN, 'User has hiden their decks');
 
         //Verify its their own profile
         // if ($this->profile->id != Kiss::$app->user->id) 
         //     throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own decks.');
 
-        $decks = Deck::findByAccount($profile->getAccount())->orderByAsc('id')->all();
+        $decks = Deck::findByAccount($this->account)->orderByAsc('id')->all();
         return $this->render('decks', [
-            'profile'   => $profile,
+            'privacy'   => $privacy,
+            'account'   => $this->account,
+            'user'      => $this->user,
             'decks'     => $decks,
         ]);
     }

@@ -28,6 +28,7 @@ use Ramsey\Uuid\Uuid;
 
 /**
  * @property Account $account
+ * @property int $accountId
  * @package app\models
  */
 class User extends Identity {
@@ -67,6 +68,11 @@ class User extends Identity {
     public function getAccount() {
         if ($this->_cockatriceAccount != null) return $this->_cockatriceAccount;
         return $this->_cockatriceAccount = Account::findByKey($this->cockatrice_id)->one();
+    }
+
+    /** @return int returns the cockatrice account id */
+    public function getAccountId() {
+        return $this->cockatrice_id;
     }
 
     /** @return string Current discord snowflake of the logged in user. */

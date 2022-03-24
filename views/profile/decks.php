@@ -1,29 +1,22 @@
 <?php
 
 use app\models\cockatrice\Deck;
-use app\models\Gallery;
-use app\models\Identifier;
-use app\models\Image;
-use app\models\Tag;
-use app\widget\GalleryList;
-use app\widget\ProfileCard;
-use kiss\helpers\HTML;
-use kiss\helpers\HTTP;
-
-/** @var User $profile */
+use kiss\helpers\{ HTML, HTTP, Strings };
+use app\models\{ cockatrice\Account, User };
+/** @var User $user */
+/** @var Account $account */
+/** @var int $privacy */
 /** @var Deck[] $decks */
 
 $decksAvailable = count($decks);
-$maxDecksAvailable = $profile->max_allowed_decks;
+$maxDecksAvailable = $user ? $user->max_allowed_decks : 999999;
 $precentage = $decksAvailable / $maxDecksAvailable;
 
-HTML::$title = Chickatrice::$app->title . " || " . $profile->username;
+HTML::$title = Chickatrice::$app->title . " || " . $account->name;
 HTML::$meta = [
-    'description' => 'List of public decks on ' . ucfirst($profile->username) . '\'s account',
-    'image'       => HTTP::url(['/profile/:profile/avatar', 'profile' => $profile->uuid], true),
+    'description' => 'List of public decks on ' . ucfirst($account->name) . '\'s account',
+    'image'       => HTTP::url(['/profile/:profile/avatar', 'profile' => $user ? $user->uuid : $account->id], true),
 ];
-
-
 ?>
 
 <style>
@@ -35,14 +28,14 @@ HTML::$meta = [
 
 <section class="section container is-max-desktop">
 
-    <nav class="breadcrumb" aria-label="breadcrumbs">
+<nav class="breadcrumb" aria-label="breadcrumbs">
         <ul>
-            <li><a href="<?= HTTP::url(['/profile/:profile/', 'profile' => $profile->getUsername()]) ?>"><span class="icon"><i class="fal fa-user"></i></span><?= HTML::encode($profile->getUsername()) ?></a></li>
+            <li><a href="<?= HTTP::url(['/profile/:profile/', 'profile' => $user ? $user->getUsername() : $account->name ]) ?>"><span class="icon"><i class="fal fa-user"></i></span><?= HTML::encode($user ? $user->getUsername() : $account->name ) ?></a></li>
             <li class="is-active"><a href="#" aria-current="page">Decks</a></li>
         </ul>
     </nav>
 
-    <?php if (Chickatrice::$app->loggedIn() && $profile->id === Chickatrice::$app->user->id): ?>
+    <?php if (Chickatrice::$app->loggedIn() && $user && $user->id === Chickatrice::$app->user->id): ?>
         <p class="block">
             <p>Storing <strong><?= $decksAvailable ?></strong> of <strong><?= $maxDecksAvailable ?></strong> decks</p>
             <p><I>Exceeding the capacity will result in <strong>NEWER</strong> decks being deleted within a week of upload.</I></p>
@@ -71,7 +64,7 @@ HTML::$meta = [
     <?php endif; ?>
 
     <!-- Account Size Advert -->
-    <?php if (Chickatrice::$app->loggedIn() && $profile->id === Chickatrice::$app->user->id): ?>
+    <?php if (Chickatrice::$app->loggedIn() && $user && $user->id === Chickatrice::$app->user->id): ?>
     <?php if ($precentage >= 1): ?>
     <section class="notification hero has-gradient is-info is-small">
         <div class="hero-body">
@@ -117,21 +110,21 @@ HTML::$meta = [
                     <div class="list-item-controls">
                         <div class="buttons">
         
-                            <?php if ($profile->deck_privacy >= 1 || $profile->id === Chickatrice::$app->user->id): ?>
-                            <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/download', 'profile' => $profile->getUsername(), 'deck' => $deck]) ?>">
+                            <?php if ($privacy >= 1 || ($user && $user->id === Chickatrice::$app->user->id)): ?>
+                            <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/download', 'profile' => $this->name, 'deck' => $deck]) ?>">
                                 <span class="icon">
                                     <i class="fal fa-download"></i>
                                 </span>
                             </a>
                             <?php endif; ?>
                             
-                            <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/', 'profile' => $profile->getUsername(), 'deck' => $deck]) ?>">
+                            <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/', 'profile' => $this->name, 'deck' => $deck]) ?>">
                                 <span class="icon">
                                     <i class="fal fa-eye"></i>
                                 </span>
                             </a>
 
-                            <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/analytics',  'profile' => $profile->getUsername(), 'deck' => $deck]) ?>">
+                            <a class="button" href="<?= HTTP::url(['/profile/:profile/decks/:deck/analytics',  'profile' => $this->name, 'deck' => $deck]) ?>">
                                 <span class="icon">
                                     <i class="fal fa-analytics"></i>
                                 </span>

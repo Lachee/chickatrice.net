@@ -1,15 +1,15 @@
 <?php
 
 use kiss\Kiss;
+use app\models\User;
 
 /**
  * @property Chickatrice $app
  * @property \app\components\discord\Discord $discord Discord API instance
  * @property \app\components\cockatrice\Cockatrice $cockatrice Cockatrice Protobuf Manager
  * @property \app\components\ScryfallTagger $tagger
- * @property \app\models\User $user current user
+ * @property User $user current user
  * @method \app\models\User getUser() gets the currently signed in user 
- * 
  */
 class Chickatrice extends Kiss {
 
