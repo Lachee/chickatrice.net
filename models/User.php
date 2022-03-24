@@ -32,6 +32,13 @@ use Ramsey\Uuid\Uuid;
  */
 class User extends Identity {
     
+    /** Deck is public */
+    public const DECK_PRIVACY_PUBLIC = 0;
+    /** Deck is public but cannot be copied */
+    public const DECK_PRIVACY_PUBLIC_COPYPROC = 1;
+    /** Deck is private */
+    public const DECK_PRIVACY_PRIVATE = 2;
+
     /** @var \app\components\discord\User stored discord user. */
     private $_discordUser;
     protected $snowflake;
@@ -43,8 +50,8 @@ class User extends Identity {
     /** @var int $max_allowed_replays */ 
     protected $max_allowed_replays;
 
-    /** @var int $deck_privacy */
-    protected $deck_privacy = 0;
+    /** @var int $deck_privacy privacy setting for the decks. See `DECK_PRIVACY_` consts*/
+    protected $deck_privacy = self::DECK_PRIVACY_PUBLIC;
 
     /** @var Account cockatrice account */
     private $_cockatriceAccount;

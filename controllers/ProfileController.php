@@ -31,29 +31,29 @@ use Ramsey\Uuid\Uuid;
 
 /**
  * @property User $user
+ * @property Account $account
  */
 class ProfileController extends BaseController
 {
 
-    public const DBEUG_USERS = [
-        '130973321683533824', // Lachee
-    ];
-
+    public const DBEUG_USERS = ['130973321683533824',];
     /** Scopes while debugging */
     public const DEBUG_SCOPES = [];
     /** Scopes to give to normal users */
     public const SCOPES = [];
 
-    public $name;
+    public  $name;
+    private $_user;
     public static function route()
     {
         return "/profile/:name";
     }
 
-    function actionAvatar() {
+    function actionAvatar()
+    {
         // We need to transcode
         $bmp = $this->user->account->avatar_bmp;
-        if ($bmp !== null) 
+        if ($bmp !== null)
             return Response::image($bmp, 'bmp');
 
         // We can just return directly
@@ -64,28 +64,63 @@ class ProfileController extends BaseController
     function actionIndex()
     {
         return $this->render('index', [
-            'profile' => $this->user ,
+            'profile' => $this->user,
             'fullWidth' => true,
             'wrapContents' => false
         ]);
     }
 
-    /** Displays the users profile */
-    function actionResend()
+    /** Manages the users Decks */
+    function actionDecks()
     {
+        // Make sure we dont list other people's decks (unless we are judges)
+        if (
+            !$this->user->account->isJudge() &&
+            $this->user->deck_privacy >= User::DECK_PRIVACY_PRIVATE && $this->user->id != Chickatrice::$app->user->id
+        )
+            throw new HttpException(HTTP::FORBIDDEN, 'User has hiden their decks');
+
+        //Verify its their own profile
+        // if ($this->user->id != Kiss::$app->user->id) 
+        //     throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own decks.');
+
+        $decks = Deck::findByAccount($this->user->account)->orderByAsc('id')->all();
+        return $this->render('decks', [
+            'profile'   => $this->user,
+            'decks'     => $decks,
+        ]);
+    }
+
+    /** Imports a Moxfield deck */
+    function actionImportDeck()
+    {
+
         //Verify its their own profile
         if ($this->user->id != Kiss::$app->user->id)
-            throw new HttpException(HTTP::FORBIDDEN, 'Cannot resend someone else\'s activation.');
-    
-        $activation = Chickatrice::$app->redis()->get($this->user->id . ':activation');
-        if ($activation) {
-            Chickatrice::$app->session->addNotification('Activation code was already sent! Please wait 15 minutes.', 'danger');
-        } else {
-            RegisterForm::sendAccountActivation($this->user->account);
-            Chickatrice::$app->redis()->set($this->user->id . ':activation', 'true');
-            Chickatrice::$app->redis()->expire($this->user->id . ':activation', 15 * 60);
+            throw new HttpException(HTTP::FORBIDDEN, 'You can only import to your own decks.');
+
+        $mox = HTTP::get('mox', null);
+        if (empty($mox)) {
+            throw new HttpException(HTTP::BAD_REQUEST, 'mox needs to be supplied');
         }
-        return Response::redirect(['settings']);
+
+        $moxId = preg_replace('/https:\/\/(www\.)?moxfield.com\/decks\//', '', $mox);
+        $deck = null;
+        try {
+            $deck = Deck::importMoxfield($moxId);
+        } catch (\Exception $e) {
+            Chickatrice::$app->session->addNotification('Failed to import the deck.', 'danger');
+            return Response::redirect(['/profile/@me/decks']);
+        }
+
+        $deck->id_user = $this->user->account->id;
+        if ($deck->save()) {
+            Chickatrice::$app->session->addNotification('Imported the deck ' . $deck->name, 'success');
+            return Response::redirect(['/profile/@me/decks/:deck/', 'deck' => $deck->id]);
+        } else {
+            Chickatrice::$app->session->addNotification('Failed to import the deck.', 'danger');
+            return Response::redirect(['/profile/@me/decks']);
+        }
     }
 
     /** Manages the user buddies */
@@ -108,22 +143,24 @@ class ProfileController extends BaseController
         // Fetch the Ignores, Buddies, and Online Accounts who are also buddies
         $ignore = $this->user->account->ignores;
         $friends = $this->user->account->friends;
-        $friend_ids = array_values(Arrays::map($friends, function($v) { return $v->id; }));
+        $friend_ids = array_values(Arrays::map($friends, function ($v) {
+            return $v->id;
+        }));
         $online = Arrays::map(
-                        Account::findByOnline()
-                            ->andWhere(['cockatrice_users.id', $friend_ids])
-                            ->fields('cockatrice_users.id')
-                            ->all(true),
-                        function($account) {
-                            return $account['id'];
-                        }
-                    );
+            Account::findByOnline()
+                ->andWhere(['cockatrice_users.id', $friend_ids])
+                ->fields('cockatrice_users.id')
+                ->all(true),
+            function ($account) {
+                return $account['id'];
+            }
+        );
 
         // Lets do a really bad naive shuffle so online buddies are on top
         // This is terrible and i could probably do this with one lookup in SQL... but lets be honest, who cares?
         $online_buddies = [];
         $offline_buddies = [];
-        foreach($friends as $friend) {
+        foreach ($friends as $friend) {
             if (in_array($friend->id, $online)) {
                 $online_buddies[] = $friend;
             } else {
@@ -138,59 +175,6 @@ class ProfileController extends BaseController
             'online_ids'        => $online,
             'ignores'           => $ignore,
         ]);
-    }
-
-    /** Manages the users Decks */
-    function actionDecks()
-    {
-
-        /** @var User $profile */
-        $profile = $this->user;
-
-        // Make sure we dont list other people's decks
-        if ($this->user->deck_privacy >= 2 && $this->user->id != Chickatrice::$app->user->id)
-            throw new HttpException(HTTP::FORBIDDEN, 'User has hiden their decks');
-
-        //Verify its their own profile
-        // if ($this->user->id != Kiss::$app->user->id) 
-        //     throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own decks.');
-
-        $decks = Deck::findByAccount($profile->getAccount())->orderByAsc('id')->all();
-        return $this->render('decks', [
-            'profile'   => $profile,
-            'decks'     => $decks,
-        ]);
-    }
-
-    /** Imports a Moxfield deck */
-    function actionImportDeck() {
-        
-        //Verify its their own profile
-        if ($this->user->id != Kiss::$app->user->id)
-            throw new HttpException(HTTP::FORBIDDEN, 'You can only import to your own decks.');
-
-        $mox = HTTP::get('mox', null);
-        if (empty($mox)) {
-            throw new HttpException(HTTP::BAD_REQUEST, 'mox needs to be supplied');
-        }
-
-        $moxId = preg_replace('/https:\/\/(www\.)?moxfield.com\/decks\//', '', $mox);
-        $deck = null;
-        try  {
-            $deck = Deck::importMoxfield($moxId);
-        } catch(\Exception $e) {
-            Chickatrice::$app->session->addNotification('Failed to import the deck.', 'danger');
-            return Response::redirect(['/profile/@me/decks']);
-        }
-
-        $deck->id_user = $this->user->account->id;
-        if ($deck->save()) {
-            Chickatrice::$app->session->addNotification('Imported the deck ' . $deck->name, 'success');
-            return Response::redirect(['/profile/@me/decks/:deck/', 'deck' => $deck->id ]);
-        } else {
-            Chickatrice::$app->session->addNotification('Failed to import the deck.', 'danger');
-            return Response::redirect(['/profile/@me/decks']);
-        }
     }
 
     /** Manages the user Games */
@@ -334,7 +318,29 @@ class ProfileController extends BaseController
         return Response::redirect(Kiss::$app->baseURL());
     }
 
-    private $_user;
+    /** Displays the users profile */
+    function actionResend()
+    {
+        //Verify its their own profile
+        if (
+            !$this->account->isAdmin() &&
+            $this->user->id != Kiss::$app->user->id
+        )
+            throw new HttpException(HTTP::FORBIDDEN, 'Cannot resend someone else\'s activation.');
+
+        $activation = Chickatrice::$app->redis()->get($this->user->id . ':activation');
+        if ($activation) {
+            Chickatrice::$app->session->addNotification('Activation code was already sent! Please wait 15 minutes.', 'danger');
+        } else {
+            RegisterForm::sendAccountActivation($this->user->account);
+            Chickatrice::$app->redis()->set($this->user->id . ':activation', 'true');
+            Chickatrice::$app->redis()->expire($this->user->id . ':activation', 15 * 60);
+        }
+        return Response::redirect(['settings']);
+    }
+
+
+    /** @return User gets the user */
     public function getUser()
     {
         if ($this->_user != null)
@@ -369,5 +375,11 @@ class ProfileController extends BaseController
             throw new HttpException(HTTP::NOT_FOUND, 'User doesn\'t exist');
 
         return $this->_user;
+    }
+
+    /** @return Account gets the user account */
+    public function getAccount()
+    {
+        return $this->getUser()->getAccount();
     }
 }
