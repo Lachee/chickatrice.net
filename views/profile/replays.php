@@ -19,7 +19,7 @@ $replaysAvailable = count($replays);
 $maxReplaysAvailable = $profile->max_allowed_replays;
 $precentage = $replaysAvailable / $maxReplaysAvailable;
 
-HTML::$title = Chickatrice::$app->title . " || " . $profile->username;
+HTML::$title = 'Replays';
 HTML::$meta = [
     'description' => 'Replays store to your account',
     'image'       => HTTP::url(['/profile/:profile/avatar', 'profile' => $profile->uuid], true),

@@ -50,7 +50,7 @@ class MainController extends BaseController {
     }
 
     /** Logs into a webatrice instance */
-    public function actionGame() {
+    public function actionPlay() {
         $auth = '';
         if (Chickatrice::$app->loggedIn() && Chickatrice::$app->user->account != null) {
             $username = Chickatrice::$app->user->account->name;

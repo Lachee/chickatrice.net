@@ -16,6 +16,7 @@ use kiss\helpers\HTTP;
 /** @var Account[] $buddies */
 /** @var Account[] $ignores */
 
+HTML::$title = 'Relations';
 ?>
 
 <style>

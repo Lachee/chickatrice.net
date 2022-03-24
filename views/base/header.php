@@ -9,7 +9,7 @@ use kiss\Kiss;
 $theme = HTTP::get('theme', 'lumen');
 ?>
 <head>
-    <title><?= HTML::encode(HTML::$title) ?></title>
+    <title><?= HTML::encode(HTML::$title == null ? Kiss::$app->title : HTML::$title . ' - ' . Kiss::$app->title) ?></title>
     <base href="<?= Kiss::$app->baseURL()?>">
     
     <!-- Meta Data -->

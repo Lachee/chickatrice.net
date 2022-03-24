@@ -24,7 +24,7 @@ class BaseController extends Controller {
 
     public function action($endpoint, ...$args) {
         
-        HTML::$title = Kiss::$app->title;
+        HTML::$title = null;
         $this->registerDependency('/dist/app.js');
         $this->registerDependency('/dist/app.css');
 

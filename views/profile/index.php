@@ -12,7 +12,7 @@ use kiss\helpers\HTTP;
 /** @var User $profile */
 
 
-HTML::$title = Chickatrice::$app->title . " || " . $profile->username;
+HTML::$title = $profile->username;
 HTML::$meta = [
     'description' => ucfirst($profile->username) . '\'s public profile.',
     'image'       => HTTP::url(['/profile/:profile/avatar', 'profile' => $profile->uuid], true),

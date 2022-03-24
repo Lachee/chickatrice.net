@@ -4,6 +4,8 @@ use kiss\helpers\HTML;
 use kiss\helpers\HTTP;
 use kiss\Kiss;
 
+HTML::$title = 'Statistics';
+
 ?>
 
 <section class="section container">

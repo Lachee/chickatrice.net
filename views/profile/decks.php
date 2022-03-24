@@ -17,7 +17,7 @@ $decksAvailable = count($decks);
 $maxDecksAvailable = $profile->max_allowed_decks;
 $precentage = $decksAvailable / $maxDecksAvailable;
 
-HTML::$title = Chickatrice::$app->title . " || " . $profile->username;
+HTML::$title = 'Decks';
 HTML::$meta = [
     'description' => 'List of public decks on ' . ucfirst($profile->username) . '\'s account',
     'image'       => HTTP::url(['/profile/:profile/avatar', 'profile' => $profile->uuid], true),

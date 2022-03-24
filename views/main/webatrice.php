@@ -4,7 +4,7 @@ use kiss\helpers\HTML;
 use kiss\helpers\HTTP;
 use kiss\Kiss;
 
-
+HTML::$title = 'Webatrice';
 ?>
 
 <section class="hero is-medium is-dark is-bold is-fullheight-with-navbar">

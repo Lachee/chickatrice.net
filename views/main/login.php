@@ -8,6 +8,7 @@ use kiss\Kiss;
 /** @var LoginForm $loginForm */
 /** @var RegisterForm $registerForm */
 
+HTML::$title = 'Login';
 ?>
 
 
