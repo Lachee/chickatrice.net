@@ -122,6 +122,7 @@ class BaseObject implements SchemaInterface, JsonSerializable {
     }
 
     public function __get($name) {
+        // determine if its a getX()
         if (is_callable(get_called_class() . "::get$name")) {
             $result = $this->{"get$name"}();
             if ($result instanceof ActiveQuery) {
@@ -133,6 +134,16 @@ class BaseObject implements SchemaInterface, JsonSerializable {
             return $result;
         }
 
+        // Determine if its a isX() 
+        if ((stripos($name, 'is') === 0 || stripos($name, 'has') === 0) && is_callable(get_called_class() . "::$name")) {
+            $result = $this->{"$name"}();
+            if ($result instanceof ActiveQuery) {
+                return $result->any();
+            }
+            return $result;
+        }
+
+        // Just look for the property
         if (stripos($name, '_') !== 0 && property_exists($this, $name))
             return $this->{$name};
     }
