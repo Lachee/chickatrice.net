@@ -79,12 +79,12 @@ class Account extends ActiveRecord {
     
     /** @return bool The account is an admin */
     public function isModerator() {
-        return $this->admin & self::ADMIN_MODERATOR != 0;
+        return $this->isAdmin() || $this->admin & self::ADMIN_MODERATOR != 0;
     }
     
     /** @return bool The account is an admin */
     public function isJudge() {
-        return $this->admin & self::ADMIN_JUDGE != 0;
+        return $this->isAdmin() || $this->admin & self::ADMIN_JUDGE != 0;
     }
 
     public function getAvatarDataUrl() {

@@ -200,7 +200,7 @@ class ProfileController extends BaseController
         $profile = $this->user;
 
         //Verify its their own profile
-        if ($this->user->id != Kiss::$app->user->id)
+        if ($this->user->id != Kiss::$app->user->id && !Chickatrice::$app->user->account->isModerator)
             throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own games.');
 
         // Download the replay
