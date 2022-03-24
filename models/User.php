@@ -217,8 +217,8 @@ class User extends Identity {
      * Creates a new user
      * @param string $username The username for a new account
      * @param string $email The email address of the account
-     * @param string $snowflake The discord snowflake of the account
-     * @param Account|null $account The linked account. If null, then a new one is made.
+     * @param string $snowflake The discord snowflake of the account. Set to null for no discord.
+     * @param Account|null $account The linked account. If null, then it is looked up or created if cannot be found by email.
      * @return User 
      * @throws QueryException 
      * @throws ArgumentException 
@@ -231,7 +231,7 @@ class User extends Identity {
         $user = new User([
             'uuid'      => Uuid::uuid1(Chickatrice::$app->uuidNodeProvider->getNode()),
             'email'     => $email,
-            'snowflake' => $snowflake,
+            'snowflake' => $snowflake == null ? '0' : $snowflake,
 
             'max_allowed_decks'     => Chickatrice::$app->defaultAllowedDecks,
             'max_allowed_replays'   => Chickatrice::$app->defaultAllowedReplays,
