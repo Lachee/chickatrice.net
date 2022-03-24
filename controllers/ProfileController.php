@@ -30,7 +30,7 @@ use kiss\Kiss;
 use Ramsey\Uuid\Uuid;
 
 /**
- * @property User $profile
+ * @property User $user
  */
 class ProfileController extends BaseController
 {
@@ -315,7 +315,7 @@ class ProfileController extends BaseController
             throw new HttpException(HTTP::UNAUTHORIZED, 'Need to be logged in to edit your settings.');
 
         //Verify its their own profile
-        if ($this->user->id != Kiss::$app->user->id && $this->user->account->admin != Account::ADMIN_LEVEL_OWNER)
+        if ($this->user->id != Kiss::$app->user->id && !$this->user->account->isAdmin)
             throw new HttpException(HTTP::FORBIDDEN, 'You cannot delete someone\'s else account! You cheeky bastard.');
 
         // Mark their account inactive and ready to delete in the next cron-job

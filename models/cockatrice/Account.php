@@ -27,14 +27,29 @@ use kiss\helpers\Strings;
  * @property string $privlevel;
  * @property string $privlevelStartDate;
  * @property string $privlevelEndDate;
+ * 
+ * @property bool $isAdmin
+ * @property bool $isModerator
+ * @property bool $isJudge
  * @package app\models\cockatrice
  */
 class Account extends ActiveRecord {
  
-    const ADMIN_LEVEL_USER = 0;
-    const ADMIN_LEVEL_OWNER = 1;
-    const ADMIN_LEVEL_MODERATOR = 2;
-
+    const ADMIN_USER = 0;
+    const ADMIN_OWNER = 1;
+    const ADMIN_MODERATOR = 2;
+    const ADMIN_JUDGE = 4;
+    
+    /*
+    
+    administrator | judge = 7
+    moderator | judge = 6
+    administrator | judge = 5
+    registered user | judge = 4
+    administrator = 3
+    administrator = 2
+    administrator = 1
+    */
     public static function tableName() { return "cockatrice_users"; }
 
     protected $id;
@@ -56,6 +71,21 @@ class Account extends ActiveRecord {
     protected $privlevel;
     protected $privlevelStartDate;
     protected $privlevelEndDate;
+
+    /** @return bool The account is an admin */
+    public function isAdmin() {
+        return $this->admin & self::ADMIN_OWNER != 0;
+    }
+    
+    /** @return bool The account is an admin */
+    public function isModerator() {
+        return $this->admin & self::ADMIN_MODERATOR != 0;
+    }
+    
+    /** @return bool The account is an admin */
+    public function isJudge() {
+        return $this->admin & self::ADMIN_JUDGE != 0;
+    }
 
     public function getAvatarDataUrl() {
         if ($this->avatar_bmp == null) 
