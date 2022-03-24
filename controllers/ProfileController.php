@@ -49,16 +49,6 @@ class ProfileController extends BaseController
         return "/profile/:name";
     }
 
-    function actionAvatar()
-    {
-        // We need to transcode
-        $bmp = $this->user->account->avatar_bmp;
-        if ($bmp !== null)
-            return Response::image($bmp, 'bmp');
-
-        // We can just return directly
-        return Response::redirect(HTTP::url($this->user->avatarUrl, true));
-    }
 
     /** Displays the users profile */
     function actionIndex()
@@ -338,6 +328,18 @@ class ProfileController extends BaseController
             Chickatrice::$app->redis()->expire($this->user->id . ':activation', 15 * 60);
         }
         return Response::redirect(['settings']);
+    }
+
+    /** Gets the raw contents of the avatar */
+    function actionAvatar()
+    {
+        // We need to transcode
+        $bmp = $this->user->account->avatar_bmp;
+        if ($bmp !== null)
+            return Response::image($bmp, 'bmp');
+
+        // We can just return directly
+        return Response::redirect(HTTP::url($this->user->avatarUrl, true));
     }
 #endregion
 
