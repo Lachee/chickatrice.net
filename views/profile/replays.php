@@ -91,19 +91,19 @@ HTML::$meta = [
 
                     <div class="list-item-controls">
                         <div class="buttons">
-                            <a class="button" href="<?= HTTP::url(['games', 'remove' => $replay->id]) ?>" onclick="return confirm('Are you sure?')">
+                            <a class="button" href="<?=  HTTP::url(['/profile/:profile/replays/:game/delete', 'profile' => $profile->username, 'game' => $replay->id])?>" onclick="return confirm('Are you sure?')">
                                 <span class="icon">
                                     <i class="fal fa-trash"></i>
                                 </span>
                             </a>
 
-                            <a class="button is-hidden-touch" href="<?= HTTP::url(['games', 'download' => $replay->id]) ?>">
+                            <a class="button is-hidden-touch" href="<?= HTTP::url(['/profile/:profile/replays/:game/download', 'profile' => $profile->username, 'game' => $replay->id]) ?>">
                                 <span class="icon">
                                     <i class="fal fa-download"></i>
                                 </span>
                             </a>
 
-                            <a class="button" href="<?= HTTP::url(['/profile/@me/replays/:game/analytics', 'game' => $replay->id]) ?>">
+                            <a class="button" href="<?= HTTP::url(['/profile/:profile/replays/:game/analytics', 'profile' => $profile->username, 'game' => $replay->id]) ?>">
                                 <span class="icon">
                                     <i class="fal fa-analytics"></i>
                                 </span>

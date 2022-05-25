@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\components\mixer\Mixer;
+use app\controllers\traits\ProfileTrait;
 use app\helpers\Country;
 use app\models\cockatrice\Account;
 use app\models\cockatrice\Deck;
@@ -29,12 +30,9 @@ use kiss\helpers\Strings;
 use kiss\Kiss;
 use Ramsey\Uuid\Uuid;
 
-/**
- * @property User $user
- * @property Account $account
- */
 class ProfileController extends BaseController
 {
+    use ProfileTrait;
 
     public const DBEUG_USERS = ['130973321683533824',];
     /** Scopes while debugging */
@@ -42,13 +40,7 @@ class ProfileController extends BaseController
     /** Scopes to give to normal users */
     public const SCOPES = [];
 
-    public  $name;
-    private $_user;
-    public static function route()
-    {
-        return "/profile/:name";
-    }
-
+    public static function route()  { return "/profile/:profile"; }
 
     /** Displays the users profile */
     function actionIndex()
@@ -121,18 +113,18 @@ class ProfileController extends BaseController
             throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own friends.');
 
         if (HTTP::get('rf', false)) {
-            $this->user->account->removeFriend(HTTP::get('rf'));
+            $this->account->removeFriend(HTTP::get('rf'));
             return Response::redirect('relations');
         }
 
         if (HTTP::get('ri', false)) {
-            $this->user->account->removeIgnore(HTTP::get('ri'));
+            $this->account->removeIgnore(HTTP::get('ri'));
             return Response::redirect('relations');
         }
 
         // Fetch the Ignores, Buddies, and Online Accounts who are also buddies
-        $ignore = $this->user->account->ignores;
-        $friends = $this->user->account->friends;
+        $ignore = $this->account->ignores;
+        $friends = $this->account->friends;
         $friend_ids = array_values(Arrays::map($friends, function ($v) {
             return $v->id;
         }));
@@ -172,55 +164,20 @@ class ProfileController extends BaseController
     /** Manages the user Games */
     function actionReplays()
     {
-        /** @var User $profile */
-        $profile = $this->user;
-
         //Verify its their own profile
-        if ($this->user->id != Kiss::$app->user->id && !Chickatrice::$app->user->account->isModerator)
+        if (
+            !$this->account->isModerator() &&
+            $this->user->id != Kiss::$app->user->id
+        )
             throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own games.');
-
-        // Download the replay
-        if (HTTP::get('download', false) !== false) {
-            $download_id = HTTP::get('download');
-
-            /** @var ReplayAccess $access */
-            $access = ReplayAccess::findByAccount($this->user->getAccount())
-                ->andWhere(['id_game', $download_id])
-                ->one();
-
-            if ($access == null)
-                throw new HttpException(HTTP::NOT_FOUND, 'Replay could not be found');
-
-            $filename = preg_replace("[^\w\s\d\.\-_~,;:\[\]\(\]]", '', $access->game->descr);
-            $blob = $access->replay->replay;
-            return Response::file($filename . '.cor', $blob);
-        }
-
-        // Delete the replay access
-        if (HTTP::get('remove', false) !== false) {
-            $remove_id = HTTP::get('remove');
-
-            // Remove access for this game with this account
-            $count = ReplayAccess::findByAccount($this->user->getAccount())
-                ->andWhere(['id_game', $remove_id])
-                ->delete()
-                ->execute();
-            if ($count > 0) {
-                Chickatrice::$app->session->addNotification('Replay Removed', 'success');
-            } else {
-                Chickatrice::$app->session->addNotification('Failed to remove replay', 'danger');
-            }
-
-            return Response::redirect(['games']);
-        }
-
+        
         // Find replays
         $replays = ReplayGame::findByAccount($this->user->getAccount())
             ->orderByDesc('time_started')
             ->all();
 
         return $this->render('replays', [
-            'profile'   => $profile,
+            'profile'   => $this->user,
             'replays'   => $replays,
         ]);
     }
@@ -347,47 +304,6 @@ class ProfileController extends BaseController
     #endregion
 
     #region Getters
-    /** @return User gets the user */
-    public function getUser()
-    {
-        if ($this->_user != null)
-            return $this->_user;
-
-        if ($this->name == '@me' && !Chickatrice::$app->loggedIn())
-            throw new HttpException(HTTP::UNAUTHORIZED, 'Need to be logged in');
-
-        if ($this->name == '@me')
-            return $this->_user = Chickatrice::$app->user;
-
-        // Find the user by the name
-        $this->_user = User::findByUsername($this->name)
-            ->orWhere(['uuid', $this->name])
-            ->one();
-
-        // If the user doesn't exist, then we will do a reverse lookup via account.
-        // If we manage to find an account but still no user, we will create the user on the spot
-        // This ensures there is always a User -> Account relation.
-        if ($this->_user == null) {
-            $account = Account::findByName($this->name)->one();
-            if ($account != null) {
-                $this->_user = User::findByAccount($account)->one();
-                if ($this->_user == null) {
-                    $this->_user = User::createUser($account->name, $account->email, null, $account);
-                }
-            }
-        }
-
-        // If we still dont have a user for what ever reason (account is null?) then we will throw an exception
-        if ($this->_user == null)
-            throw new HttpException(HTTP::NOT_FOUND, 'User doesn\'t exist');
-
-        return $this->_user;
-    }
-
-    /** @return Account gets the user account */
-    public function getAccount()
-    {
-        return $this->getUser()->getAccount();
-    }
+ 
     #endregion
 }

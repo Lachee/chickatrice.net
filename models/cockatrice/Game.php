@@ -5,8 +5,10 @@ use kiss\db\ActiveRecord;
 use kiss\Kiss;
 
 /** 
+ * A game that has been played.
  * @property string[] players 
  * @property Replay $replay
+ * @property mixed $replayData The replay data
  * 
  * @property string $description
 */
@@ -54,13 +56,19 @@ class Game extends ActiveRecord {
 
         
     private $_replay;
+
+    /** @return Replay replay */
     public function getReplay() {
         if ($this->_replay != null)
             return $this->_replay;
 
-        return $this->_replay = Replay::findByGame($this->id_game)->one();
+        return $this->_replay = Replay::findByGame($this->id)->one();
     }
 
+    /** @return mixed Gets the raw replay data */
+    public function getReplayData() {
+        return $this->getReplay()->replay;
+    }
 
     /** @return ActiveQuery|Game[] finds all the games by the player */
     public static function findByPlayer($playerName) {

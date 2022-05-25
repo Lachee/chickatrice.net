@@ -1,6 +1,9 @@
-<?php namespace app\controllers;
+<?php
+
+namespace app\controllers;
 
 use app\components\mixer\Mixer;
+use app\controllers\traits\ProfileTrait;
 use app\helpers\Country;
 use app\models\cockatrice\Deck;
 use app\models\cockatrice\Replay;
@@ -18,72 +21,94 @@ use app\models\User;
 use app\widget\Notification;
 use Chickatrice;
 use kiss\helpers\HTML;
+use kiss\helpers\Strings;
 use kiss\Kiss;
 use Ramsey\Uuid\Uuid;
 
 /**
- * @property User $profile
- * @property ReplayGame $game
+ * @property ReplayGame $replay
  */
-class GameController extends BaseController {
+class GameController extends BaseController
+{
 
-    public $profile_name;
-    public $game_id;
+    use ProfileTrait;
 
-    public static function route() { return "/profile/:profile_name/replays/:game_id"; }
+    public $replayId;
+    private $_replay;
 
-    function actionIndex() {
+    public static function route()
+    {
+        return "/profile/:profile/replays/:replayId";
+    }
+
+    function actionIndex()
+    {
         return Response::redirect(['/profile/@me/replays']);
-    }    
+    }
 
-    function actionAnalytics() {
-        if ($this->profile->id != Chickatrice::$app->user->id)
+    /** Downloads a specific replay */
+    function actionDownload()
+    {
+        //Verify its their own profile
+        if (
+            !$this->account->isModerator() &&
+            $this->user->id != Kiss::$app->user->id
+        )
+            throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own games.');
+
+        $filename = Strings::safe($this->replay->description) . '.cor';
+        $filedata = $this->replay->replayData;
+        return Response::file($filename, $filedata);
+    }
+
+    /** Deletes a specific replay */
+    function actionDelete()
+    {
+        //Verify its their own profile
+        if (
+            !$this->account->isAdmin() &&
+            $this->user->id != Kiss::$app->user->id
+        )
+            throw new HttpException(HTTP::FORBIDDEN, 'You can only view your own games.');
+
+        // Delete the replay
+        if ($this->replay->delete()) {
+            Chickatrice::$app->session->addNotification('Replay Removed', 'success');
+        } else {
+            Chickatrice::$app->session->addNotification('Failed to remove replay', 'danger');
+        }
+
+        // Redirect back to our list of replays
+        return Response::redirect(['/profile/:profile/replays', 'profile' => $this->profile]);
+    }
+
+    /** Analytics */
+    function actionAnalytics()
+    {
+        if ($this->user->id != Chickatrice::$app->user->id)
             throw new HttpException(HTTP::FORBIDDEN, 'Cannot view other people\'s replays.');
-        
-        return $this->render('analytics', [            
-            'profile'       => $this->profile,
+
+        return $this->render('analytics', [
+            'profile'       => $this->user,
             'replay'          => $this->replay,
-            
+
             'fullWidth' => true,
             'wrapContents' => false,
         ]);
     }
 
+    /** @return ReplayGame The replay that matches the ID */
+    public function getReplay()
+    {
+        if ($this->_replay != null)
+            return $this->_replay;
 
-    private $_profile;
-    public function getProfile() {
+        $this->_replay = ReplayGame::findByAccount($this->account)
+            ->andWhere(['id', $this->replayId])
+            ->one();
 
-        if ($this->profile_name == '@me' && !Chickatrice::$app->loggedIn()) 
-            throw new HttpException(HTTP::UNAUTHORIZED, 'Need to be logged in');
-        
-        if ($this->_profile != null) 
-            return $this->_profile;        
-
-        if ($this->profile_name == '@me')
-            return $this->_profile = Chickatrice::$app->user;
-
-        $this->_profile = User::findByUsername($this->profile_name)
-                                    ->orWhere(['uuid', $this->profile_name])
-                                    ->one();
-
-        if ($this->_profile != null)
-            return $this->_profile;        
-
-        //This is bunk, we found nudda
-        throw new HttpException(HTTP::NOT_FOUND, 'Profile doesn\'t exist');
-    }
-
-    private $_replay;
-    public function getDeck() {
-        if ($this->_replay != null) 
-            return $this->_replay;        
-
-        $this->_replay = ReplayGame::findByAccount($this->profile->getAccount()->id )
-                                ->andWhere(['id', $this->game_id])
-                                ->one();
-
-        if ($this->_replay != null) 
-            return $this->_replay;        
+        if ($this->_replay != null)
+            return $this->_replay;
 
         //This is bunk, we found nudda
         throw new HttpException(HTTP::NOT_FOUND, 'Replay doesn\'t exist');

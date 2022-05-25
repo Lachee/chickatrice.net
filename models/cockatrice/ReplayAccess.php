@@ -5,6 +5,7 @@ use kiss\db\ActiveRecord;
 use kiss\Kiss;
 
 /** 
+ * Determines the access to a specific Game
  * @property Replay $replay
  * @property Game $game
  */
