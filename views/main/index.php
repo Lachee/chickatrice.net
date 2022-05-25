@@ -21,8 +21,9 @@ use kiss\Kiss;
                         <span class="icon"><i class="fab fa-discord"></i></span>
                         <span>Join Discord</span>
                     </a>
-
-
+                    <!--
+                    <iframe  src="https://github.com/sponsors/Lachee/card" title="Sponsor Lachee" height="225" width="600" style="border: 0;"></iframe>
+                    -->
                 </div>
                 <div class="column is-one-third">
                     <div class="block has-text-centered">

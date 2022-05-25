@@ -13,6 +13,7 @@ use kiss\helpers\HTTP;
                 
             </div>
             <div class="level-item">    
+                <iframe src="https://github.com/sponsors/Lachee/button" title="Sponsor Lachee" height="35" width="116" style="border: 0;"></iframe>
                 <a class="badge" href="<?= HTTP::url('/jwt')?>" target="_blank"><img src="https://jwt.io/img/badge-compatible.svg"></a>
                 <a class="badge" href="https://bulma.io">
                     <img src="/images/made-with-bulma.png" alt="Made with Bulma" width="128" height="24">
