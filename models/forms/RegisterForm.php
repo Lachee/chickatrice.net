@@ -47,6 +47,7 @@ class RegisterForm extends Form {
         }
 
         $this->username = Strings::safe($this->username);
+        return true;
     }
 
     public function validate()

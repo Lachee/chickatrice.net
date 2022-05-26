@@ -137,7 +137,9 @@ class MainController extends BaseController {
         $loginForm      = new LoginForm(['formName' => 'login']);
         $registerForm   = new RegisterForm(['formName' => 'register']);
         if (HTTP::hasPost()) {
-            if ($loginForm->load(HTTP::post())) {
+            $formData = HTTP::post();
+            
+            if ($loginForm->load($formData)) {
                 if ($loginForm->save()) {
                     if ($loginForm->btn_recover) {
                         Kiss::$app->session->addNotification('Recovery emailed', 'success');
@@ -152,9 +154,9 @@ class MainController extends BaseController {
                 Kiss::$app->session->addNotification( $loginForm->errorSummary(), 'danger');
             }
 
-            if ($registerForm->load(HTTP::post())) {
+            if ($registerForm->load($formData)) {
                 if ($registerForm->save()) {
-                    // Proceed with login logic
+                    return Response::redirect(['/login']);
                 } else {
                     Kiss::$app->session->addNotification('Failed to register: ' . $registerForm->errorSummary(), 'danger');
                 }
