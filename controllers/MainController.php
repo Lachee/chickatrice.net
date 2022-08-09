@@ -187,7 +187,8 @@ class MainController extends BaseController {
             //Get the tokens.
             $tokens = Chickatrice::$app->discord->handleRequest();
             if ($tokens === false) {
-                return Chickatrice::$app->discord->redirect();
+                Chickatrice::$app->session->addNotification('Invalid Auth response.', 'danger');
+                return Response::redirect([ '/login' ]);
             }
 
             //Get the discord user
