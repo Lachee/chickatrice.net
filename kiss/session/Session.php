@@ -13,7 +13,7 @@ use kiss\models\BaseObject;
 abstract class Session extends BaseObject {
 
     /** @var string the cookie name */
-    private const JWT_COOKIE_NAME = '_KISSJWT';
+    private const JWT_COOKIE_NAME = '_KISSSESH';
     
     /** @var string the name of the notification session */
     private const KEY_NOTIFICATIONS = '$notifications';
@@ -28,7 +28,7 @@ abstract class Session extends BaseObject {
     private $claims = null;
 
     /** @var int how long sessions last for in seconds by default. */
-    public $sessionDuration = 7*24*60*60;
+    public $sessionDuration = 60; //7*24*60*60;
 
     /** Initializes the session from JWT. Throws if unable. */
     protected function init() {
@@ -64,7 +64,14 @@ abstract class Session extends BaseObject {
         $this->jwt = null;
     }
 
-    /** Sets the current JWT. If the session details reset then the current session will be aborted. */
+    /** 
+     * Sets the sessions JWT. The token describes the current user and their claims.
+     * When set, the cookie will be updated with the JWT and expire with the JWT.
+     * 
+     * @remark the internal list of claims will be updated to match the JWT details
+     * @param string $jwt the encoded JWT
+     * @param bool $destroySession Will the previous session get destroyed when setting JWT?
+     */
     public function setJWT($jwt, $destroySession = true) {
         if ($jwt == null) throw new ArgumentException('No valid JWT');
         $this->jwt = $jwt;
@@ -79,7 +86,6 @@ abstract class Session extends BaseObject {
         if ($destroySession && $previousSessionId != $this->session_id) 
             $this->reset()->start();
         
-
         //Store the JWT
         HTTP::setCookie(self::JWT_COOKIE_NAME, $this->jwt, [ HTTP::COOKIE_EXPIRES => $this->claims->exp, HTTP::COOKIE_PATH => '/' ]);
     }
