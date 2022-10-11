@@ -13,6 +13,9 @@ $config = function() {
             'key'       => 'sss',
             'salt'      => 'sss'
         ],
+        'logger'        => [
+            '$class'        => \kiss\components\logging\MonoLogger::class,
+        ],
         'db' => [
             '$assoc'    => true,
             'dsn'       => 'mysql:dbname=xve;host=localhost',

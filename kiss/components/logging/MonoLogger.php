@@ -70,8 +70,8 @@ class MonoLogger extends Logger {
         // Setup default handlers
         if ($this->handlers == null || count($this->handlers)) {
             $this->handlers = [
-                new \Monolog\Handler\StreamHandler('logs/error.log', MLogger::ERROR),
-                new \Monolog\Handler\StreamHandler('logs/default.log', MLogger::DEBUG),
+                new \Monolog\Handler\StreamHandler('log/error.log', MLogger::ERROR),
+                new \Monolog\Handler\StreamHandler('log/default.log', MLogger::DEBUG),
             ];
         }
 
