@@ -23,6 +23,17 @@ class ActiveRecord extends BaseObject{
     /** The ID of the table */
     public static function tableKey() { return ['id']; }
     
+    /** Called after the constructor init the properties */
+    protected function init() {
+        parent::init();
+
+        $this->_columns = [];
+        $properties = static::getSchemaProperties();
+        foreach($properties as $key => $property) {
+            $this->{$key} = $this->getProperty($key, $property->default);
+        }
+    }
+
     /** TODO Implement validation */
     public function validate() { return true; }
 
@@ -121,8 +132,8 @@ class ActiveRecord extends BaseObject{
 
     /** An array of fields */
     public function fields() { 
-        if (!empty($this->_columns)) 
-            return $this->_columns;
+        $columns = $this->columns();
+        if (!empty($columns)) return $columns;
         
         $keys = array_keys(get_object_vars($this));
         $fields = [];
@@ -304,6 +315,8 @@ class ActiveRecord extends BaseObject{
 
     /** Sets the results from the query */
     public function setQueryResult($result) {
+        $this->_columns = [];
+
         $this->beforeQueryLoad($result);
         $this->beforeLoad($result);
 

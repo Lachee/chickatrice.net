@@ -8,6 +8,7 @@ use kiss\exception\InvalidOperationException;
 use kiss\helpers\Arrays;
 use kiss\helpers\Strings;
 use kiss\Kiss;
+use kiss\schema\Property;
 use kiss\schema\ArrayProperty;
 use kiss\schema\BooleanProperty;
 use kiss\schema\EnumProperty;

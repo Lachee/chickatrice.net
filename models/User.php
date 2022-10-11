@@ -55,11 +55,14 @@ class User extends Identity {
     public static function getSchemaProperties($options = [])
     {
         return [
-            'uuid'          => new StringProperty('ID of the user'),
-            'email'          => new StringProperty('Email address of the user'),
-            'snowflake'     => new IntegerProperty('Discord Snowflake id'),
-            'last_seen'     => new StringProperty('Last time this user was active'),
-            'last_sync'     => new StringProperty('Last time the avatar was synchronised')
+            'uuid'                  => new StringProperty('ID of the user'),
+            'email'                 => new StringProperty('Email address of the user'),
+            'snowflake'             => new IntegerProperty('Discord Snowflake id'),
+            'last_seen'             => new StringProperty('Last time this user was active'),
+            'last_sync'             => new StringProperty('Last time the avatar was synchronised'),
+            'deck_privacy'          => new IntegerProperty('Deck privacy setting'),
+            'max_allowed_decks'     => new IntegerProperty('Max amount of decks allowed'),
+            'max_allowed_replays'   => new IntegerProperty('Max amount of replays allowed')
         ];
     }
 
