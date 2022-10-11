@@ -34,7 +34,7 @@ class Identity extends ActiveRecord {
     protected $jwt = null;
 
     /** @var int The duration of the sessions once we have logged in */
-    public $sessionDuration = 7*24*60*60;
+    private $_sessionDuration = 7*24*60*60;
 
     protected function init() {
         if (is_string($this->uuid)) $this->uuid = Uuid::fromString($this->uuid);
@@ -85,7 +85,7 @@ class Identity extends ActiveRecord {
         $jwt = $this->jwt([
             'src'      => 'login',
             'sid'       => Kiss::$app->session->getSessionId(),
-        ], $this->sessionDuration);
+        ], $this->_sessionDuration);
 
         // Update the session cookies to these deets
         Kiss::$app->session->setJWT($jwt);
