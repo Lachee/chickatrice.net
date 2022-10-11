@@ -249,23 +249,23 @@ class Response {
         }
 
 
-        $logContext = [
-            '_ROUTE'    => HTTP::route(),
-            '_ERR'      => $this->exception,
-        ];
-        Kiss::$app->log->trace(HTTP::route(), $logContext);
-        if ($this->exception != null) 
-            Kiss::$app->log->error(HTTP::route() . ' ' . $this->exception->getMessage(), $logContext);
+        Kiss::$app->log->trace(HTTP::route());
+        if ($this->exception != null) {
+            Kiss::$app->log->error($this->exception->getMessage(), [
+                'exception' => $this->exception,
+                'trace'     => $this->exception->getTraceAsString()
+            ]);
+        }
 
         if (self::$saveRequest) {
-            $logContext = array_merge($logContext,[
+            $logContext = [
                 '_ROUTE'    => HTTP::route(),
                 '_HEAD'     => HTTP::headers(),
                 '_REQUEST'  => HTTP::request(), 
                 '_GET'      => HTTP::get(),
                 '_POST'     => HTTP::post(), 
                 '_BODY'     => HTTP::body(), 
-            ]);
+            ];
             file_put_contents('public/logs/last_request.json', json_encode($logContext, JSON_PRETTY_PRINT));
         }
 
