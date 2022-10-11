@@ -47,7 +47,7 @@ class Query extends BaseObject{
     
     private static $_memcache = [];
     private static $_execLog = [ 'QUERY' => [],  'CACHE' => [], 'REPEAT' => [] ];
-    public static function getLog() { return self::$_execLog; }
+    public static function execLog() { return self::$_execLog; }
 
     protected function init() {
         parent::init();

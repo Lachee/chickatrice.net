@@ -7,8 +7,11 @@ if (!defined('KISS_SESSIONLESS'))
     define('KISS_SESSIONLESS', false);
 
 use Exception;
+
 use kiss\cache\CacheInterface;
 use kiss\cache\RedisCache;
+use kiss\components\logging\Logger;
+use kiss\components\logging\MonoLogger;
 use kiss\db\Connection;
 use kiss\exception\HttpException;
 use kiss\exception\InvalidOperationException;
@@ -75,13 +78,17 @@ class Kiss extends BaseObject {
     /** @var Session $session current session object */
     public $session = [ '$class' => PhpSession::class ];
 
+    /** @var Logger */
+    protected $logger = [ '$class' => MonoLogger::class ];
+
     /** @var Identity current user */
     public $user;
 
     /** {@inheritdoc} */
     public static function getSchemaProperties($options = []) {
         return array_merge(parent::getSchemaProperties($options), [
-            'jwtProvider' => new RefProperty(JWTProvider::class)
+            'jwtProvider' => new RefProperty(JWTProvider::class),
+            'logger'        => new RefProperty(Logger::class),
         ]);
     }
 
@@ -96,12 +103,12 @@ class Kiss extends BaseObject {
         
         if ($this->redis == null)
             $this->redis = new \Predis\Client();
-            
+          
         if ($this->db != null) {
             $this->db = new Connection($this->db['dsn'],$this->db['user'],$this->db['pass'], array(), $this->db['prefix']);
             $this->db->exec("SET NAMES 'utf8mb4'");
         }
-
+  
         if (empty($this->components['cache']))
             $this->components['cache'] = new RedisCache([ 'redis' => $this->redis ]);
 
@@ -192,10 +199,18 @@ class Kiss extends BaseObject {
         return $this->redis;
     }
 
+    /** @return Logger the current logger */
+    public function getLog() {
+        return $this->logger;
+    }
+
     /** magic get value */
     public function __get($name) {
         if (isset($this->components[$name]))
             return $this->components[$name];
+
+        if ($name == 'log')
+            return $this->getLog();
     }
 
     /** Gets the current default response type. This can be used to determine how we should respond */
@@ -242,6 +257,10 @@ class Kiss extends BaseObject {
      * @return exit 
      */
     public function respond($response, $status = HTTP::OK) {
+        // Filter null responses
+        if ($response === null)            
+            $response = Response::text(HTTP::NO_CONTENT, '');
+
         //Prepare the response if it isn't already a Response object.
         if (!($response instanceof Response)) {
 
@@ -270,10 +289,8 @@ class Kiss extends BaseObject {
 
         }
 
-
         //Return the response
         $response->respond();
-        exit;
     }
 
 }

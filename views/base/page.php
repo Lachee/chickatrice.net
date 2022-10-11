@@ -19,6 +19,6 @@ use kiss\Kiss;
     <?= $this->renderJsVariables(Controller::POS_END); ?>
     <?php if (KISS_DEBUG): ?>
         <?= '<pre class="referal">Referal: ' . HTTP::referral() . '</pre>' ?>
-        <?php var_dump(Query::getLog()) ?>
+        <?php var_dump(Query::execLog()) ?>
     <?php endif; ?>
 </html>

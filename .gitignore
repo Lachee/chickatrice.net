@@ -4,6 +4,8 @@ config.php
 public/dist/*
 public/cache/*
 public/webatrice/*
+public/logs
+logs/*
 .npmrc
 *.key
 *.env

@@ -9,6 +9,7 @@ use kiss\exception\HttpException;
 use kiss\exception\NotYetImplementedException;
 use kiss\Kiss;
 use kiss\models\BaseObject;
+use RuntimeException;
 
 class Response {
     
@@ -17,6 +18,9 @@ class Response {
     private $contentType;
     private $content;
     
+    /** @var \Exception exception */
+    private $exception;
+
     /** @var bool saves the request to the disk */
     public static $saveRequest = false;
 
@@ -38,23 +42,37 @@ class Response {
      * @return Response the response
      */
     public static function exception($exception, $status = HTTP::INTERNAL_SERVER_ERROR, $mode = null) {
-        if ($exception instanceof HttpException)                return self::httpException($exception, $mode);
-        if ($exception instanceof NotYetImplementedException)   return self::httpException(new HttpException(HTTP::NOT_IMPLEMENTED, $exception->getMessage()), $mode);
-        return self::httpException(new HttpException($status, $exception), $mode);
+       
+        $response = null;
+        if ($exception instanceof HttpException){
+            $response = self::httpException($exception, $mode);
+        } else if ($exception instanceof NotYetImplementedException) {
+            $response = self::httpException(new HttpException(HTTP::NOT_IMPLEMENTED, $exception->getMessage()), $mode);
+        } else {
+            $response = self::httpException(new HttpException($status, $exception), $mode);
+        }
+
+        $response->exception = $exception;
+        return $response;
     }
 
     /** Creates a new response to handle the exception. If the supplied mode is null, it will use the server's default. 
      * @return Response the response
      */
     public static function httpException(HttpException $exception, $mode = null) {
-        if ($mode == null) $mode = Kiss::$app->getDefaultResponseType();
+        if ($mode == null) 
+            $mode = Kiss::$app->getDefaultResponseType();
+        
+        $response = null;
         switch ($mode){
             default:
             case HTTP::CONTENT_TEXT_PLAIN:
-                return self::text($exception->getStatus(), $exception->getMessage());
+                $response = self::text($exception->getStatus(), $exception->getMessage());
+                break;
 
             case HTTP::CONTENT_APPLICATION_JSON:
-                return self::json($exception->getStatus(), $exception->getInnerException(), $exception->getMessage());
+                $response = self::json($exception->getStatus(), $exception->getInnerException(), $exception->getMessage());
+                break;
 
             case HTTP::CONTENT_TEXT_HTML:
                 try {
@@ -62,13 +80,17 @@ class Response {
                     $controllerClass = Kiss::$app->mainControllerClass;
                     $controller = BaseObject::new( $controllerClass);
                     $response = $controller->action('exception', $exception);
-                    //$response = $controller->renderException($exception);
-                    return self::html($exception->getStatus(), $response);
+                    if ($response === null) 
+                        throw new RuntimeException('Failed to generate error response');
                 } catch(Exception $ex) { 
                     //An error occured, so we ill just use the default plain text handling
-                    return self::httpException($exception, HTTP::CONTENT_TEXT_PLAIN);
+                    $response = self::text(500, $ex->getMessage());
                 }
+                break;
         }
+
+        $response->exception = $exception;
+        return $response;
     }
 
     /** Creates a new plain text response 
@@ -194,6 +216,8 @@ class Response {
     /** Executes the response, setting the current page's response code & headers, echoing out the contents and then exiting. */
     public function respond() {
         
+        
+        
         //Prepare the response data.
         // We want to make sure the were able to parse the json data
         $body = $this->content;
@@ -224,19 +248,25 @@ class Response {
             $body .= PHP_EOL;
         }
 
+
+        $logContext = [
+            '_ROUTE'    => HTTP::route(),
+            '_ERR'      => $this->exception,
+        ];
+        Kiss::$app->log->trace(HTTP::route(), $logContext);
+        if ($this->exception != null) 
+            Kiss::$app->log->error(HTTP::route() . ' ' . $this->exception->getMessage(), $logContext);
+
         if (self::$saveRequest) {
-            file_put_contents('./last_request.json', json_encode([
+            $logContext = array_merge($logContext,[
                 '_ROUTE'    => HTTP::route(),
                 '_HEAD'     => HTTP::headers(),
                 '_REQUEST'  => HTTP::request(), 
                 '_GET'      => HTTP::get(),
                 '_POST'     => HTTP::post(), 
                 '_BODY'     => HTTP::body(), 
-                '_RESPONSE' => [ 
-                    'headers' => $this->headers,
-                    'body' => $body
-                ]
-                ], JSON_PRETTY_PRINT));
+            ]);
+            file_put_contents('public/logs/last_request.json', json_encode($logContext, JSON_PRETTY_PRINT));
         }
 
         //Finally, respond with the body

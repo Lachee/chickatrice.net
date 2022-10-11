@@ -129,7 +129,7 @@ class Controller extends Route {
         try {
             $content = $this->render($this->exceptionView, [ 'exception' => $exception ]);
             return Response::html($exception->getStatus(), $content);
-        }catch(Throwable $e) {
+        }catch(\Exception $e) {
             return Response::html(500, '<h1>Failed to render an exception!</h1>A critical error has occured, which means we are unable to render the exception page. <pre>' . $e->getMessage());
         }
     }
@@ -253,7 +253,9 @@ class Controller extends Route {
         }
     }
 
-    /** Performs the endpoint's action */
+    /** Performs the endpoint's action
+     * @return Response|null Returns a response if a valid one is generated. Otherwise null.
+     */
     public function action($endpoint, ...$args) {
 
         //Set hte error handling
@@ -286,9 +288,11 @@ class Controller extends Route {
         $this->registerJsVariable("ACTION", $endpoint, self::POS_HEAD, 'kiss');
         $this->registerJsVariable("PARAMS", $this->export(), self::POS_HEAD, 'kiss');
         
+        
+        // Try to perform the action
+        $response = null;
         try {
-            //Perform the action
-            $value = $this->{$action}(...$args);
+            $response = $this->{$action}(...$args);
         } catch(\Throwable $throwable) {
             if ($this->uncaughtException != null)
                 return Response::exception(new AggregateException($throwable, $this->uncaughtException));
@@ -299,9 +303,7 @@ class Controller extends Route {
         if ($this->uncaughtException != null) 
             return Response::exception($this->uncaughtException);
 
-        //Proceed as normal and just return the value
-        $response = Kiss::$app->respond($value);
-        return $response;  
+        return $response;
     }
 
     /** Renders the exception page*/

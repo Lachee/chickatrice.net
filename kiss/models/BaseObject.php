@@ -7,6 +7,7 @@ use kiss\db\Query;
 use kiss\exception\InvalidOperationException;
 use kiss\helpers\Arrays;
 use kiss\helpers\Strings;
+use kiss\Kiss;
 use kiss\schema\ArrayProperty;
 use kiss\schema\BooleanProperty;
 use kiss\schema\EnumProperty;
@@ -16,7 +17,12 @@ use kiss\schema\ObjectProperty;
 use kiss\schema\RefProperty;
 use kiss\schema\SchemaInterface;
 use kiss\schema\StringProperty;
+use kiss\components\logging\Logger;
 
+/**
+ * @property Logger $log the current logger instance
+ * @package kiss\models
+ */
 class BaseObject implements SchemaInterface, JsonSerializable {
     
     /** @property array[string] $defaults list of default settings for objects created using BaseObject::new. It is indexed by the class name.*/
@@ -24,6 +30,9 @@ class BaseObject implements SchemaInterface, JsonSerializable {
 
     /** @var string[] errors from validation */
     private $errors = null;
+
+    /** @var Logger logger instance. Lazy */
+    private $_logger;
 
     /** Called after the constructor init the properties */
     protected function init() {}
@@ -494,5 +503,16 @@ class BaseObject implements SchemaInterface, JsonSerializable {
             $properties[$name] = $this->__get($name);
         }
         return $properties;
+    }
+
+    /**
+     * Gets the logger for this class
+     * @return Logger
+     */
+    public function getLog() {
+        if ($this->_logger == null)
+            $this->_logger = Kiss::$app->log->createChild(static::class);
+    
+        return $this->_logger;
     }
 }

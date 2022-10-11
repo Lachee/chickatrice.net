@@ -51,6 +51,6 @@ try {
     return Kiss::$app->respond($response);
 } catch(HttpException $exception) {
     return Kiss::$app->respond($exception);
-} catch(\Throwable $exception) {
+} catch(\Exception $exception) {
     return Kiss::$app->respond(new HttpException(HTTP::INTERNAL_SERVER_ERROR, $exception));
 }
