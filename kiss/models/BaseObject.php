@@ -133,8 +133,9 @@ class BaseObject implements SchemaInterface, JsonSerializable {
 
     public function __get($name) {
         // determine if its a getX()
-        if (is_callable(get_called_class() . "::get$name")) {
-            $result = $this->{"get$name"}();
+	$functionName = "get" . ucfirst($name);
+        if (method_exists($this, $functionName)) {
+            $result = $this->{$functionName}();
             if ($result instanceof ActiveQuery) {
                 $all = $result->all();
                 $limit = $result->getLimit();
@@ -158,12 +159,14 @@ class BaseObject implements SchemaInterface, JsonSerializable {
             return $this->{$name};
     }
 
-    public function __set($name, $value) {      
-        if (is_callable(get_called_class() . "::set$name")) {            
-            $this->{"set$name"}($value);
+    public function __set($name, $value) {
+        // determine if its a setX()
+        $functionName = "set" . ucfirst($name);
+        if (method_exists($this, $functionName)) {            
+            $this->{$functionName}($value);
         } else  if (stripos($name, '_') !== 0 && property_exists($this, $name)) {
             $this->{$name} = $value;
-        }         
+        }
     }
 
     /** Creates an object of the class.
