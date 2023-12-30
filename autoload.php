@@ -9,7 +9,8 @@ function shutdown_handler() {
 
         http_response_code(500);
         echo "<h1>FATAL E_ERROR OCCURED</h1>";
-        //echo "<h3>$errstr</h3>"; THIS IS A SECURITY LEAK! If the MySQL connection fails, it leaks the password
+	if (KISS_DEBUG) 
+        	echo "<h3>$errstr</h3>"; // THIS IS A SECURITY LEAK! If the MySQL connection fails, it leaks the password
         echo "<a href='vscode://file/$errfile:$errline'>$errfile :: <i>$errline</i></a>";
         return;
     }
