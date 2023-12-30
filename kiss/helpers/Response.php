@@ -266,7 +266,7 @@ class Response {
                 '_POST'     => HTTP::post(), 
                 '_BODY'     => HTTP::body(), 
             ];
-            file_put_contents('public/logs/last_request.json', json_encode($logContext, JSON_PRETTY_PRINT));
+            //file_put_contents('public/log/last_request.json', json_encode($logContext, JSON_PRETTY_PRINT));
         }
 
         //Finally, respond with the body
