@@ -103,7 +103,7 @@ class HTML {
 
     /** @return string encodes the content to be HTML safe */
     public static function encode($text) {
-        return htmlspecialchars($text);
+        return htmlspecialchars($text ?? '');
     }
 
     /** Alias of HTTP::safeURLEncode
