@@ -27,7 +27,7 @@ class Connection  extends \PDO
     }
 
     #[\ReturnTypeWillChange]
-    public function query($statemen, $fetchMode = null, ...$fetchModeArgs)
+    public function query($statement, $fetchMode = null, ...$fetchModeArgs)
     {
         $statement = $this->_tablePrefixSuffix($statement);
         $args      = func_get_args();
