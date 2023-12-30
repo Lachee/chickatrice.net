@@ -25,7 +25,7 @@ class Connection  extends \PDO
         return parent::prepare($statement, $driver_options);
     }
 
-    public function query($statement)
+    public function query($statemen, $fetchMode = null, ...$fetchModeArgs)
     {
         $statement = $this->_tablePrefixSuffix($statement);
         $args      = func_get_args();
@@ -33,7 +33,7 @@ class Connection  extends \PDO
         if (count($args) > 1) {
             return call_user_func_array(array($this, 'parent::query'), $args);
         } else {
-            return parent::query($statement);
+            return parent::query($statement, $fetchMode, ...$fetchModeArgs);
         }
     }
 
