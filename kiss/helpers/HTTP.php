@@ -215,7 +215,7 @@ class HTTP {
             if ($key === 0) continue;
 
             //Covnert active records
-            if (method_exists($pair, 'getKey')) {
+            if ((is_string($pair) || is_object($pair)) &&  method_exists($pair, 'getKey')) {
                 $pair = $pair->getKey();
             }
 
