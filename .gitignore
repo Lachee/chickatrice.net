@@ -5,6 +5,7 @@ public/dist/*
 public/cache/*
 public/webatrice/*
 public/**/*.log
+public/log/*
 logs/*
 .npmrc
 *.key
