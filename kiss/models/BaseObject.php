@@ -494,6 +494,7 @@ class BaseObject implements SchemaInterface, JsonSerializable {
     }
 
     /** {@inheritdoc} */
+    #[\ReturnTypeWillChange]
     function jsonSerialize() {
         //Only serializing what is available in the schema properties
         // This is really basic. Probably should do a more indepth version but meh

@@ -12,19 +12,21 @@ class Connection  extends \PDO
         $this->_table_prefix = $prefix;
         parent::__construct($dsn, $user, $password, $driver_options);
     }
-
+    #[\ReturnTypeWillChange]
     public function exec($statement)
     {
         $statement = $this->_tablePrefixSuffix($statement);
         return parent::exec($statement);
     }
 
+    #[\ReturnTypeWillChange]
     public function prepare($statement, $driver_options = array())
     {
         $statement = $this->_tablePrefixSuffix($statement);
         return parent::prepare($statement, $driver_options);
     }
 
+    #[\ReturnTypeWillChange]
     public function query($statemen, $fetchMode = null, ...$fetchModeArgs)
     {
         $statement = $this->_tablePrefixSuffix($statement);
