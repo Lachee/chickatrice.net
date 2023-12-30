@@ -9,8 +9,8 @@ While custom instances are not officially supported (defeats its purpose), its i
 Before we begin, please ensure you have all the dependencies installed:
 
 ### Dependencies
-* PHP +7.2
-* NPM
+* PHP +.2
+* NPM ( Node 16 )
 * Composer
 * Redis
 * MySQL (or mariadb)
@@ -27,6 +27,7 @@ KISS framework uses 2 package managers... horrible isn't. It uses composer for i
 
 First, install the node packages. This will likely cause you the most issue because of Font Awesome 5 Pro. Some adjustments maybe required (still working on it, suggestions pls)
 `npm install`
+`npm install --save --legacy-peer-deps` if issues occur.
 
 Congrats on getting the node packages installed! Now, install the composer packages.
 `composer install`
