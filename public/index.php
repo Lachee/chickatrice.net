@@ -1,5 +1,6 @@
 <?php 
 // enables debugging if we are a local host
+ini_set('display_errors', 0);
 defined('KISS_DEBUG') or define('KISS_DEBUG', in_array(@$_SERVER['REMOTE_ADDR'], ['127.0.0.1', '::1']));
 define('PUBLIC_DIR', __DIR__);
 
