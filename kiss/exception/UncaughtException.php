@@ -6,8 +6,8 @@ class UncaughtException extends Exception {
     
     public $no;
     public $str;
-    public $file;
-    public $line;
+    public $filePath;
+    public $fileLine;
 
     /** {@inheritdoc}
      */
@@ -15,7 +15,7 @@ class UncaughtException extends Exception {
         parent::__construct($errstr, $errno, $previous);
         $this->no = $errno;
         $this->str = $errstr;
-        $this->file = $errfile;
-        $this->line = $errline;
+        $this->filePath = $errfile;
+        $this->fileLine = $errline;
     }
 }
