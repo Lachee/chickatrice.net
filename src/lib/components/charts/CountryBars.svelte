@@ -3,14 +3,18 @@
 	import { countryName, flag } from '#lib/countries.js';
 
 	let {
-		countries,
-		total
+		countries: all,
+		total,
+		limit = 15
 	}: {
+		/** Most players first. */
 		countries: { country: string; players: number }[];
 		/** Players across every country, not just the ones listed, for the shares. */
 		total: number;
+		limit?: number;
 	} = $props();
 
+	const countries = $derived(all.slice(0, limit));
 	const max = $derived(Math.max(1, ...countries.map((c) => c.players)));
 	const percent = (n: number) => (total ? `${Math.round((n / total) * 100)}%` : '');
 </script>

@@ -256,3 +256,33 @@ export function countryName(code: string | null | undefined): string {
 	if (!code) return 'Unknown';
 	return COUNTRIES.get(code.toLowerCase()) ?? code.toUpperCase();
 }
+
+/**
+ * ISO 3166-1 numeric codes (what world-atlas keys its shapes by) back to our
+ * alpha-2 codes. Generated from i18n-iso-countries for the codes above; `cs`
+ * (Serbia and Montenegro) covers both of today's shapes, and `an` (Netherlands
+ * Antilles) has none.
+ */
+const NUMERIC =
+	'af:004 al:008 dz:012 as:016 ad:020 ao:024 ai:660 aq:010 ag:028 ar:032 am:051 aw:533 au:036 at:040 ' +
+	'az:031 bs:044 bh:048 bd:050 bb:052 by:112 be:056 bz:084 bj:204 bm:060 bt:064 bo:068 ba:070 bw:072 ' +
+	'bv:074 br:076 io:086 bn:096 bg:100 bf:854 bi:108 kh:116 cm:120 ca:124 cv:132 ky:136 cf:140 td:148 ' +
+	'cl:152 cn:156 cx:162 cc:166 co:170 km:174 cg:178 cd:180 ck:184 cr:188 ci:384 hr:191 cu:192 cy:196 ' +
+	'cz:203 dk:208 dj:262 dm:212 do:214 ec:218 eg:818 sv:222 gq:226 er:232 ee:233 et:231 fk:238 fo:234 ' +
+	'fj:242 fi:246 fr:250 gf:254 pf:258 tf:260 ga:266 gm:270 ge:268 de:276 gh:288 gi:292 gr:300 gl:304 ' +
+	'gd:308 gp:312 gu:316 gt:320 gn:324 gw:624 gy:328 ht:332 hm:334 va:336 hn:340 hk:344 hu:348 is:352 ' +
+	'in:356 id:360 ir:364 iq:368 ie:372 il:376 it:380 jm:388 jp:392 jo:400 kz:398 ke:404 ki:296 kp:408 ' +
+	'kr:410 kw:414 kg:417 la:418 lv:428 lb:422 ls:426 lr:430 ly:434 li:438 lt:440 lu:442 mo:446 mk:807 ' +
+	'mg:450 mw:454 my:458 mv:462 ml:466 mt:470 mh:584 mq:474 mr:478 mu:480 yt:175 mx:484 fm:583 md:498 ' +
+	'mc:492 mn:496 ms:500 ma:504 mz:508 mm:104 na:516 nr:520 np:524 nl:528 nc:540 nz:554 ni:558 ne:562 ' +
+	'ng:566 nu:570 nf:574 mp:580 no:578 om:512 pk:586 pw:585 ps:275 pa:591 pg:598 py:600 pe:604 ph:608 ' +
+	'pn:612 pl:616 pt:620 pr:630 qa:634 re:638 ro:642 ru:643 rw:646 sh:654 kn:659 lc:662 pm:666 vc:670 ' +
+	'ws:882 sm:674 st:678 sa:682 sn:686 sc:690 sl:694 sg:702 sk:703 si:705 sb:090 so:706 za:710 gs:239 ' +
+	'es:724 lk:144 sd:729 sr:740 sj:744 sz:748 se:752 ch:756 sy:760 tw:158 tj:762 tz:834 th:764 tl:626 ' +
+	'tg:768 tk:772 to:776 tt:780 tn:788 tr:792 tm:795 tc:796 tv:798 ug:800 ua:804 ae:784 gb:826 us:840 ' +
+	'um:581 uy:858 uz:860 vu:548 ve:862 vn:704 vg:092 vi:850 wf:876 eh:732 ye:887 zm:894 zw:716 cs:688 ' +
+	'cs:499';
+
+export const COUNTRY_BY_NUMERIC: ReadonlyMap<string, string> = new Map(
+	[...NUMERIC.matchAll(/([a-z]{2}):(\d{3})/g)].map(([, alpha2, numeric]) => [numeric, alpha2])
+);

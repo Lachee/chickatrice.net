@@ -41,6 +41,13 @@
 	--ring: rgb(255 102 102 / 50%);
 	--chart-1: #f05050;
 	--chart-grid: rgb(0 0 0 / 7%);
+	/* The world map's sequential ramp: one hue, light (few players) to dark (many); --map-0 is "none". */
+	--map-0: oklch(0.94 0.003 30);
+	--map-1: oklch(0.86 0.06 25);
+	--map-2: oklch(0.77 0.11 25);
+	--map-3: oklch(0.68 0.15 25);
+	--map-4: oklch(0.58 0.17 25);
+	--map-5: oklch(0.47 0.15 25);
 	--scrollbar: rgb(0 0 0 / 18%);
 	/* The old site's hero ran #ff3355 → #ff9580; this is a deeper, calmer take on it. */
 	--hero: linear-gradient(141deg, oklch(0.56 0.14 18) 0%, oklch(0.62 0.13 24) 70%, oklch(0.66 0.11 35) 100%);
@@ -73,6 +80,13 @@
 	--ring: oklch(0.7 0.16 25 / 55%);
 	--chart-1: oklch(0.66 0.17 25);
 	--chart-grid: oklch(1 0 0 / 7%);
+	/* Its own steps for dark, not a flip: dim (few) to bright (many) against --card. */
+	--map-0: oklch(0.25 0.006 25);
+	--map-1: oklch(0.36 0.07 25);
+	--map-2: oklch(0.45 0.11 25);
+	--map-3: oklch(0.55 0.14 25);
+	--map-4: oklch(0.65 0.16 25);
+	--map-5: oklch(0.76 0.13 25);
 	--scrollbar: oklch(1 0 0 / 14%);
 	--heading: var(--foreground);
 	--hero: var(--card);

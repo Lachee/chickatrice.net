@@ -6,6 +6,7 @@
 	import LineChart from '#lib/components/charts/LineChart.svelte';
 	import ColumnChart from '#lib/components/charts/ColumnChart.svelte';
 	import CountryBars from '#lib/components/charts/CountryBars.svelte';
+	import WorldMap from '#lib/components/charts/WorldMap.svelte';
 	import { compact, duration, full } from '#lib/charts.js';
 	import type { PageProps } from './$types';
 
@@ -114,6 +115,12 @@
 				Players by the country on their account. {full(data.countries.total)} players set one.
 			</Card.Description>
 		</Card.Header>
-		<Card.Content><CountryBars countries={data.countries.countries} total={data.countries.total} /></Card.Content>
+		<Card.Content class="grid gap-6 lg:grid-cols-[1fr_20rem] lg:items-start">
+			<div><WorldMap countries={data.countries.countries} total={data.countries.total} /></div>
+			<div>
+				<h3 class="mb-3 text-xs font-medium text-muted-foreground">Top countries</h3>
+				<CountryBars countries={data.countries.countries} total={data.countries.total} />
+			</div>
+		</Card.Content>
 	</Card.Root>
 </div>

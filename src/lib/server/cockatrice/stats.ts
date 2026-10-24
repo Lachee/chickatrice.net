@@ -173,9 +173,9 @@ export function getDaily(): Promise<DailyPoint[]> {
 
 export type CountryCount = { country: string; players: number };
 
-/** Where the last `stats.days` days' players are from, most first. */
-export function getCountries(limit = 15): Promise<{ countries: CountryCount[]; total: number }> {
-  return cached(`countries:${limit}`, 10 * 60, async () => {
+/** Where the last `stats.days` days' players are from, most first: every country, for the map. */
+export function getCountries(): Promise<{ countries: CountryCount[]; total: number }> {
+  return cached('countries', 10 * 60, async () => {
     const result = await rows<{ country: string; players: number }>(`
       SELECT LOWER(u.country) AS country, COUNT(DISTINCT u.id) AS players
       FROM ${T.sessions} s
@@ -186,7 +186,7 @@ export function getCountries(limit = 15): Promise<{ countries: CountryCount[]; t
 
     const countries = result.map((row) => ({ country: row.country, players: Number(row.players) }));
     return {
-      countries: countries.slice(0, limit),
+      countries,
       total: countries.reduce((sum, row) => sum + row.players, 0),
     };
   });
