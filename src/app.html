@@ -1,9 +1,13 @@
 <!doctype html>
+<!-- Dark mode temporarily off: restore class="dark" (and theme-color #0f0b0b) to bring it back. -->
 <html lang="en">
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<meta name="text-scale" content="scale" />
+		<meta name="theme-color" content="#fbf9f8" />
+		<!-- Not "no-referrer": that makes form POSTs send `Origin: null`, which SvelteKit's CSRF check rejects. -->
+		<meta name="referrer" content="same-origin" />
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">

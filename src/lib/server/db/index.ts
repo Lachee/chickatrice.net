@@ -1,10 +1,22 @@
 import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
-import * as schema from './schema';
-import { DATABASE_URL } from '$app/env/private';
+import * as chickatrice from './chickatrice.schema';
+import * as cockatrice from './cockatrice';
+import { config } from '#lib/server/config.js';
 
-if (!DATABASE_URL) throw new Error('DATABASE_URL is not set');
+/**
+ * `timezone: 'Z'` makes mysql2 read and write DATETIMEs as UTC, matching
+ * Servatrice's `UTC_TIMESTAMP()` columns and our own. Servatrice's uptime and
+ * session times use `NOW()` instead, so the stats compare those in SQL.
+ */
+export const pool = mysql.createPool({
+  uri: config.db.url,
+  timezone: 'Z',
+  connectionLimit: 10,
+  // `avatar_bmp` and friends come back as Buffers; nothing here needs BigInt ids.
+  supportBigNumbers: true,
+});
 
-const client = mysql.createPool(DATABASE_URL);
+export const db = drizzle(pool, { schema: { ...chickatrice }, mode: 'default' });
 
-export const db = drizzle(client, { schema, mode: 'default' });
+export { chickatrice, cockatrice };

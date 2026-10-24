@@ -1,2 +1,4 @@
 allowBuilds:
   esbuild: true
+patchedDependencies:
+  '@auth/sveltekit@1.11.3': patches/@auth__sveltekit@1.11.3.patch

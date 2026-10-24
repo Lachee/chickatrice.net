@@ -1,3 +1,125 @@
 @import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn-svelte/tailwind.css';
+@import '@fontsource-variable/geist';
+
+@custom-variant dark (&:is(.dark *));
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
+
+/*
+ * Ember — Chickatrice's theme. Warm near-black surfaces and the coral red the
+ * original site used, so the numbers and the one call to action stand out.
+ * Dark is the real theme: `app.html` pins `class="dark"` for it and the shadcn
+ * `dark:` variants. Dark mode is temporarily off — `:root` carries a light
+ * palette and `app.html` leaves the class out; put it back to restore dark.
+ *
+ * --chart-1 is the series colour every chart uses (each chart plots a single
+ * measure). It was checked with the dataviz palette validator against --card:
+ * inside the dark lightness band, and over 3:1 contrast.
+ */
+:root {
+	color-scheme: light;
+
+	--background: oklch(0.985 0.003 40);
+	--foreground: oklch(0.2 0.01 25);
+	--card: oklch(1 0 0);
+	--card-foreground: oklch(0.2 0.01 25);
+	--popover: oklch(1 0 0);
+	--popover-foreground: oklch(0.2 0.01 25);
+	--primary: oklch(0.58 0.19 25);
+	--primary-foreground: oklch(0.985 0.005 40);
+	--secondary: oklch(0.95 0.006 30);
+	--secondary-foreground: oklch(0.2 0.01 25);
+	--muted: oklch(0.955 0.005 30);
+	--muted-foreground: oklch(0.5 0.014 30);
+	--accent: oklch(0.93 0.02 25);
+	--accent-foreground: oklch(0.2 0.01 25);
+	--destructive: oklch(0.55 0.22 28);
+	--border: oklch(0 0 0 / 10%);
+	--input: oklch(0 0 0 / 14%);
+	--ring: oklch(0.58 0.19 25 / 50%);
+	--chart-1: oklch(0.6 0.18 25);
+	--chart-grid: oklch(0 0 0 / 7%);
+	--scrollbar: oklch(0 0 0 / 18%);
+	--radius: 0.6rem;
+
+	--success: oklch(0.55 0.14 155);
+	--warning: oklch(0.62 0.14 70);
+}
+
+.dark {
+	color-scheme: dark;
+
+	--background: oklch(0.14 0.006 25);
+	--foreground: oklch(0.94 0.008 40);
+	--card: oklch(0.18 0.008 25);
+	--card-foreground: oklch(0.94 0.008 40);
+	--popover: oklch(0.2 0.01 25);
+	--popover-foreground: oklch(0.94 0.008 40);
+	--primary: oklch(0.7 0.16 25);
+	--primary-foreground: oklch(0.17 0.03 25);
+	--secondary: oklch(0.23 0.01 25);
+	--secondary-foreground: oklch(0.94 0.008 40);
+	--muted: oklch(0.21 0.008 25);
+	--muted-foreground: oklch(0.66 0.014 30);
+	--accent: oklch(0.26 0.022 25);
+	--accent-foreground: oklch(0.96 0.01 40);
+	--destructive: oklch(0.66 0.2 28);
+	--border: oklch(1 0 0 / 8%);
+	--input: oklch(1 0 0 / 12%);
+	--ring: oklch(0.7 0.16 25 / 55%);
+	--chart-1: oklch(0.66 0.17 25);
+	--chart-grid: oklch(1 0 0 / 7%);
+	--scrollbar: oklch(1 0 0 / 14%);
+
+	--success: oklch(0.74 0.14 155);
+	--warning: oklch(0.8 0.13 75);
+}
+
+@theme inline {
+	--font-sans: 'Geist Variable', sans-serif;
+	--color-success: var(--success);
+	--color-warning: var(--warning);
+	--color-chart-1: var(--chart-1);
+	--color-chart-grid: var(--chart-grid);
+	--color-ring: var(--ring);
+	--color-input: var(--input);
+	--color-border: var(--border);
+	--color-destructive: var(--destructive);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-accent: var(--accent);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-muted: var(--muted);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-secondary: var(--secondary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-primary: var(--primary);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-popover: var(--popover);
+	--color-card-foreground: var(--card-foreground);
+	--color-card: var(--card);
+	--color-foreground: var(--foreground);
+	--color-background: var(--background);
+	--radius-sm: calc(var(--radius) * 0.6);
+	--radius-md: calc(var(--radius) * 0.8);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.4);
+	--radius-2xl: calc(var(--radius) * 1.8);
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	body {
+		@apply bg-background text-foreground antialiased;
+	}
+	html {
+		@apply font-sans;
+		scrollbar-color: var(--scrollbar) transparent;
+	}
+	::selection {
+		background: oklch(0.7 0.16 25 / 35%);
+	}
+}

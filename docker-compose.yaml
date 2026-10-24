@@ -1,0 +1,55 @@
+# Development:  `docker compose up db`, then `pnpm dev` on the host.
+# All-in-one:   `docker compose up --build` (the app reads ./config.yaml).
+#
+# The database is the one Servatrice uses: point servatrice.ini's [database]
+# section at it (host db / localhost:3306, database `servatrice`). On first
+# start it is given Servatrice's tables from docker/servatrice.sql.
+
+services:
+  db:
+    image: mysql:8.4
+    restart: unless-stopped
+    # Servatrice refuses to start against a server in strict mode, and its
+    # schema's zero-date defaults need it off too.
+    command: ["--sql-mode=NO_ENGINE_SUBSTITUTION"]
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-mysecretpassword}
+      MYSQL_DATABASE: servatrice
+    volumes:
+      - servatrice-db:/var/lib/mysql
+      - ./docker/backup.sql.gz:/docker-entrypoint-initdb.d/01-servatrice.sql.gz:ro,z
+#      - ./docker/servatrice.sql:/docker-entrypoint-initdb.d/01-servatrice.sql:ro,z
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-mysecretpassword}"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  app:
+    build: .
+    image: ${APP_IMAGE:-chickatrice}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - 3000:3000
+    environment:
+      # adapter-node needs to know the public address for redirects, CSRF and
+      # the provider callback URLs (<ORIGIN>/auth/callback/<id>).
+      ORIGIN: ${ORIGIN:-http://localhost:3000}
+      DATABASE_URL: mysql://root:${MYSQL_ROOT_PASSWORD:-mysecretpassword}@db:3306/servatrice
+      # Required; generate with `openssl rand -hex 32`. The app refuses to start without it.
+      AUTH_SECRET: ${AUTH_SECRET:-}
+      OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-}
+      OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:-}
+      # Behind a proxy: adapter-node reads the client address from this header.
+      # ADDRESS_HEADER: X-Forwarded-For
+      # XFF_DEPTH: "1"
+    volumes:
+      - ./config.yaml:/config/config.yaml:ro,z
+
+volumes:
+  servatrice-db:
