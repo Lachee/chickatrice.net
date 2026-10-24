@@ -1,51 +1,53 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import 'shadcn-svelte/tailwind.css';
-@import '@fontsource-variable/geist';
 
 @custom-variant dark (&:is(.dark *));
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
 /*
- * Ember — Chickatrice's theme. Warm near-black surfaces and the coral red the
- * original site used, so the numbers and the one call to action stand out.
- * Dark is the real theme: `app.html` pins `class="dark"` for it and the shadcn
- * `dark:` variants. Dark mode is temporarily off — `:root` carries a light
- * palette and `app.html` leaves the class out; put it back to restore dark.
+ * Light theme, after the original PHP site (Bulma + the Lumen swatch): a
+ * coral navbar and hero, white cards on light grey, grey body text.
+ *
+ * Ember, the dark theme, is temporarily off: `.dark` keeps its palette and
+ * `app.html` leaves `class="dark"` out; put it back to restore dark.
  *
  * --chart-1 is the series colour every chart uses (each chart plots a single
- * measure). It was checked with the dataviz palette validator against --card:
- * inside the dark lightness band, and over 3:1 contrast.
+ * measure). In light it's a shade darker than --primary to stay over 3:1
+ * against --card.
  */
 :root {
 	color-scheme: light;
 
-	--background: oklch(0.985 0.003 40);
-	--foreground: oklch(0.2 0.01 25);
-	--card: oklch(1 0 0);
-	--card-foreground: oklch(0.2 0.01 25);
-	--popover: oklch(1 0 0);
-	--popover-foreground: oklch(0.2 0.01 25);
-	--primary: oklch(0.58 0.19 25);
-	--primary-foreground: oklch(0.985 0.005 40);
-	--secondary: oklch(0.95 0.006 30);
-	--secondary-foreground: oklch(0.2 0.01 25);
-	--muted: oklch(0.955 0.005 30);
-	--muted-foreground: oklch(0.5 0.014 30);
-	--accent: oklch(0.93 0.02 25);
-	--accent-foreground: oklch(0.2 0.01 25);
-	--destructive: oklch(0.55 0.22 28);
-	--border: oklch(0 0 0 / 10%);
-	--input: oklch(0 0 0 / 14%);
-	--ring: oklch(0.58 0.19 25 / 50%);
-	--chart-1: oklch(0.6 0.18 25);
-	--chart-grid: oklch(0 0 0 / 7%);
-	--scrollbar: oklch(0 0 0 / 18%);
-	--radius: 0.6rem;
+	--background: #f7f7f7;
+	--foreground: #4a4a4a;
+	--heading: #363636;
+	--card: #fff;
+	--card-foreground: #4a4a4a;
+	--popover: #fff;
+	--popover-foreground: #4a4a4a;
+	--primary: #ff6666;
+	--primary-foreground: #fff;
+	--secondary: #f5f5f5;
+	--secondary-foreground: #363636;
+	--muted: #f5f5f5;
+	--muted-foreground: #757575;
+	--accent: #ffebeb;
+	--accent-foreground: #c73a3a;
+	--destructive: #e0294d;
+	--border: #e5e5e5;
+	--input: #dbdbdb;
+	--ring: rgb(255 102 102 / 50%);
+	--chart-1: #f05050;
+	--chart-grid: rgb(0 0 0 / 7%);
+	--scrollbar: rgb(0 0 0 / 18%);
+	/* The old site's hero ran #ff3355 → #ff9580; this is a deeper, calmer take on it. */
+	--hero: linear-gradient(141deg, oklch(0.56 0.14 18) 0%, oklch(0.62 0.13 24) 70%, oklch(0.66 0.11 35) 100%);
+	--radius: 0.5rem;
 
-	--success: oklch(0.55 0.14 155);
-	--warning: oklch(0.62 0.14 70);
+	--success: #257953;
+	--warning: #946c00;
 }
 
 .dark {
@@ -72,13 +74,17 @@
 	--chart-1: oklch(0.66 0.17 25);
 	--chart-grid: oklch(1 0 0 / 7%);
 	--scrollbar: oklch(1 0 0 / 14%);
+	--heading: var(--foreground);
+	--hero: var(--card);
+	--radius: 0.6rem;
 
 	--success: oklch(0.74 0.14 155);
 	--warning: oklch(0.8 0.13 75);
 }
 
 @theme inline {
-	--font-sans: 'Geist Variable', sans-serif;
+	--font-sans: BlinkMacSystemFont, -apple-system, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	--color-heading: var(--heading);
 	--color-success: var(--success);
 	--color-warning: var(--warning);
 	--color-chart-1: var(--chart-1);
@@ -114,6 +120,15 @@
 	}
 	body {
 		@apply bg-background text-foreground antialiased;
+		/* Keeps the footer at the bottom on short pages (app.html's wrapper is `display: contents`). */
+		@apply flex min-h-svh flex-col;
+		/* `.full-bleed` reaches 100vw, which counts the scrollbar. */
+		overflow-x: clip;
+	}
+	h1,
+	h2,
+	h3 {
+		@apply text-heading;
 	}
 	html {
 		@apply font-sans;
@@ -122,4 +137,9 @@
 	::selection {
 		background: oklch(0.7 0.16 25 / 35%);
 	}
+}
+
+/* Breaks out of `<main>`'s width to span the window. */
+@utility full-bleed {
+	margin-inline: calc(50% - 50vw);
 }

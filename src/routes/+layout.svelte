@@ -9,6 +9,7 @@
 	import HouseIcon from '@lucide/svelte/icons/house';
 	import UserCogIcon from '@lucide/svelte/icons/user-cog';
 	import LogOutIcon from '@lucide/svelte/icons/log-out';
+	import LogInIcon from '@lucide/svelte/icons/log-in';
 	import type { LayoutProps } from './$types';
 
 	let { data, children }: LayoutProps = $props();
@@ -26,65 +27,71 @@
 	<title>Chickatrice</title>
 </svelte:head>
 
-<header class="sticky top-0 z-40 border-b bg-background/85 backdrop-blur-xl">
-	<nav class="mx-auto flex h-14 max-w-6xl items-center gap-1 px-4 sm:gap-2">
-		<a href="/" class="mr-2 flex items-center gap-2 font-semibold tracking-tight sm:mr-4">
-			<img src="/logo.png" alt="" class="size-6" />
-			<span>Chickatrice</span>
+<header class="sticky top-0 z-40 bg-primary text-primary-foreground shadow-sm">
+	<nav class="mx-auto flex h-13 max-w-6xl items-stretch gap-1 px-4">
+		<a href="/" class="mr-2 flex items-center gap-2 px-1 font-semibold sm:mr-4" aria-label="Chickatrice home">
+			<img src="/logo.png" alt="" class="size-7" />
 		</a>
 
 		{#each nav as item (item.href)}
-			<Button
+			<a
 				href={item.href}
-				variant="ghost"
-				size="sm"
-				class={isActive(item.href) ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'}
+				class="flex items-center gap-1.5 border-b-3 px-3 pt-0.75 text-sm transition-colors hover:bg-black/5 [&_svg]:size-4 {isActive(item.href)
+					? 'border-white'
+					: 'border-transparent text-white/85 hover:text-white'}"
 				aria-current={isActive(item.href) ? 'page' : undefined}
 			>
 				<item.icon />
 				<span class="hidden sm:inline">{item.label}</span>
-			</Button>
+			</a>
 		{/each}
 
 		<div class="flex-1"></div>
 
 		{#if data.account}
-			<DropdownMenu.Root>
-				<DropdownMenu.Trigger class="flex items-center gap-2 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-ring/50">
-					<span class="hidden text-sm sm:inline">{data.account.name}</span>
-					<Avatar.Root class="size-8">
-						{#if data.account.hasAvatar}
-							<Avatar.Image src="/avatar/{encodeURIComponent(data.account.name)}" alt="" />
-						{/if}
-						<Avatar.Fallback class="text-xs">{data.account.name.slice(0, 2).toUpperCase()}</Avatar.Fallback>
-					</Avatar.Root>
-				</DropdownMenu.Trigger>
-				<DropdownMenu.Content align="end" class="w-56">
-					<DropdownMenu.Label class="truncate">{data.account.name}</DropdownMenu.Label>
-					<DropdownMenu.Separator />
-					<DropdownMenu.Item>
-						{#snippet child({ props })}
-							<a href="/account" {...props}><UserCogIcon /> Account settings</a>
-						{/snippet}
-					</DropdownMenu.Item>
-					<DropdownMenu.Separator />
-					<form method="POST" action="/auth/signout">
-						<input type="hidden" name="callbackUrl" value="/" />
+			<div class="flex items-center">
+				<DropdownMenu.Root>
+					<DropdownMenu.Trigger class="flex items-center gap-2 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-white/60">
+						<span class="hidden text-sm sm:inline">{data.account.name}</span>
+						<Avatar.Root class="size-8 ring-2 ring-white/70">
+							{#if data.account.hasAvatar}
+								<Avatar.Image src="/avatar/{encodeURIComponent(data.account.name)}" alt="" />
+							{/if}
+							<Avatar.Fallback class="text-xs">{data.account.name.slice(0, 2).toUpperCase()}</Avatar.Fallback>
+						</Avatar.Root>
+					</DropdownMenu.Trigger>
+					<DropdownMenu.Content align="end" class="w-56">
+						<DropdownMenu.Label class="truncate">{data.account.name}</DropdownMenu.Label>
+						<DropdownMenu.Separator />
 						<DropdownMenu.Item>
 							{#snippet child({ props })}
-								<button type="submit" {...props} class="{props.class ?? ''} w-full"><LogOutIcon /> Sign out</button>
+								<a href="/account" {...props}><UserCogIcon /> Account settings</a>
 							{/snippet}
 						</DropdownMenu.Item>
-					</form>
-				</DropdownMenu.Content>
-			</DropdownMenu.Root>
+						<DropdownMenu.Separator />
+						<form method="POST" action="/auth/signout">
+							<input type="hidden" name="callbackUrl" value="/" />
+							<DropdownMenu.Item>
+								{#snippet child({ props })}
+									<button type="submit" {...props} class="{props.class ?? ''} w-full"><LogOutIcon /> Sign out</button>
+								{/snippet}
+							</DropdownMenu.Item>
+						</form>
+					</DropdownMenu.Content>
+				</DropdownMenu.Root>
+			</div>
 		{:else}
-			<Button href="/login" size="sm">Sign in</Button>
+			<div class="flex items-center">
+				<Button href="/login" variant="outline" class="border-input bg-white text-heading hover:bg-white/90">
+					<LogInIcon /> Sign in
+				</Button>
+			</div>
 		{/if}
 	</nav>
 </header>
 
-<main class="mx-auto max-w-6xl px-4 py-8">
+<!-- A column so a page's last section can `flex-1` down to the footer (the home hero does). -->
+<main class="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-8">
 	{#if data.flash}
 		<Notice type={data.flash.type} class="mb-6">{data.flash.message}</Notice>
 	{/if}
@@ -97,6 +104,8 @@
 	{@render children()}
 </main>
 
-<footer class="mx-auto max-w-6xl px-4 pb-10 text-xs text-muted-foreground">
-	Chickatrice is a community server for <a href="https://cockatrice.github.io/" class="underline-offset-4 hover:underline">Cockatrice</a>.
+<footer class="border-t bg-card">
+	<div class="mx-auto max-w-6xl px-4 py-5 text-center text-xs text-muted-foreground">
+		Chickatrice is a community server for <a href="https://cockatrice.github.io/" class="underline-offset-4 hover:underline">Cockatrice</a>.
+	</div>
 </footer>
