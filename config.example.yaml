@@ -1,0 +1,105 @@
+# Copy to config.yaml (gitignored) and edit. Point CONFIG_FILE at another path to override.
+#
+# Any string value can defer to somewhere else instead of being written here:
+#   env:NAME     read from the environment variable NAME (.env is loaded in dev)
+#   file:/path   read from a file, e.g. a docker compose secret under /run/secrets
+# Use them for anything secret so this file can be mounted read-only and shared.
+#
+# Not everything lives here: ORIGIN, PORT and the proxy headers are read by
+# adapter-node straight from the environment, and drizzle-kit wants DATABASE_URL.
+
+db:
+  # The database Servatrice uses. This site reads its tables and adds its own,
+  # all prefixed chickatrice_.
+  url: env:DATABASE_URL
+
+server:
+  # What players type into Cockatrice's connect dialog.
+  host: mtg.chickatrice.net
+  port: 4748
+  # websocketPort: 4748
+
+cockatrice:
+  # Servatrice's [database] prefix.
+  # prefix: cockatrice
+
+  # How passwords set here are stored. `legacy` (salted SHA-512) works with every
+  # released Servatrice. `scrypt` is the newer verifier format; only use it once
+  # your Servatrice understands it. Either format is accepted when signing in.
+  # passwordFormat: legacy
+
+  # Keep these in step with servatrice.ini, so accounts made here are ones the
+  # server will let in. The defaults are Servatrice's.
+  # minPasswordLength: 6             # [users] minpasswordlength
+  # usernames:
+  #   minLength: 6                   # [users] minnamelength
+  #   maxLength: 12                  # [users] maxnamelength
+  #   allowLowercase: true
+  #   allowUppercase: true
+  #   allowNumerics: true
+  #   allowedPunctuation: "_.-"
+  #   allowPunctuationPrefix: false
+  #   disallowedWords: [admin]
+  #   disallowedRegExp: []
+
+stats:
+  # Seconds without an uptime report before the server shows as offline.
+  # Servatrice reports every [server] statusupdate ms (15s by default).
+  # offlineAfterSeconds: 45
+  # Days covered by the daily and country charts.
+  # days: 14
+
+avatar:
+  # Avatars are cropped square, scaled to this many pixels and stored as PNG.
+  # size: 256
+  # Raising this past 6 MB needs BODY_SIZE_LIMIT raised too (see server.js).
+  # maxUploadBytes: 5242880
+
+auth:
+  # Auth.js encrypts the sign-in cookies with this. Generate with `openssl rand -hex 32`.
+  secret: env:AUTH_SECRET
+  # sessionDays: 30
+
+  # Accounts with no provider linked sign in with their in-game name and password.
+  # allowPasswordLogin: true
+  # Signing in with a provider for the first time creates a Cockatrice account.
+  # Off, providers can only be linked to accounts that already exist.
+  # allowRegistration: true
+
+  # Each provider's callback URL is <ORIGIN>/auth/callback/<id>. The in-game name
+  # of a new account comes from the `username` claims, made to fit the rules above,
+  # with a number added if it's taken.
+  providers:
+    - id: authentik
+      name: Authentik
+      # A selfh.st icon (https://selfh.st/icons) by name, e.g. discord or
+      # authentik-light; add .png or .webp for those formats. Or any https URL.
+      icon: authentik
+      type: oidc
+      issuer: https://auth.example.com/application/o/chickatrice/
+      clientId: env:OIDC_CLIENT_ID
+      clientSecret: env:OIDC_CLIENT_SECRET
+      # scope: openid email profile
+      # claims:
+      #   id: sub
+      #   username: [preferred_username, nickname, name]
+      #   email: email
+      #   image: picture
+
+    # Discord, which speaks plain OAuth2:
+    # - id: discord
+    #   name: Discord
+    #   icon: discord
+    #   type: oauth
+    #   issuer: https://discord.com
+    #   clientId: env:DISCORD_CLIENT_ID
+    #   clientSecret: env:DISCORD_CLIENT_SECRET
+    #   scope: identify email
+    #   endpoints:
+    #     authorization: https://discord.com/oauth2/authorize
+    #     token: https://discord.com/api/oauth2/token
+    #     userinfo: https://discord.com/api/users/@me
+    #   claims:
+    #     id: id
+    #     username: [username, global_name]
+    #     email: email

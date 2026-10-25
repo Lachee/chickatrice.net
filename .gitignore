@@ -1,16 +1,27 @@
-vendor/*
-node_modules/*
-config.php
-public/dist/*
-public/cache/*
-public/webatrice/*
-public/**/*.log
-public/log/*
-logs/*
-.npmrc
-*.key
-*.env
+node_modules
 
-last_request.json
-_staging
-_staging/*
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Config (see config.example.yaml)
+/config.yaml
+/docker/*.sql.gz

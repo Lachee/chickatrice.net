@@ -1,0 +1,181 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn-svelte/tailwind.css';
+
+@custom-variant dark (&:is(.dark *));
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+/*
+ * Light theme, after the original PHP site (Bulma + the Lumen swatch): a
+ * coral navbar and hero, white cards on light grey, grey body text.
+ *
+ * Ember, the dark theme, is temporarily off: `.dark` keeps its palette and
+ * `app.html` leaves `class="dark"` out; put it back to restore dark.
+ *
+ * --chart-1 is the series colour every chart uses (each chart plots a single
+ * measure). In light it's a shade darker than --primary to stay over 3:1
+ * against --card.
+ */
+:root {
+	color-scheme: light;
+
+	--background: #f7f7f7;
+	--foreground: #4a4a4a;
+	--heading: #363636;
+	--card: #fff;
+	--card-foreground: #4a4a4a;
+	--popover: #fff;
+	--popover-foreground: #4a4a4a;
+	/* The old site's #ff6666, a step deeper so white text on it (navbar, hero) holds up. */
+	--primary: oklch(0.63 0.19 22);
+	--primary-foreground: #fff;
+	--secondary: #f5f5f5;
+	--secondary-foreground: #363636;
+	--muted: #f5f5f5;
+	--muted-foreground: #757575;
+	--accent: #ffebeb;
+	--accent-foreground: #c73a3a;
+	--destructive: #e0294d;
+	--border: #e5e5e5;
+	--input: #dbdbdb;
+	--ring: rgb(255 102 102 / 50%);
+	--chart-1: #f05050;
+	--chart-grid: rgb(0 0 0 / 7%);
+	/* The world map's sequential ramp: one hue, light (few players) to dark (many); --map-0 is "none". */
+	--map-0: oklch(0.94 0.003 30);
+	--map-1: oklch(0.86 0.06 25);
+	--map-2: oklch(0.77 0.11 25);
+	--map-3: oklch(0.68 0.15 25);
+	--map-4: oklch(0.58 0.17 25);
+	--map-5: oklch(0.47 0.15 25);
+	--scrollbar: rgb(0 0 0 / 18%);
+	--radius: 0.5rem;
+
+	--success: #257953;
+	--warning: #946c00;
+}
+
+.dark {
+	color-scheme: dark;
+
+	--background: oklch(0.14 0.006 25);
+	--foreground: oklch(0.94 0.008 40);
+	--card: oklch(0.18 0.008 25);
+	--card-foreground: oklch(0.94 0.008 40);
+	--popover: oklch(0.2 0.01 25);
+	--popover-foreground: oklch(0.94 0.008 40);
+	--primary: oklch(0.7 0.16 25);
+	--primary-foreground: oklch(0.17 0.03 25);
+	--secondary: oklch(0.23 0.01 25);
+	--secondary-foreground: oklch(0.94 0.008 40);
+	--muted: oklch(0.21 0.008 25);
+	--muted-foreground: oklch(0.66 0.014 30);
+	--accent: oklch(0.26 0.022 25);
+	--accent-foreground: oklch(0.96 0.01 40);
+	--destructive: oklch(0.66 0.2 28);
+	--border: oklch(1 0 0 / 8%);
+	--input: oklch(1 0 0 / 12%);
+	--ring: oklch(0.7 0.16 25 / 55%);
+	--chart-1: oklch(0.66 0.17 25);
+	--chart-grid: oklch(1 0 0 / 7%);
+	/* Its own steps for dark, not a flip: dim (few) to bright (many) against --card. */
+	--map-0: oklch(0.25 0.006 25);
+	--map-1: oklch(0.36 0.07 25);
+	--map-2: oklch(0.45 0.11 25);
+	--map-3: oklch(0.55 0.14 25);
+	--map-4: oklch(0.65 0.16 25);
+	--map-5: oklch(0.76 0.13 25);
+	--scrollbar: oklch(1 0 0 / 14%);
+	--heading: var(--foreground);
+	--radius: 0.6rem;
+
+	--success: oklch(0.74 0.14 155);
+	--warning: oklch(0.8 0.13 75);
+}
+
+@theme inline {
+	--font-sans: BlinkMacSystemFont, -apple-system, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+	--color-heading: var(--heading);
+	--color-success: var(--success);
+	--color-warning: var(--warning);
+	--color-chart-1: var(--chart-1);
+	--color-chart-grid: var(--chart-grid);
+	--color-ring: var(--ring);
+	--color-input: var(--input);
+	--color-border: var(--border);
+	--color-destructive: var(--destructive);
+	--color-accent-foreground: var(--accent-foreground);
+	--color-accent: var(--accent);
+	--color-muted-foreground: var(--muted-foreground);
+	--color-muted: var(--muted);
+	--color-secondary-foreground: var(--secondary-foreground);
+	--color-secondary: var(--secondary);
+	--color-primary-foreground: var(--primary-foreground);
+	--color-primary: var(--primary);
+	--color-popover-foreground: var(--popover-foreground);
+	--color-popover: var(--popover);
+	--color-card-foreground: var(--card-foreground);
+	--color-card: var(--card);
+	--color-foreground: var(--foreground);
+	--color-background: var(--background);
+	--radius-sm: calc(var(--radius) * 0.6);
+	--radius-md: calc(var(--radius) * 0.8);
+	--radius-lg: var(--radius);
+	--radius-xl: calc(var(--radius) * 1.4);
+	--radius-2xl: calc(var(--radius) * 1.8);
+}
+
+@layer base {
+	* {
+		@apply border-border outline-ring/50;
+	}
+	body {
+		@apply bg-background text-foreground antialiased;
+		/* Keeps the footer at the bottom on short pages (app.html's wrapper is `display: contents`). */
+		@apply flex min-h-svh flex-col;
+		/* `.full-bleed` reaches 100vw, which counts the scrollbar. */
+		overflow-x: clip;
+	}
+	h1,
+	h2,
+	h3 {
+		@apply text-heading;
+	}
+	html {
+		@apply font-sans;
+		scrollbar-color: var(--scrollbar) transparent;
+	}
+	::selection {
+		background: oklch(0.7 0.16 25 / 35%);
+	}
+	/* Tailwind 4 leaves buttons with the default arrow; here they all point. */
+	button:not(:disabled),
+	[role='button']:not([aria-disabled='true']),
+	::file-selector-button {
+		cursor: pointer;
+	}
+}
+
+/* Breaks out of `<main>`'s width to span the window. */
+@utility full-bleed {
+	margin-inline: calc(50% - 50vw);
+}
+
+/*
+ * The home page hero: the primary colour, lit from the top right and shaded
+ * towards the bottom left, so it has depth without a visible stripe.
+ */
+.hero {
+	background:
+		radial-gradient(70% 90% at 90% 0%, oklch(0.76 0.13 45 / 0.55), transparent 70%),
+		radial-gradient(60% 80% at 0% 100%, oklch(0.48 0.17 15 / 0.5), transparent 70%),
+		var(--primary);
+}
+
+/* A faint dot grid over it, fading out away from the top left. */
+@utility hero-dots {
+	background-image: radial-gradient(oklch(1 0 0 / 0.18) 1.2px, transparent 1.6px);
+	background-size: 24px 24px;
+	mask-image: radial-gradient(90% 90% at 15% 20%, black, transparent 75%);
+}

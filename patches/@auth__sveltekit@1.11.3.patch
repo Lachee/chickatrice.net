@@ -1,0 +1,47 @@
+diff --git a/dist/actions.js b/dist/actions.js
+index 45ef0af1816902b3036bbfa5a331142d3946ba5c..144d06ae265998bb4f4dcf609f75540ca1712f34 100644
+--- a/dist/actions.js
++++ b/dist/actions.js
+@@ -1,6 +1,6 @@
+ import { redirect } from "@sveltejs/kit";
+ import { parse } from "set-cookie-parser";
+-import { env } from "$env/dynamic/private";
++import * as env from "$app/env/private";
+ import { Auth, createActionURL, raw } from "@auth/core";
+ import { setEnvDefaults } from "./env";
+ export async function signIn(provider, options = {}, authorizationParams, config, event) {
+diff --git a/dist/env.js b/dist/env.js
+index a1a26c80305ed6c96cb4352a2cdea717362f47db..c774a2b83a4ce53d4bb2ca3e38e8541eae3f77e3 100644
+--- a/dist/env.js
++++ b/dist/env.js
+@@ -1,9 +1,9 @@
+ import { setEnvDefaults as coreSetEnvDefaults, skipCSRFCheck } from "@auth/core";
+-import { dev, building } from "$app/environment";
+-import { base } from "$app/paths";
++import { dev, building } from "$app/env";
+ export function setEnvDefaults(envObject, config) {
+     config.trustHost ??= dev;
+-    config.basePath = `${base}/auth`;
++    // SvelteKit 3 dropped `base` from $app/paths; chickatrice.net has no paths.base.
++    config.basePath = "/auth";
+     config.skipCSRFCheck = skipCSRFCheck;
+     if (building)
+         return;
+diff --git a/dist/index.js b/dist/index.js
+index a2fb0150da6c36659aae038b99030e2dc699c1df..f3b1319a6061e18f5546d260222c8541af520658 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -281,11 +281,11 @@
+  * @module @auth/sveltekit
+  */
+ import "@sveltejs/kit";
+-import { env } from "$env/dynamic/private";
++import * as env from "$app/env/private";
+ import { setEnvDefaults } from "./env";
+ import { auth, signIn, signOut } from "./actions";
+ import { Auth, isAuthAction, customFetch } from "@auth/core";
+-import { building } from "$app/environment";
++import { building } from "$app/env";
+ export { customFetch };
+ export { AuthError, CredentialsSignin } from "@auth/core/errors";
+ const authorizationParamsPrefix = "authorizationParams-";
