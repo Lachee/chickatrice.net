@@ -9,7 +9,6 @@ export const load: PageServerLoad = async ({ depends }) => {
 	return {
 		status,
 		recent: history.map((point) => ({ t: point.t, v: point.users })),
-		site: { tagline: config.site.tagline, discord: config.site.discord ?? null },
 		server: config.server
 	};
 };

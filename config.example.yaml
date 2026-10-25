@@ -13,11 +13,6 @@ db:
   # all prefixed chickatrice_.
   url: env:DATABASE_URL
 
-site:
-  title: Chickatrice
-  tagline: Australian Cockatrice Server
-  # discord: https://discord.gg/your-invite
-
 server:
   # What players type into Cockatrice's connect dialog.
   host: mtg.chickatrice.net

@@ -46,7 +46,7 @@
 				/>
 				<div>
 					<h1 class="text-5xl font-bold tracking-tight text-white sm:text-6xl">Chickatrice</h1>
-					<p class="mt-1 text-xl text-white/90 sm:text-2xl">{data.site.tagline}</p>
+					<p class="mt-1 text-xl text-white/90 sm:text-2xl">Australian Cockatrice Server</p>
 				</div>
 			</div>
 			<p class="mt-8 max-w-xl text-lg leading-relaxed text-white/90">
@@ -63,11 +63,9 @@
 				>
 					<DownloadIcon /> Get Cockatrice
 				</Button>
-				{#if data.site.discord}
-					<Button href={data.site.discord} size="lg" variant="outline" class={outlined} target="_blank" rel="noopener">
-						<MessageCircleIcon /> Join Discord
-					</Button>
-				{/if}
+				<Button href="https://discord.gg/py3Xbnv" size="lg" variant="outline" class={outlined} target="_blank" rel="noopener">
+					<MessageCircleIcon /> Join Discord
+				</Button>
 				<Button href="/stats" size="lg" variant="ghost" class="{heroButton} text-white hover:bg-white/15 hover:text-white">
 					<ActivityIcon /> Server statistics
 				</Button>

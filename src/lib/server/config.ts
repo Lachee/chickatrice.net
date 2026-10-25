@@ -91,12 +91,6 @@ const configSchema = z.object({
   db: z.object({
     url: secret(),
   }),
-  site: z.object({
-    title: z.string().default('Chickatrice'),
-    tagline: z.string().default('Australian Cockatrice Server'),
-    /** Invite link shown on the home page. Left out, the button isn't. */
-    discord: z.url().optional(),
-  }).prefault({}),
   server: z.object({
     /** What players type into Cockatrice's connect dialog. */
     host: z.string().default('localhost'),
