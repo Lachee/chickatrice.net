@@ -33,7 +33,8 @@ export const load: PageServerLoad = async ({ locals, url, cookies }) => {
 
 	if (locals.account) {
 		if (error) {
-			setFlash(cookies, { type: 'error', message: error });
+			// Signed in already, so it was linking a provider that failed.
+			setFlash(cookies, { type: 'error', message: error, event: { name: 'account-link-failed', data: { code: code! } } });
 			redirect(303, '/account');
 		}
 		redirect(303, next);

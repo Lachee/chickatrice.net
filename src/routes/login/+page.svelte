@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { enhance } from '$app/forms';
+	import { page } from '$app/state';
 	import { Button } from '#lib/components/ui/button/index.ts';
 	import { Input } from '#lib/components/ui/input/index.ts';
 	import { Label } from '#lib/components/ui/label/index.ts';
@@ -7,10 +9,17 @@
 	import Notice from '#lib/components/Notice.svelte';
 	import LogInIcon from '@lucide/svelte/icons/log-in';
 	import ProviderIcon from '#lib/components/ProviderIcon.svelte';
+	import { track, trackResult, trackSubmit } from '#lib/umami.ts';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
 	let submitting = $state(false);
+
+	// Auth.js sends a provider sign-in that didn't work back here with a code.
+	onMount(() => {
+		const code = page.url.searchParams.get('error');
+		if (code) track('sign-in-provider-failed', { code });
+	});
 </script>
 
 <div class="mx-auto max-w-sm pt-6">
@@ -34,7 +43,7 @@
 				<div class="space-y-2">
 					{#each data.providers as provider (provider.id)}
 						<!-- Native POST straight to Auth.js, which sends the browser on to the provider. -->
-						<form method="POST" action="/auth/signin/{provider.id}">
+						<form method="POST" action="/auth/signin/{provider.id}" onsubmit={trackSubmit('sign-in-provider', { provider: provider.id })}>
 							<input type="hidden" name="callbackUrl" value={data.next} />
 							<Button type="submit" variant="outline" size="lg" class="w-full">
 								<ProviderIcon src={provider.icon}>
@@ -61,7 +70,8 @@
 					class="space-y-4"
 					use:enhance={() => {
 						submitting = true;
-						return async ({ update }) => {
+						return async ({ result, update }) => {
+							trackResult('sign-in-password', result);
 							await update({ reset: false });
 							submitting = false;
 						};

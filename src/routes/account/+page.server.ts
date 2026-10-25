@@ -25,10 +25,15 @@ export const load: PageServerLoad = async (event) => {
 		if (url.searchParams.has('welcome') && !account.hasPassword)
 			setFlash(cookies, {
 				type: 'success',
-				message: `Welcome! Your Cockatrice name is ${account.name}. Set a password below to log in from the client.`
+				message: `Welcome! Your Cockatrice name is ${account.name}. Set a password below to log in from the client.`,
+				event: { name: 'sign-up', data: identities[0] ? { provider: identities[0].provider } : undefined }
 			});
 		else if (provider && linked.has(provider))
-			setFlash(cookies, { type: 'success', message: `${providerName(provider)} is linked. Sign in with it from now on.` });
+			setFlash(cookies, {
+				type: 'success',
+				message: `${providerName(provider)} is linked. Sign in with it from now on.`,
+				event: { name: 'account-link', data: { provider } }
+			});
 		redirect(303, '/account');
 	}
 

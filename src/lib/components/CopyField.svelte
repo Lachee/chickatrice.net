@@ -1,8 +1,10 @@
 <script lang="ts">
 	import CopyIcon from '@lucide/svelte/icons/copy';
 	import CheckIcon from '@lucide/svelte/icons/check';
+	import { track } from '#lib/umami.ts';
 
-	let { label, value }: { label: string; value: string } = $props();
+	/** `event` is reported to Umami on each copy, with the field's label. */
+	let { label, value, event }: { label: string; value: string; event?: string } = $props();
 
 	let copied = $state(false);
 	let timer: ReturnType<typeof setTimeout> | undefined;
@@ -10,6 +12,7 @@
 	async function copy() {
 		try {
 			await navigator.clipboard.writeText(value);
+			if (event) track(event, { field: label.toLowerCase() });
 			copied = true;
 			clearTimeout(timer);
 			timer = setTimeout(() => (copied = false), 1500);

@@ -8,6 +8,7 @@
 	import CountryBars from '#lib/components/charts/CountryBars.svelte';
 	import WorldMap from '#lib/components/charts/WorldMap.svelte';
 	import { compact, duration, full } from '#lib/charts.ts';
+	import { track } from '#lib/umami.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();
@@ -54,6 +55,7 @@
 				data-sveltekit-noscroll
 				data-sveltekit-replacestate
 				aria-current={option.id === data.range ? 'true' : undefined}
+				onclick={() => track('stats-range', { range: option.id })}
 				class="rounded-md px-3 py-1 text-sm transition-colors {option.id === data.range
 					? 'bg-accent font-medium text-accent-foreground'
 					: 'text-muted-foreground hover:text-foreground'}"

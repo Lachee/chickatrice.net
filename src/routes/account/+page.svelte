@@ -9,6 +9,7 @@
 	import Notice from '#lib/components/Notice.svelte';
 	import ProviderIcon from '#lib/components/ProviderIcon.svelte';
 	import { flag } from '#lib/countries.ts';
+	import { track, trackResult, trackSubmit, type EventData } from '#lib/umami.ts';
 	import KeyRoundIcon from '@lucide/svelte/icons/key-round';
 	import ImageIcon from '@lucide/svelte/icons/image';
 	import LinkIcon from '@lucide/svelte/icons/link';
@@ -25,12 +26,15 @@
 	let avatarVersion = $state(0);
 	let pending = $state<string | null>(null);
 
+	// `name` doubles as the Umami event, `account-<name>`.
 	const submit =
-		(name: string, reset = true): SubmitFunction =>
-		() => {
+		(name: string, reset = true, event?: EventData): SubmitFunction =>
+		({ formData }) => {
 			pending = name;
+			const provider = formData.get('provider');
 			return async ({ result, update }) => {
-				if (result.type === 'success' && name.toLowerCase().includes('avatar')) avatarVersion++;
+				trackResult(`account-${name}`, result, { ...event, ...(typeof provider === 'string' && { provider }) });
+				if (result.type === 'success' && name.startsWith('avatar')) avatarVersion++;
 				await update({ reset });
 				pending = null;
 			};
@@ -85,7 +89,7 @@
 			</Card.Description>
 		</Card.Header>
 		<Card.Content>
-			<form method="POST" action="?/password" class="space-y-4" use:enhance={submit('password')}>
+			<form method="POST" action="?/password" class="space-y-4" use:enhance={submit('password', true, { first: !profile.hasPassword })}>
 				{#if !profile.hasPassword && !form}
 					<Notice type="info">You haven't set a password yet, so this account can't log in from the client.</Notice>
 				{/if}
@@ -169,14 +173,14 @@
 						<p class="text-xs text-muted-foreground">PNG, JPEG, GIF, WebP or BMP up to {data.maxAvatarMb} MB. It's cropped square.</p>
 						<div class="flex flex-wrap gap-2">
 							{#each data.identities.filter((i) => i.hasImage) as identity (identity.provider)}
-								<form method="POST" action="?/importAvatar" use:enhance={submit('importAvatar')}>
+								<form method="POST" action="?/importAvatar" use:enhance={submit('avatar-import')}>
 									<input type="hidden" name="provider" value={identity.provider} />
-									<Button type="submit" size="sm" variant="outline" disabled={pending === 'importAvatar'}>Use {identity.providerName} picture</Button>
+									<Button type="submit" size="sm" variant="outline" disabled={pending === 'avatar-import'}>Use {identity.providerName} picture</Button>
 								</form>
 							{/each}
 							{#if profile.hasAvatar}
-								<form method="POST" action="?/removeAvatar" use:enhance={submit('removeAvatar')}>
-									<Button type="submit" size="sm" variant="ghost" class="text-muted-foreground" disabled={pending === 'removeAvatar'}>
+								<form method="POST" action="?/removeAvatar" use:enhance={submit('avatar-remove')}>
+									<Button type="submit" size="sm" variant="ghost" class="text-muted-foreground" disabled={pending === 'avatar-remove'}>
 										<Trash2Icon /> Remove
 									</Button>
 								</form>
@@ -225,7 +229,7 @@
 				<div class="flex flex-wrap gap-2">
 					{#each data.linkable as provider (provider.id)}
 						<!-- Signed in, Auth.js links the provider instead of signing in with it. -->
-						<form method="POST" action="/auth/signin/{provider.id}">
+						<form method="POST" action="/auth/signin/{provider.id}" onsubmit={trackSubmit('account-link-start', { provider: provider.id })}>
 							<input type="hidden" name="callbackUrl" value="/account?linked={provider.id}" />
 							<Button type="submit" variant="outline">
 								<ProviderIcon src={provider.icon}>
@@ -253,7 +257,15 @@
 			{#if profile.deleteRefusal}
 				<Notice type="info">{profile.deleteRefusal}</Notice>
 			{:else if !confirmingDelete}
-				<Button variant="destructive" onclick={() => (confirmingDelete = true)}><Trash2Icon /> Delete account…</Button>
+				<Button
+					variant="destructive"
+					onclick={() => {
+						confirmingDelete = true;
+						track('account-delete-start');
+					}}
+				>
+					<Trash2Icon /> Delete account…
+				</Button>
 			{:else}
 				<div class="grid gap-4 text-sm sm:grid-cols-2">
 					<div>
@@ -276,7 +288,7 @@
 						<p class="mt-3 text-muted-foreground">Afterwards, anyone can register the name {profile.name}.</p>
 					</div>
 				</div>
-				<form method="POST" action="?/deleteAccount" class="max-w-md space-y-4" use:enhance={submit('deleteAccount', false)}>
+				<form method="POST" action="?/deleteAccount" class="max-w-md space-y-4" use:enhance={submit('delete', false)}>
 					<div class="space-y-1.5">
 						<Label for="confirm-name">Type <strong>{profile.name}</strong> to confirm</Label>
 						<Input id="confirm-name" name="confirmName" autocomplete="off" spellcheck="false" bind:value={confirmName} required />
@@ -291,7 +303,7 @@
 						<Button
 							type="submit"
 							class="bg-destructive text-white hover:bg-destructive/90"
-							disabled={confirmName !== profile.name || pending === 'deleteAccount'}
+							disabled={confirmName !== profile.name || pending === 'delete'}
 						>
 							<Trash2Icon /> Delete my account forever
 						</Button>

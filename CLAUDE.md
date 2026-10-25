@@ -62,6 +62,10 @@ The original PHP site lives on `master` / `v1.0.0` — useful for how things use
   Servatrice's `is_public` (inherited from folders), kept in step both ways. Edits to a `.cod`
   change only `<deckname>`/`<comments>` so whatever the client wrote survives. Importers use
   `node:https`, not `fetch`: Moxfield's Cloudflare blocks undici's headers.
+- **Umami events go through `#lib/umami.ts`** (`track`, `trackResult` for enhanced forms,
+  `trackSubmit` for posts to Auth.js), never `data-umami-event` on an internal link: Umami turns
+  that click into a full page load. Server-only outcomes ride on a flash's `event`. Event data
+  never identifies anyone (no names, emails, deck titles).
 - **Databases from the old site** are converted by `0001_legacy_import.sql`: its Discord links
   become identities on provider id `discord` (keep that id), and its tables are kept as
   `legacy_chickatrice_*`, outside drizzle-kit's `chickatrice_*` filter. Nothing reads them.

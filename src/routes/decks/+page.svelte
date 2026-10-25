@@ -8,6 +8,7 @@
 	import Notice from '#lib/components/Notice.svelte';
 	import Textarea from '#lib/components/Textarea.svelte';
 	import DeckTable from '#lib/components/decks/DeckTable.svelte';
+	import { trackResult, type EventData } from '#lib/umami.ts';
 	import FileUpIcon from '@lucide/svelte/icons/file-up';
 	import ImportIcon from '@lucide/svelte/icons/import';
 	import LayersIcon from '@lucide/svelte/icons/layers';
@@ -18,13 +19,28 @@
 	let pending = $state<string | null>(null);
 	const submit =
 		(name: string): SubmitFunction =>
-		() => {
+		({ formData }) => {
 			pending = name;
-			return async ({ update }) => {
+			const event = name === 'upload' ? uploadEvent(formData) : importEvent(formData);
+			return async ({ result, update }) => {
+				trackResult(`deck-${name}`, result, event);
 				await update();
 				pending = null;
 			};
 		};
+
+	// Which ways in people use, and which sites they import from (or try to).
+	const uploadEvent = (formData: FormData): EventData => {
+		const file = formData.get('file');
+		return { source: file instanceof File && file.size ? 'file' : 'paste' };
+	};
+	const importEvent = (formData: FormData): EventData => {
+		try {
+			return { site: new URL(String(formData.get('url'))).hostname.replace(/^www\./, '') };
+		} catch {
+			return { site: 'invalid' };
+		}
+	};
 
 	const feedback = (action: string) => (form?.action === action ? form : null);
 	const full = $derived(data.decks.length >= data.maxDecks);

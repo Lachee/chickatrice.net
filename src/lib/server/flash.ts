@@ -21,7 +21,11 @@ export function takeFlash(cookies: Cookies): Flash | null {
   try {
     const parsed = JSON.parse(decodeURIComponent(value));
     if ((parsed.type === 'success' || parsed.type === 'error' || parsed.type === 'info') && typeof parsed.message === 'string')
-      return parsed as Flash;
+      return {
+        type: parsed.type,
+        message: parsed.message,
+        ...(typeof parsed.event?.name === 'string' && { event: { name: parsed.event.name, data: parsed.event.data } }),
+      };
   } catch { /* someone else's cookie, or a mangled one */ }
   return null;
 }

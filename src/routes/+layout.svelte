@@ -6,6 +6,7 @@
 	import * as DropdownMenu from '#lib/components/ui/dropdown-menu/index.ts';
 	import Notice from '#lib/components/Notice.svelte';
 	import Umami from '#lib/components/Umami.svelte';
+	import { track, trackSubmit } from '#lib/umami.ts';
 	import ActivityIcon from '@lucide/svelte/icons/activity';
 	import HouseIcon from '@lucide/svelte/icons/house';
 	import LayersIcon from '@lucide/svelte/icons/layers';
@@ -25,6 +26,11 @@
 	]);
 
 	const isActive = (href: string) => (href === '/' ? page.url.pathname === '/' : page.url.pathname.startsWith(href));
+
+	// Outcomes the server reports through a flash, like a sign-up finishing.
+	$effect(() => {
+		if (data.flash?.event) track(data.flash.event.name, data.flash.event.data);
+	});
 </script>
 
 {#if data.umami}
@@ -90,7 +96,7 @@
 							</DropdownMenu.Item>
 						{/if}
 						<DropdownMenu.Separator />
-						<form method="POST" action="/auth/signout">
+						<form method="POST" action="/auth/signout" onsubmit={trackSubmit('sign-out')}>
 							<input type="hidden" name="callbackUrl" value="/" />
 							<DropdownMenu.Item>
 								{#snippet child({ props })}
@@ -133,6 +139,7 @@
 			target="_blank"
 			rel="noopener"
 			class="inline-flex items-center gap-1.5 underline-offset-4 hover:text-foreground hover:underline"
+			onclick={() => track('outbound-github')}
 		>
 			<!-- GitHub's mark; Lucide no longer ships brand icons. -->
 			<svg viewBox="0 0 16 16" class="size-3.5 fill-current" aria-hidden="true">

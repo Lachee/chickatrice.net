@@ -7,6 +7,7 @@
 	import CopyField from '#lib/components/CopyField.svelte';
 	import LineChart from '#lib/components/charts/LineChart.svelte';
 	import { duration, full } from '#lib/charts.ts';
+	import { track } from '#lib/umami.ts';
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import MessageCircleIcon from '@lucide/svelte/icons/message-circle';
 	import ActivityIcon from '@lucide/svelte/icons/activity';
@@ -60,10 +61,19 @@
 					class="{heroButton} bg-white text-primary shadow-[0_8px_20px_-8px_rgb(80_10_10/0.5)] hover:bg-white/90"
 					target="_blank"
 					rel="noopener"
+					onclick={() => track('outbound-cockatrice')}
 				>
 					<DownloadIcon /> Get Cockatrice
 				</Button>
-				<Button href="https://discord.gg/py3Xbnv" size="lg" variant="outline" class={outlined} target="_blank" rel="noopener">
+				<Button
+					href="https://discord.gg/py3Xbnv"
+					size="lg"
+					variant="outline"
+					class={outlined}
+					target="_blank"
+					rel="noopener"
+					onclick={() => track('outbound-discord')}
+				>
 					<MessageCircleIcon /> Join Discord
 				</Button>
 				<Button href="/stats" size="lg" variant="ghost" class="{heroButton} text-white hover:bg-white/15 hover:text-white">
@@ -108,8 +118,8 @@
 					<Card.Description>Add a new server in the client's connect dialog with these details.</Card.Description>
 				</Card.Header>
 				<Card.Content class="grid grid-cols-[1fr_7rem] gap-3">
-					<CopyField label="Host" value={data.server.host} />
-					<CopyField label="Port" value={String(data.server.port)} />
+					<CopyField label="Host" value={data.server.host} event="server-copy" />
+					<CopyField label="Port" value={String(data.server.port)} event="server-copy" />
 					{#if data.server.websocketPort}
 						<div class="col-span-2 text-xs text-muted-foreground">
 							Webatrice and other websocket clients use port {data.server.websocketPort}.

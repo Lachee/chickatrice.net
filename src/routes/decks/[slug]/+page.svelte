@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { untrack } from 'svelte';
 	import { enhance, type SubmitFunction } from '$app/forms';
 	import { page } from '$app/state';
 	import * as Card from '#lib/components/ui/card/index.ts';
@@ -12,6 +13,7 @@
 	import Time from '#lib/components/admin/Time.svelte';
 	import VisibilityBadge from '#lib/components/decks/VisibilityBadge.svelte';
 	import { VISIBILITIES } from '#lib/decks.ts';
+	import { track, trackResult } from '#lib/umami.ts';
 	import CopyIcon from '@lucide/svelte/icons/copy';
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
@@ -29,9 +31,11 @@
 	let pending = $state<string | null>(null);
 	const submit =
 		(name: string): SubmitFunction =>
-		() => {
+		({ formData }) => {
 			pending = name;
-			return async ({ update }) => {
+			const visibility = formData.get('visibility');
+			return async ({ result, update }) => {
+				trackResult(`deck-${name}`, result, typeof visibility === 'string' ? { visibility } : undefined);
 				await update({ reset: false });
 				pending = null;
 			};
@@ -44,6 +48,23 @@
 
 	type Images = Awaited<PageProps['data']['images']>;
 	let view = $state<'images' | 'list'>('images');
+
+	// Once per deck, so a save doesn't count as another look. Whose look it is says whether shared links get used.
+	const slug = $derived(deck.slug);
+	$effect(() => {
+		void slug;
+		untrack(() =>
+			track('deck-view', {
+				viewer: data.access.owner ? 'owner' : data.access.manage ? 'staff' : page.data.account ? 'member' : 'guest',
+				visibility: deck.visibility
+			})
+		);
+	});
+
+	const setView = (next: typeof view) => {
+		view = next;
+		track('deck-view-mode', { view: next });
+	};
 </script>
 
 <svelte:head>
@@ -102,9 +123,17 @@
 	</div>
 	</div>
 	<div class="flex flex-wrap gap-2">
-		<Button href="/decks/{deck.slug}/download" data-sveltekit-reload><DownloadIcon /> Download</Button>
+		<Button href="/decks/{deck.slug}/download" data-sveltekit-reload onclick={() => track('deck-download', { format: 'cod' })}>
+			<DownloadIcon /> Download
+		</Button>
 		{#if deck.cards !== null}
-			<Button href="/decks/{deck.slug}/download?format=txt" variant="outline" data-sveltekit-reload title="A plain list other deck sites can import">
+			<Button
+				href="/decks/{deck.slug}/download?format=txt"
+				variant="outline"
+				data-sveltekit-reload
+				title="A plain list other deck sites can import"
+				onclick={() => track('deck-download', { format: 'txt' })}
+			>
 				<FileTextIcon /> As text
 			</Button>
 		{/if}
@@ -114,7 +143,15 @@
 			</form>
 		{/if}
 		{#if deck.sourceUrl}
-			<Button href={deck.sourceUrl} variant="ghost" target="_blank" rel="noopener noreferrer"><ExternalLinkIcon /> {sourceName}</Button>
+			<Button
+				href={deck.sourceUrl}
+				variant="ghost"
+				target="_blank"
+				rel="noopener noreferrer"
+				onclick={() => track('deck-source', { site: sourceName ?? '' })}
+			>
+				<ExternalLinkIcon /> {sourceName}
+			</Button>
 		{/if}
 	</div>
 </div>
@@ -145,6 +182,7 @@
 										target="_blank"
 										rel="noopener noreferrer"
 										title="{card.count} × {card.name}{image?.artist ? ` (art by ${image.artist})` : ''}"
+										onclick={() => track('deck-card-open', { view })}
 										class="relative block aspect-[488/680] overflow-hidden rounded-[4.75%/3.5%] bg-muted shadow-sm transition-transform hover:-translate-y-0.5"
 									>
 										{#if image}
@@ -175,7 +213,13 @@
 							{#each zone.cards as card, i (i)}
 								<li class="flex break-inside-avoid gap-2 py-0.5">
 									<span class="w-6 shrink-0 text-right tabular-nums text-muted-foreground">{card.count}</span>
-									<a href={images?.[card.key]?.uri ?? scryfall(card.name)} target="_blank" rel="noopener noreferrer" class="min-w-0 truncate underline-offset-4 hover:underline">{card.name}</a>
+									<a
+										href={images?.[card.key]?.uri ?? scryfall(card.name)}
+										target="_blank"
+										rel="noopener noreferrer"
+										class="min-w-0 truncate underline-offset-4 hover:underline"
+										onclick={() => track('deck-card-open', { view })}
+									>{card.name}</a>
 									{#if card.set}<span class="ml-auto shrink-0 text-xs uppercase text-muted-foreground">{card.set}</span>{/if}
 								</li>
 							{/each}
@@ -192,10 +236,10 @@
 {:else}
 	<div class="mb-3 flex justify-end">
 		<div class="inline-flex rounded-lg border p-0.5" role="group" aria-label="Show cards as">
-			<Button size="sm" variant={view === 'images' ? 'secondary' : 'ghost'} aria-pressed={view === 'images'} onclick={() => (view = 'images')}>
+			<Button size="sm" variant={view === 'images' ? 'secondary' : 'ghost'} aria-pressed={view === 'images'} onclick={() => setView('images')}>
 				<LayoutGridIcon /> Images
 			</Button>
-			<Button size="sm" variant={view === 'list' ? 'secondary' : 'ghost'} aria-pressed={view === 'list'} onclick={() => (view = 'list')}>
+			<Button size="sm" variant={view === 'list' ? 'secondary' : 'ghost'} aria-pressed={view === 'list'} onclick={() => setView('list')}>
 				<ListIcon /> List
 			</Button>
 		</div>
@@ -279,7 +323,7 @@
 					</Card.Description>
 				</Card.Header>
 				<Card.Content>
-					<CopyField label="Link" value={shareUrl} />
+					<CopyField label="Link" value={shareUrl} event="deck-link-copy" />
 				</Card.Content>
 			</Card.Root>
 
