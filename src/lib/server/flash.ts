@@ -1,13 +1,6 @@
 import type { Cookies } from '@sveltejs/kit';
 import type { Flash } from '#lib/flash.js';
 
-/*
- * A message for the next page the browser lands on, for the end of flows that
- * finish with a redirect (sign-in callbacks, mostly). It rides a cookie the
- * server writes rather than the URL, so nobody can craft a link that makes the
- * site say something it didn't.
- */
-
 const COOKIE = 'chickatrice_flash';
 
 export function setFlash(cookies: Cookies, flash: Flash) {

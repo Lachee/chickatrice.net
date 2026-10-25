@@ -1,8 +1,4 @@
-/**
- * The countries Cockatrice has flags for, keyed by the lowercase ISO 3166-1
- * alpha-2 code Servatrice stores in `cockatrice_users.country`. Ported from the
- * original site's `helpers/Country.php`.
- */
+/** List of every country code and their names */
 export const COUNTRIES: ReadonlyMap<string, string> = new Map([
 	['af', "Afghanistan"],
 	['al', "Albania"],

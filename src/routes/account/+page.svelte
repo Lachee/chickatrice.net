@@ -20,6 +20,7 @@
 	let { data, form }: PageProps = $props();
 
 	const profile = $derived(data.profile);
+
 	// Bumped after an avatar change so the browser fetches the new picture.
 	let avatarVersion = $state(0);
 	let pending = $state<string | null>(null);
