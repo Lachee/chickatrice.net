@@ -64,6 +64,11 @@ avatar:
   # Raising this past 6 MB needs BODY_SIZE_LIMIT raised too (see server.js).
   # maxUploadBytes: 5242880
 
+decks:
+  # Decks an account can keep before uploads, imports and copies from the site
+  # are refused. Decks saved to the server from the client don't count against it.
+  # maxPerAccount: 200
+
 # Umami analytics (https://umami.is). Left out, nothing is tracked.
 # umami:
 #   host: https://umami.example.com

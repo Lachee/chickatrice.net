@@ -162,6 +162,13 @@ const configSchema = z.object({
     /** Largest upload accepted, in bytes, before any resizing. */
     maxUploadBytes: z.number().int().min(1024).default(5 * 1024 * 1024),
   }).prefault({}),
+  decks: z.object({
+    /**
+     * Decks an account may keep before the site stops adding more (uploads,
+     * imports and copies). Decks uploaded from the client aren't held to it.
+     */
+    maxPerAccount: z.number().int().min(1).default(200),
+  }).prefault({}),
   /** Umami (https://umami.is) analytics. Left out, nothing is tracked. */
   umami: z.object({
     /** Where the Umami instance is served, e.g. `https://umami.example.com`. */

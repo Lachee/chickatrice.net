@@ -1,4 +1,4 @@
-import { datetime, index, int, mysqlTable, serial, text, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
+import { datetime, index, int, mysqlEnum, mysqlTable, serial, text, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
 
 /*
  * This site's own tables. Everything it adds to the Servatrice database is
@@ -69,4 +69,30 @@ export const adminLog = mysqlTable('chickatrice_admin_log', {
 }, (table) => [
   index('chickatrice_admin_log_created').on(table.createdAt),
   index('chickatrice_admin_log_target').on(table.target),
+]);
+
+/**
+ * What the site adds to a deck in Servatrice's `decklist_files`: the link it's
+ * shared by, and who may follow it. Rows are made the first time the site
+ * lists a deck; a deck uploaded from the client has none until then, and counts
+ * as private. Where Servatrice has `is_public` (schema 37+) that column decides
+ * "public" instead, so the client and the site agree (see cockatrice/decks.ts).
+ */
+export const decks = mysqlTable('chickatrice_decks', {
+  /** `decklist_files.id`. */
+  deckId: int('deck_id', { unsigned: true }).primaryKey(),
+  /**
+   * The deck's owner when the row was made. A row whose owner no longer matches
+   * belongs to a deleted deck whose id was handed out again, and is replaced.
+   */
+  accountId: int('account_id', { unsigned: true }).notNull(),
+  /** The deck's address, `/decks/<slug>`: random, so a link can't be guessed. */
+  slug: varchar('slug', { length: 16 }).notNull(),
+  visibility: mysqlEnum('visibility', [ 'private', 'unlisted', 'public' ]).notNull().default('private'),
+  /** Where it was imported from, if it was. */
+  sourceUrl: varchar('source_url', { length: 512 }),
+  createdAt: datetime('created_at', { mode: 'date' }).notNull(),
+}, (table) => [
+  uniqueIndex('chickatrice_decks_slug').on(table.slug),
+  index('chickatrice_decks_account').on(table.accountId),
 ]);

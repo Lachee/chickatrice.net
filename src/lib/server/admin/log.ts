@@ -10,7 +10,8 @@ export type AdminAction =
   | 'report.assign' | 'report.resolve' | 'report.dismiss' | 'report.comment'
   | 'room.create' | 'room.update' | 'room.delete'
   | 'servermessage'
-  | 'cardart.set' | 'cardart.remove';
+  | 'cardart.set' | 'cardart.remove'
+  | 'deck.update' | 'deck.visibility' | 'deck.delete';
 
 export type AdminLogEntry = {
   id: number;

@@ -23,6 +23,12 @@ export type Capabilities = {
   reports: boolean;
   /** The `card_art_name_rules` table (schema 35+): which cards may be used as profile art. */
   cardArtRules: boolean;
+  /**
+   * `is_public` on `decklist_files` and `decklist_folders` (schema 37+), with the
+   * preview columns (`banner_card_name`, `tags`, ...) that came alongside: decks
+   * other players can browse from the client.
+   */
+  publicDecks: boolean;
 };
 
 let cached: Promise<Capabilities> | undefined;
@@ -37,7 +43,7 @@ export function capabilities(): Promise<Capabilities> {
 async function probe(): Promise<Capabilities> {
   const prefix = config.cockatrice.prefix;
   const table = `${prefix}_users`;
-  const [ [ rows ], [ tableRows ] ] = await Promise.all([
+  const [ [ rows ], [ tableRows ], [ deckRows ] ] = await Promise.all([
     pool.query(
       'SELECT COLUMN_NAME AS name FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?',
       [ table ],
@@ -45,6 +51,11 @@ async function probe(): Promise<Capabilities> {
     pool.query(
       'SELECT TABLE_NAME AS name FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN (?)',
       [ [ 'reports', 'report_comments', 'card_art_name_rules' ].map((name) => `${prefix}_${name}`) ],
+    ),
+    pool.query(
+      `SELECT TABLE_NAME AS name FROM information_schema.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN (?) AND COLUMN_NAME = 'is_public'`,
+      [ [ 'decklist_files', 'decklist_folders' ].map((name) => `${prefix}_${name}`) ],
     ),
   ]);
   const columns = new Set((rows as { name: string }[]).map((row) => row.name));
@@ -59,5 +70,6 @@ async function probe(): Promise<Capabilities> {
     adminNotes: columns.has('adminnotes'),
     reports: tables.has('reports') && tables.has('report_comments'),
     cardArtRules: tables.has('card_art_name_rules'),
+    publicDecks: (deckRows as unknown[]).length === 2,
   };
 }

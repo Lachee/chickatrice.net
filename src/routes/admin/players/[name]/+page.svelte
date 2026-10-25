@@ -69,7 +69,8 @@
 		</h2>
 		<p class="text-sm text-muted-foreground">
 			#{player.id} · {player.email || 'no email'} · registered <Time at={player.registeredAt} /> · last login
-			<Time at={player.lastLogin} relative empty="never" />{#if player.clientVersion}&nbsp;on {player.clientVersion}{/if}
+			<Time at={player.lastLogin} relative empty="never" />{#if player.clientVersion}&nbsp;on {player.clientVersion}{/if} ·
+			<a href="/decks/by/{encodeURIComponent(player.name)}" class="underline-offset-4 hover:underline">decks</a>
 		</p>
 	</div>
 </div>

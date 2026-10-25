@@ -47,6 +47,7 @@ const SERVATRICE: [string, string, Key][] = [
 const CHICKATRICE: [string, string, Key][] = [
   ['chickatrice_identities', 'account_id', 'id'],
   ['chickatrice_sessions', 'account_id', 'id'],
+  ['chickatrice_decks', 'account_id', 'id'],
   ['legacy_chickatrice_users', 'cockatrice_id', 'id'], // email, Discord id, API keys
   ['legacy_chickatrice_users_backup', 'id', 'id'] // original email
 ];

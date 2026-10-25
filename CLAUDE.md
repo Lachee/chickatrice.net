@@ -13,7 +13,9 @@ The original PHP site lives on `master` / `v1.0.0` — useful for how things use
   `capabilities.ts` (which optional columns and tables this schema version has), `stats.ts`,
   and for the admin pages `moderation.ts` (players, bans, warnings, account changes),
   `metrics.ts`, `reports.ts`, `settings.ts` (rooms, server message, card art), `logs.ts`,
-  all raw SQL through `sql.ts`.
+  all raw SQL through `sql.ts`. `decks.ts` is the client's server deck storage (`decklist_files`).
+- `src/lib/server/decks/` — `format.ts` (`.cod` and plain-text lists, the deck hash),
+  `import.ts` (Moxfield, Archidekt), `access.ts` (owner or admin manages; others view if shared).
 - `src/lib/server/auth/` — `index.ts` (Auth.js config, as in labooru), `adapter.ts` (Auth.js
   users = Cockatrice accounts), `session.ts` (DB sessions, password sign-in), `identities.ts`
   (provider ↔ account links), `guard.ts` (`requireAccount`, `requireStaff`), `ratelimit.ts`.
@@ -50,6 +52,11 @@ The original PHP site lives on `master` / `v1.0.0` — useful for how things use
   actions) and logs through `logAdminAction`. Non-player log targets are prefixed (`room:3`).
 - **Newer Servatrice tables (reports 36+, card art 35+, `adminnotes` 30+) are probed** in
   `capabilities.ts`; pages hide what the schema lacks.
+- **Decks are Servatrice's `decklist_files` rows**, so the client sees them; `chickatrice_decks`
+  adds the random `/decks/<slug>` link and private/unlisted/public. On schema 37+ "public" is
+  Servatrice's `is_public` (inherited from folders), kept in step both ways. Edits to a `.cod`
+  change only `<deckname>`/`<comments>` so whatever the client wrote survives. Importers use
+  `node:https`, not `fetch`: Moxfield's Cloudflare blocks undici's headers.
 - **Databases from the old site** are converted by `0001_legacy_import.sql`: its Discord links
   become identities on provider id `discord` (keep that id), and its tables are kept as
   `legacy_chickatrice_*`, outside drizzle-kit's `chickatrice_*` filter. Nothing reads them.

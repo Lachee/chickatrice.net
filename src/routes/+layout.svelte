@@ -8,6 +8,7 @@
 	import Umami from '#lib/components/Umami.svelte';
 	import ActivityIcon from '@lucide/svelte/icons/activity';
 	import HouseIcon from '@lucide/svelte/icons/house';
+	import LayersIcon from '@lucide/svelte/icons/layers';
 	import UserCogIcon from '@lucide/svelte/icons/user-cog';
 	import LogOutIcon from '@lucide/svelte/icons/log-out';
 	import LogInIcon from '@lucide/svelte/icons/log-in';
@@ -19,6 +20,7 @@
 	const nav = $derived([
 		{ href: '/', label: 'Home', icon: HouseIcon },
 		{ href: '/stats', label: 'Statistics', icon: ActivityIcon },
+		...(data.account ? [{ href: '/decks', label: 'Decks', icon: LayersIcon }] : []),
 		...(data.account?.staff ? [{ href: '/admin', label: 'Admin', icon: ShieldIcon }] : [])
 	]);
 
@@ -73,6 +75,11 @@
 						<DropdownMenu.Item>
 							{#snippet child({ props })}
 								<a href="/account" {...props}><UserCogIcon /> Account settings</a>
+							{/snippet}
+						</DropdownMenu.Item>
+						<DropdownMenu.Item>
+							{#snippet child({ props })}
+								<a href="/decks" {...props}><LayersIcon /> Your decks</a>
 							{/snippet}
 						</DropdownMenu.Item>
 						{#if data.account.staff}
