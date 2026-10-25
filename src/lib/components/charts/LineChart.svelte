@@ -9,14 +9,20 @@
 		label,
 		height = 200,
 		/** How x positions read: clock times for short ranges, dates for long ones. */
-		timeFormat = 'time'
+		timeFormat = 'time',
+		/** How values read, on the axis and off it. Counts by default. */
+		format
 	}: {
 		points: Point[];
 		/** The measure, for the tooltip and the table: "Players online". */
 		label: string;
 		height?: number;
 		timeFormat?: 'time' | 'date';
+		format?: { axis: (v: number) => string; value: (v: number) => string };
 	} = $props();
+
+	const axisFormat = $derived(format?.axis ?? compact);
+	const valueFormat = $derived(format?.value ?? full);
 
 	const PAD = { top: 12, right: 12, bottom: 26, left: 40 };
 
@@ -84,7 +90,7 @@
 		role="application"
 		aria-roledescription="chart"
 		tabindex="0"
-		aria-label="{label}: peak {full(max)}. Use the arrow keys to read values."
+		aria-label="{label}: peak {valueFormat(max)}. Use the arrow keys to read values."
 		class="block touch-pan-y outline-none focus-visible:ring-3 focus-visible:ring-ring/50 rounded-md"
 		{onpointermove}
 		onpointerleave={() => (active = null)}
@@ -93,7 +99,7 @@
 	>
 		{#each ticks as tick (tick)}
 			<line x1={PAD.left} x2={width - PAD.right} y1={y(tick)} y2={y(tick)} class="stroke-chart-grid" stroke-width="1" />
-			<text x={PAD.left - 8} y={y(tick)} dy="0.32em" text-anchor="end" class="fill-muted-foreground text-[11px] tabular-nums">{compact(tick)}</text>
+			<text x={PAD.left - 8} y={y(tick)} dy="0.32em" text-anchor="end" class="fill-muted-foreground text-[11px] tabular-nums">{axisFormat(tick)}</text>
 		{/each}
 
 		{#each xTicks as i, k (i)}
@@ -127,7 +133,7 @@
 			class="pointer-events-none absolute top-1 z-10 rounded-md border bg-popover px-2.5 py-1.5 text-xs shadow-lg whitespace-nowrap"
 			style="left: {left}px; transform: translateX({left > width / 2 ? 'calc(-100% - 10px)' : '10px'})"
 		>
-			<div class="text-sm font-semibold tabular-nums">{full(points[active].v)}</div>
+			<div class="text-sm font-semibold tabular-nums">{valueFormat(points[active].v)}</div>
 			<div class="flex items-center gap-1.5 text-muted-foreground">
 				<span class="inline-block h-0.5 w-3 rounded bg-chart-1"></span>{label}
 			</div>
@@ -140,7 +146,7 @@
 		{@const shift = px < PAD.left + 20 ? '0' : px > width - 30 ? '-100%' : '-50%'}
 		{@const py = y(max) - 20}
 		<div class="pointer-events-none absolute text-[11px] font-medium tabular-nums text-foreground" style="left: {px}px; top: {py}px; transform: translateX({shift})">
-			{full(max)}
+			{valueFormat(max)}
 		</div>
 	{/if}
 </div>
@@ -156,7 +162,7 @@
 				{#each points as point (point.t)}
 					<tr class="border-t">
 						<td class="px-2 py-0.5">{mounted ? fullFormatter.format(new Date(point.t * 1000)) : new Date(point.t * 1000).toISOString().slice(0, 16).replace('T', ' ') + ' UTC'}</td>
-						<td class="px-2 py-0.5 text-right text-foreground">{full(point.v)}</td>
+						<td class="px-2 py-0.5 text-right text-foreground">{valueFormat(point.v)}</td>
 					</tr>
 				{/each}
 			</tbody>

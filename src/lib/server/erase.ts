@@ -13,8 +13,8 @@ import type { Account } from '#lib/server/cockatrice/accounts.ts';
  * Others are only tied to the user by name, or only SET NULL (shared decks
  * would stay up), so they have to be.
  *
- * Kept on purpose: bans, warnings and reports. They're the server's moderation
- * record, and bans go by name, IP and client id, so deleting them would let
+ * Kept on purpose: bans, warnings and reports, and chickatrice_admin_log's
+ * lines about the account. They're the server's moderation record, and bans go by name, IP and client id, so deleting them would let
  * anyone shed a ban by deleting their account. Games stay too: they're other
  * players' history as well, and only carry names.
  *

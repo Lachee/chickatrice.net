@@ -23,6 +23,15 @@ cockatrice:
   # Servatrice's [database] prefix.
   # prefix: cockatrice
 
+  # Servatrice's [server] id. The admin pages edit this server's rooms and
+  # server message, and list who is connected to it.
+  # serverId: 1
+  # [security] trusted_sources: addresses the admin pages refuse to IP-ban,
+  # as Servatrice does (a reverse proxy's, which every player would share).
+  # trustedSources: ["127.0.0.1", "::1"]
+  # [server] officialwarnings, without the |levels: reasons offered when warning.
+  # officialWarnings: [Abusive Language, Cheating, Spamming, Targeted Harassment]
+
   # How passwords set here are stored. `legacy` (salted SHA-512) works with every
   # released Servatrice. `scrypt` is the newer verifier format; only use it once
   # your Servatrice understands it. Either format is accepted when signing in.
@@ -111,3 +120,16 @@ auth:
     #     id: id
     #     username: [username, global_name]
     #     email: email
+
+    # Google, an OIDC provider. Create an OAuth client ID ("Web application") at
+    # https://console.cloud.google.com/apis/credentials. Google has no username
+    # claim, so new accounts are named after the person's first or full name.
+    # - id: google
+    #   name: Google
+    #   icon: google
+    #   type: oidc
+    #   issuer: https://accounts.google.com
+    #   clientId: env:GOOGLE_CLIENT_ID
+    #   clientSecret: env:GOOGLE_CLIENT_SECRET
+    #   claims:
+    #     username: [given_name, name]

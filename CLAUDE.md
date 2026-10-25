@@ -10,10 +10,17 @@ The original PHP site lives on `master` / `v1.0.0` — useful for how things use
 - `src/lib/server/cockatrice/` — everything that touches Servatrice's tables:
   `accounts.ts` (create/find/update `cockatrice_users`), `password.ts` (both hash formats),
   `username.ts` (Servatrice's name rules + deriving a name from a provider),
-  `capabilities.ts` (which optional columns this schema version has), `stats.ts`.
+  `capabilities.ts` (which optional columns and tables this schema version has), `stats.ts`,
+  and for the admin pages `moderation.ts` (players, bans, warnings, account changes),
+  `metrics.ts`, `reports.ts`, `settings.ts` (rooms, server message, card art), `logs.ts`,
+  all raw SQL through `sql.ts`.
 - `src/lib/server/auth/` — `index.ts` (Auth.js config, as in labooru), `adapter.ts` (Auth.js
   users = Cockatrice accounts), `session.ts` (DB sessions, password sign-in), `identities.ts`
-  (provider ↔ account links), `guard.ts`, `ratelimit.ts`.
+  (provider ↔ account links), `guard.ts` (`requireAccount`, `requireStaff`), `ratelimit.ts`.
+- `src/lib/server/admin/` — `log.ts` (`chickatrice_admin_log`: what staff did from the site),
+  `actions.ts` (form actions shared between admin pages), `form.ts`.
+- `src/routes/admin/` — the staff pages. Access is Servatrice's `admin` bitfield, mapped in
+  `#lib/staff.ts`: developers view, moderators moderate, admins administer.
 - `src/lib/server/db/` — `cockatrice.ts` (Servatrice tables, never migrated),
   `chickatrice.schema.ts` (ours, migrated), `migrate.ts`, `lock.ts` (MySQL named locks).
 - `src/lib/components/charts/` — hand-rolled SVG charts (no chart library).
@@ -36,6 +43,13 @@ The original PHP site lives on `master` / `v1.0.0` — useful for how things use
 - **Times:** our tables are UTC (compare with `UTC_TIMESTAMP()`); Servatrice's uptime and
   session rows use `NOW()`, so stats work out ages in SQL and return epoch seconds.
 - Stats queries are public — keep them cached (`cached()` in `stats.ts`) and indexed.
+- **Admin pages talk to Servatrice only through its tables**, so nothing reaches a connected
+  player: bans apply at their next login, warnings and demotions aren't shown to them, and
+  rooms and the server message wait for Servatrice to re-read them. The UI says so; keep it
+  honest. Every admin form action calls `requireStaff` itself (layout loads don't guard
+  actions) and logs through `logAdminAction`. Non-player log targets are prefixed (`room:3`).
+- **Newer Servatrice tables (reports 36+, card art 35+, `adminnotes` 30+) are probed** in
+  `capabilities.ts`; pages hide what the schema lacks.
 - **Databases from the old site** are converted by `0001_legacy_import.sql`: its Discord links
   become identities on provider id `discord` (keep that id), and its tables are kept as
   `legacy_chickatrice_*`, outside drizzle-kit's `chickatrice_*` filter. Nothing reads them.

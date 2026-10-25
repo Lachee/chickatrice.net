@@ -1,4 +1,4 @@
-import { datetime, index, int, mysqlTable, serial, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
+import { datetime, index, int, mysqlTable, serial, text, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
 
 /*
  * This site's own tables. Everything it adds to the Servatrice database is
@@ -49,4 +49,24 @@ export const sessions = mysqlTable('chickatrice_sessions', {
 }, (table) => [
   index('chickatrice_sessions_account').on(table.accountId),
   index('chickatrice_sessions_expires').on(table.expiresAt),
+]);
+
+/**
+ * What staff did from the admin pages. Servatrice only notices some of these
+ * (a ban from here is just a row in its bans table), so this is the record of
+ * who did what. Names are copied in, so a line still reads once an account is gone.
+ */
+export const adminLog = mysqlTable('chickatrice_admin_log', {
+  id: serial('id').primaryKey(),
+  actorId: int('actor_id', { unsigned: true }).notNull(),
+  actorName: varchar('actor_name', { length: 35 }).notNull(),
+  /** What was done, e.g. `ban` or `room.update`; see `AdminAction` in server/admin/log.ts. */
+  action: varchar('action', { length: 64 }).notNull(),
+  /** Who or what it was done to: an account's name, or a prefixed id like `room:3`, `report:12`, `ip:…`. */
+  target: varchar('target', { length: 255 }),
+  details: text('details'),
+  createdAt: datetime('created_at', { mode: 'date' }).notNull(),
+}, (table) => [
+  index('chickatrice_admin_log_created').on(table.createdAt),
+  index('chickatrice_admin_log_target').on(table.target),
 ]);

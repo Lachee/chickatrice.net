@@ -13,6 +13,14 @@ statistics, plus self-service accounts.
   link one from their account page.
 - **Account settings** — change the in-game password, set an avatar (uploaded, or copied
   from the provider), and choose a country flag.
+- **Admin tools** (`/admin`, for accounts with a staff flag in `cockatrice_users.admin`) —
+  a dashboard (players, games, traffic, sign-ups, client versions), who's connected now,
+  player lookup with sessions, likely alts, ban/warning history and staff notes; placing
+  and lifting bans, recording warnings, activating accounts and resetting passwords;
+  player reports (schema 36+); chat log and audit search; staff roles and privileges;
+  and the database-held server settings: rooms and game types, the login message, and
+  card art rules. Everything is done the way Servatrice's own moderator commands do it,
+  and logged. Developers get the read-only parts; admins get roles and server settings.
 
 SvelteKit 3 (Svelte 5) + Drizzle on the MySQL database Servatrice uses. The site reads
 and writes Servatrice's own tables (`cockatrice_users` and friends) in the formats

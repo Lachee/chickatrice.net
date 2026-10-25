@@ -107,6 +107,19 @@ const configSchema = z.object({
   cockatrice: z.object({
     /** Servatrice's `database/prefix`. Tables are `<prefix>_users` and so on. */
     prefix: z.string().regex(/^[a-z0-9_]+$/i).default('cockatrice'),
+    /** Servatrice's `server/id`: whose rooms, server message and sessions the admin pages work with. */
+    serverId: z.number().int().min(1).max(255).default(1),
+    /**
+     * Servatrice's `security/trusted_sources`. Its own bans never ban these
+     * addresses (a proxy's, say, which every player would share), and nor do
+     * the admin pages.
+     */
+    trustedSources: z.array(z.string().min(1)).default([ '127.0.0.1', '::1' ]),
+    /** Servatrice's `server/officialwarnings`, without the `|level`s: the reasons offered when warning a player. */
+    officialWarnings: z.array(z.string().min(1)).default([
+      'Abusive Language', 'Calling Out User', 'Causing Drama', 'Cheating', 'Disrespecting Staff', 'Disrupting a Draft',
+      'Inappropriate Avatar', 'Inappropriate Game Name', 'Kicking Without Valid Reason', 'Spamming', 'Targeted Harassment',
+    ]),
     /**
      * How new passwords are stored. `legacy` is the salted SHA-512 every released
      * Servatrice understands; `scrypt` is the verifier format newer Servatrice

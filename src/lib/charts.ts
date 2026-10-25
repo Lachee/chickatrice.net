@@ -28,3 +28,15 @@ export function duration(seconds: number): string {
 	if (m) return `${m}m`;
 	return `${Math.floor(seconds)}s`;
 }
+
+const byteUnits = ['B', 'kB', 'MB', 'GB', 'TB'];
+
+/** 1534 → "1.5 kB", in thousands as network speeds are. */
+export function bytes(value: number): string {
+	let unit = 0;
+	while (Math.abs(value) >= 1000 && unit < byteUnits.length - 1) {
+		value /= 1000;
+		unit++;
+	}
+	return `${unit ? value.toFixed(value < 10 ? 1 : 0) : Math.round(value)} ${byteUnits[unit]}`;
+}

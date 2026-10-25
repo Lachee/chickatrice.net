@@ -22,7 +22,7 @@ const T = {
 const cache = new Map<string, { expires: number; value: Promise<unknown> }>();
 
 /** Memoises `fn` under `key` for `seconds`. A failure is not remembered. */
-function cached<T>(key: string, seconds: number, fn: () => Promise<T>): Promise<T> {
+export function cached<T>(key: string, seconds: number, fn: () => Promise<T>): Promise<T> {
   const hit = cache.get(key);
   if (hit && hit.expires > Date.now())
     return hit.value as Promise<T>;

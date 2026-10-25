@@ -15,6 +15,13 @@
       "when": 1792716386748,
       "tag": "0001_legacy_import",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1792910363809,
+      "tag": "0002_admin_log",
+      "breakpoints": true
     }
   ]
 }
