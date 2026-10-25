@@ -27,8 +27,11 @@ cp .env.example .env                  # then fill in AUTH_SECRET and the provide
 docker compose up --build
 ```
 
-That starts MySQL (seeded with Servatrice's schema on first start) and the site on
-<http://localhost:3000>. Point Servatrice's `[database]` section at the same database.
+That starts MySQL (seeded with Servatrice's schema on first start), Servatrice itself
+on ports 4747 (TCP) and 4748 (WebSocket), and the site on <http://localhost:3000>.
+Servatrice is Cockatrice's own image (`ghcr.io/cockatrice/servatrice`), with its settings
+in `docker/servatrice.ini`. `SERVATRICE_TAG` picks another release, but it must use the
+same schema version as `docker/servatrice.sql` (3.1.1's, version 37).
 
 To run against an existing Servatrice database, only the `app` service (or the image on
 its own) is needed: set `DATABASE_URL`, mount `config.yaml` at `/config/config.yaml`, and

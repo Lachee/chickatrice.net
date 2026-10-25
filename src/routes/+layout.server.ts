@@ -10,6 +10,7 @@ export const load: LayoutServerLoad = async ({ locals, cookies }) => {
 			hasAvatar: account.hasAvatar,
 			hasPassword: account.hasPassword
 		},
-		flash: takeFlash(cookies)
+		flash: takeFlash(cookies),
+		umami: config.umami ?? null
 	};
 };

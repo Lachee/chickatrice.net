@@ -55,6 +55,14 @@ avatar:
   # Raising this past 6 MB needs BODY_SIZE_LIMIT raised too (see server.js).
   # maxUploadBytes: 5242880
 
+# Umami analytics (https://umami.is). Left out, nothing is tracked.
+# umami:
+#   host: https://umami.example.com
+#   websiteId: env:UMAMI_WEBSITE_ID
+#   performance: true    # page load times (Web Vitals)
+#   replays: false       # session replays, which need the recorder script
+#   heatmap: false       # heatmaps, likewise
+
 auth:
   # Auth.js encrypts the sign-in cookies with this. Generate with `openssl rand -hex 32`.
   secret: env:AUTH_SECRET

@@ -5,6 +5,7 @@
 	import * as Avatar from '#lib/components/ui/avatar/index.ts';
 	import * as DropdownMenu from '#lib/components/ui/dropdown-menu/index.ts';
 	import Notice from '#lib/components/Notice.svelte';
+	import Umami from '#lib/components/Umami.svelte';
 	import ActivityIcon from '@lucide/svelte/icons/activity';
 	import HouseIcon from '@lucide/svelte/icons/house';
 	import UserCogIcon from '@lucide/svelte/icons/user-cog';
@@ -21,6 +22,10 @@
 
 	const isActive = (href: string) => (href === '/' ? page.url.pathname === '/' : page.url.pathname.startsWith(href));
 </script>
+
+{#if data.umami}
+	<Umami {...data.umami} />
+{/if}
 
 <svelte:head>
 	<link rel="icon" href="/favicon.ico" />

@@ -149,6 +149,18 @@ const configSchema = z.object({
     /** Largest upload accepted, in bytes, before any resizing. */
     maxUploadBytes: z.number().int().min(1024).default(5 * 1024 * 1024),
   }).prefault({}),
+  /** Umami (https://umami.is) analytics. Left out, nothing is tracked. */
+  umami: z.object({
+    /** Where the Umami instance is served, e.g. `https://umami.example.com`. */
+    host: url().transform((value) => value.replace(/\/+$/, '')),
+    /** The website's id, from its settings in Umami. */
+    websiteId: secret().pipe(z.string().regex(/^[\w-]+$/, 'not a website id')),
+    /** Report page load times (Web Vitals) as well. */
+    performance: z.boolean().default(true),
+    /** Load Umami's recorder for session replays and heatmaps; switch either on in Umami too. */
+    replays: z.boolean().default(false),
+    heatmap: z.boolean().default(false),
+  }).optional(),
   auth: z.object({
     /** Auth.js encrypts the cookies that carry a sign-in to the provider and back with it. Generate with `openssl rand -hex 32`. */
     secret: secret().pipe(z.string().min(32, 'use at least 32 characters')),

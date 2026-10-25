@@ -80,7 +80,7 @@ export async function eraseAccount(account: Pick<Account, 'id' | 'name' | 'admin
     ...CHICKATRICE
   ];
 
-  // Older schemas lack some tables (deck_share is new in 40), and legacy_* only
+  // Older schemas lack some tables (deck_share, for one), and legacy_* only
   // exist where the old site's database was imported. Asking after the column,
   // not just the table, means a schema that differs is skipped rather than fatal.
   const [rows] = await pool.query(
