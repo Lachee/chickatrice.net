@@ -1,9 +1,10 @@
-# Development:  `docker compose up db`, then `pnpm dev` on the host.
+# Development:  `docker compose up db`, then `pnpm dev` on the host. Add
+#               `servatrice` to have a game server to connect to as well.
 # All-in-one:   `docker compose up --build` (the app reads ./config.yaml).
 #
-# The database is the one Servatrice uses: point servatrice.ini's [database]
-# section at it (host db / localhost:3306, database `servatrice`). On first
-# start it is given Servatrice's tables from docker/servatrice.sql.
+# The database is the one Servatrice uses (docker/servatrice.ini points it at
+# host db, database `servatrice`). On first start it is given Servatrice's
+# tables from docker/servatrice.sql.
 
 services:
   db:
@@ -28,6 +29,24 @@ services:
       interval: 5s
       timeout: 5s
       retries: 30
+
+  servatrice:
+    # Cockatrice's own image, published for each stable release. Pinned rather
+    # than :latest: Servatrice refuses to start unless the database has exactly
+    # its schema version, and docker/servatrice.sql is 3.1.1's (37). Moving to a
+    # release with a newer schema needs that file or the migrations updated too.
+    image: ghcr.io/cockatrice/servatrice:${SERVATRICE_TAG:-2026-10-10-Release-3.1.1}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    # Appended to the image's `servatrice --log-to-console`.
+    command: ["--config", "/config/servatrice.ini"]
+    ports:
+      - 4747:4747 # TCP, for desktop clients
+      - 4748:4748 # WebSocket, for webatrice and newer clients
+    volumes:
+      - ./docker/servatrice.ini:/config/servatrice.ini:ro,z
 
   app:
     build: .
