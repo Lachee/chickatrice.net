@@ -27,7 +27,8 @@
 	--card-foreground: #4a4a4a;
 	--popover: #fff;
 	--popover-foreground: #4a4a4a;
-	--primary: #ff6666;
+	/* The old site's #ff6666, a step deeper so white text on it (navbar, hero) holds up. */
+	--primary: oklch(0.63 0.19 22);
 	--primary-foreground: #fff;
 	--secondary: #f5f5f5;
 	--secondary-foreground: #363636;
@@ -49,8 +50,6 @@
 	--map-4: oklch(0.58 0.17 25);
 	--map-5: oklch(0.47 0.15 25);
 	--scrollbar: rgb(0 0 0 / 18%);
-	/* The old site's hero ran #ff3355 → #ff9580; this is a deeper, calmer take on it. */
-	--hero: linear-gradient(141deg, oklch(0.56 0.14 18) 0%, oklch(0.62 0.13 24) 70%, oklch(0.66 0.11 35) 100%);
 	--radius: 0.5rem;
 
 	--success: #257953;
@@ -89,7 +88,6 @@
 	--map-5: oklch(0.76 0.13 25);
 	--scrollbar: oklch(1 0 0 / 14%);
 	--heading: var(--foreground);
-	--hero: var(--card);
 	--radius: 0.6rem;
 
 	--success: oklch(0.74 0.14 155);
@@ -156,4 +154,22 @@
 /* Breaks out of `<main>`'s width to span the window. */
 @utility full-bleed {
 	margin-inline: calc(50% - 50vw);
+}
+
+/*
+ * The home page hero: the primary colour, lit from the top right and shaded
+ * towards the bottom left, so it has depth without a visible stripe.
+ */
+.hero {
+	background:
+		radial-gradient(70% 90% at 90% 0%, oklch(0.76 0.13 45 / 0.55), transparent 70%),
+		radial-gradient(60% 80% at 0% 100%, oklch(0.48 0.17 15 / 0.5), transparent 70%),
+		var(--primary);
+}
+
+/* A faint dot grid over it, fading out away from the top left. */
+@utility hero-dots {
+	background-image: radial-gradient(oklch(1 0 0 / 0.18) 1.2px, transparent 1.6px);
+	background-size: 24px 24px;
+	mask-image: radial-gradient(90% 90% at 15% 20%, black, transparent 75%);
 }

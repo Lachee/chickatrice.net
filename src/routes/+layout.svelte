@@ -51,7 +51,7 @@
 		{#if data.account}
 			<div class="flex items-center">
 				<DropdownMenu.Root>
-					<DropdownMenu.Trigger class="flex items-center gap-2 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-white/60">
+					<DropdownMenu.Trigger class="flex cursor-pointer items-center gap-2 rounded-full outline-none focus-visible:ring-3 focus-visible:ring-white/60">
 						<span class="hidden text-sm sm:inline">{data.account.name}</span>
 						<Avatar.Root class="size-8 ring-2 ring-white/70">
 							{#if data.account.hasAvatar}

@@ -22,31 +22,53 @@
 		return () => clearInterval(timer);
 	});
 
-	// Bulma's "is-inverted is-outlined" buttons: white outline on the hero, filled white on hover.
-	const inverted =
-		'h-11 border-2 border-white bg-transparent px-4 text-base text-white hover:bg-white hover:text-primary dark:bg-transparent dark:border-white';
+	const heroButton = 'h-11 px-4 text-base';
+	// White outline on the hero, filled white on hover (Bulma's "is-inverted is-outlined").
+	const outlined = `${heroButton} border-2 border-white/80 bg-transparent text-white hover:border-white hover:bg-white hover:text-primary dark:bg-transparent dark:border-white/80`;
 </script>
 
-<!-- Like the old site's Bulma hero: full width, coral gradient, filling down to the footer. -->
-<section class="full-bleed flex flex-1 items-center bg-(image:--hero) text-white first:-mt-8 last:-mb-8">
-	<div class="mx-auto grid w-full max-w-6xl gap-8 px-4 py-8 lg:grid-cols-[1fr_24rem] lg:items-center lg:py-10">
+<!--
+	The old site's Bulma hero, filling down to the footer. It's the navbar's colour, so the
+	two read as one surface; the glow, shade and dots are layered on in layout.css.
+-->
+<section class="hero full-bleed relative isolate flex flex-1 items-center overflow-hidden text-white first:-mt-8 last:-mb-8">
+	<div class="hero-dots absolute inset-0 -z-10" aria-hidden="true"></div>
+	<div class="mx-auto grid w-full max-w-6xl grid-cols-1 gap-10 px-4 py-12 lg:grid-cols-[1fr_24rem] lg:items-center lg:py-16">
 		<div>
-			<h1 class="text-5xl font-semibold text-white">Chickatrice</h1>
-			<p class="mt-3 text-2xl font-light sm:text-3xl">{data.site.tagline}</p>
-			<p class="mt-6 max-w-xl text-white/85">
+			<div class="flex items-center gap-5">
+				<!-- The art is a 16px grid: 80/96/112px keep each of its pixels a whole 5/6/7 screen pixels. -->
+				<img
+					src="/logo.png"
+					alt=""
+					width="112"
+					height="112"
+					class="size-20 shrink-0 rounded-[20px] bg-white shadow-[0_12px_30px_-10px_rgb(80_10_10/0.45)] [image-rendering:pixelated] sm:size-24 lg:size-28"
+				/>
+				<div>
+					<h1 class="text-5xl font-bold tracking-tight text-white sm:text-6xl">Chickatrice</h1>
+					<p class="mt-1 text-xl text-white/90 sm:text-2xl">{data.site.tagline}</p>
+				</div>
+			</div>
+			<p class="mt-8 max-w-xl text-lg leading-relaxed text-white/90">
 				A free server for playing Magic: The Gathering with Cockatrice. Sign in to set up your in-game account, then connect from
 				the client.
 			</p>
 			<div class="mt-8 flex flex-wrap gap-3">
-				<Button href="https://cockatrice.github.io/" size="lg" variant="outline" class={inverted} target="_blank" rel="noopener">
+				<Button
+					href="https://cockatrice.github.io/"
+					size="lg"
+					class="{heroButton} bg-white text-primary shadow-[0_8px_20px_-8px_rgb(80_10_10/0.5)] hover:bg-white/90"
+					target="_blank"
+					rel="noopener"
+				>
 					<DownloadIcon /> Get Cockatrice
 				</Button>
 				{#if data.site.discord}
-					<Button href={data.site.discord} size="lg" variant="outline" class={inverted} target="_blank" rel="noopener">
+					<Button href={data.site.discord} size="lg" variant="outline" class={outlined} target="_blank" rel="noopener">
 						<MessageCircleIcon /> Join Discord
 					</Button>
 				{/if}
-				<Button href="/stats" size="lg" variant="ghost" class="h-11 px-4 text-base text-white hover:bg-white/15 hover:text-white">
+				<Button href="/stats" size="lg" variant="ghost" class="{heroButton} text-white hover:bg-white/15 hover:text-white">
 					<ActivityIcon /> Server statistics
 				</Button>
 			</div>
