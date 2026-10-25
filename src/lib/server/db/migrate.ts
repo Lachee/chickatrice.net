@@ -55,6 +55,6 @@ async function appliedCount(pool: mysql.Pool): Promise<number> {
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   // Imported here rather than at the top so the app's own `init` hook, which
   // already holds the config, doesn't make this module depend on it.
-  const { config } = await import('#lib/server/config.js');
+  const { config } = await import('#lib/server/config.ts');
   await migrateDatabase(config.db.url);
 }

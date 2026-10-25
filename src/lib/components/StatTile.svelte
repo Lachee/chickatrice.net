@@ -1,5 +1,5 @@
 <script lang="ts">
-	import * as Card from '#lib/components/ui/card/index.js';
+	import * as Card from '#lib/components/ui/card/index.ts';
 
 	let { label, value, hint }: { label: string; value: string; hint?: string } = $props();
 </script>

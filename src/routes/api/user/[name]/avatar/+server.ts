@@ -1,7 +1,7 @@
 import { createHash } from 'node:crypto';
 import { error } from '@sveltejs/kit';
-import { getAvatar } from '#lib/server/cockatrice/accounts.js';
-import { sniffImageType } from '#lib/server/avatar.js';
+import { getAvatar } from '#lib/server/cockatrice/accounts.ts';
+import { sniffImageType } from '#lib/server/avatar.ts';
 import type { RequestHandler } from './$types';
 
 /** A player's in-game avatar. Public, as it is to anyone connected to the server.  */

@@ -1,6 +1,6 @@
 import { eq, inArray, sql } from 'drizzle-orm';
-import { config } from '#lib/server/config.js';
-import { db, cockatrice } from '#lib/server/db/index.js';
+import { config } from '#lib/server/config.ts';
+import { db, cockatrice } from '#lib/server/db/index.ts';
 import { capabilities } from './capabilities';
 import { hashPassword } from './password';
 import { usernameCandidates } from './username';

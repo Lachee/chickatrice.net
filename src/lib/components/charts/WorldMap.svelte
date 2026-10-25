@@ -3,7 +3,7 @@
 	import { feature } from 'topojson-client';
 	import type { Topology, GeometryCollection } from 'topojson-specification';
 	import world from 'world-atlas/countries-110m.json';
-	import { COUNTRY_BY_NUMERIC, countryName } from '#lib/countries.js';
+	import { COUNTRY_BY_NUMERIC, countryName } from '#lib/countries.ts';
 
 	const WIDTH = 960;
 
@@ -25,7 +25,7 @@
 </script>
 
 <script lang="ts">
-	import { full } from '#lib/charts.js';
+	import { full } from '#lib/charts.ts';
 
 	let {
 		countries,

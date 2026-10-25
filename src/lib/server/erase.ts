@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
-import { config } from '#lib/server/config.js';
-import { db, pool } from '#lib/server/db/index.js';
-import type { Account } from '#lib/server/cockatrice/accounts.js';
+import { config } from '#lib/server/config.ts';
+import { db, pool } from '#lib/server/db/index.ts';
+import type { Account } from '#lib/server/cockatrice/accounts.ts';
 
 /*
  * "Delete my account": the Cockatrice account and everything personal hanging
@@ -18,8 +18,8 @@ import type { Account } from '#lib/server/cockatrice/accounts.js';
  * anyone shed a ban by deleting their account. Games stay too: they're other
  * players' history as well, and only carry names.
  *
- * Staff accounts are refused before getting here: `bans.id_admin` cascades, so
- * deleting one would delete every ban they ever issued.
+ * Accounts that ever issued a ban are refused (see `erasureRefusal`):
+ * `bans.id_admin` cascades, so deleting one would delete every ban it issued.
  */
 
 type Key = 'id' | 'name';
@@ -51,9 +51,29 @@ const CHICKATRICE: [string, string, Key][] = [
   ['legacy_chickatrice_users_backup', 'id', 'id'] // original email
 ];
 
+/**
+ * Why the account can't be deleted from the site, or null if it can. Checking
+ * `admin` alone isn't enough: a moderator who has since been demoted still
+ * has their bans hanging off their id.
+ */
+export async function erasureRefusal(account: Pick<Account, 'id' | 'admin'>): Promise<string | null> {
+  if (account.admin)
+    return "Staff accounts can't be deleted here. Ask the server's admin.";
+
+  const [rows] = await pool.query(
+    `SELECT 1 FROM \`${config.cockatrice.prefix}_bans\` WHERE id_admin = ? LIMIT 1`,
+    [account.id]
+  );
+  if ((rows as unknown[]).length)
+    return "This account has issued bans, which would be deleted with it. Ask the server's admin.";
+
+  return null;
+}
+
 /** Deletes the account and its data. Returns how many rows went, for the log. */
 export async function eraseAccount(account: Pick<Account, 'id' | 'name' | 'admin'>): Promise<number> {
-  if (account.admin) throw new Error(`refusing to erase staff account ${account.name}`);
+  const refusal = await erasureRefusal(account);
+  if (refusal) throw new Error(`refusing to erase ${account.name}: ${refusal}`);
 
   const targets = [
     ...SERVATRICE.map(([table, column, key]): [string, string, Key] => [`${config.cockatrice.prefix}_${table}`, column, key]),

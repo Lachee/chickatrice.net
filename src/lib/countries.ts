@@ -1,6 +1,7 @@
 /** List of every country code and their names */
 export const COUNTRIES: ReadonlyMap<string, string> = new Map([
 	['af', "Afghanistan"],
+	['ax', "Åland Islands"],
 	['al', "Albania"],
 	['dz', "Algeria"],
 	['as', "American Samoa"],
@@ -26,6 +27,7 @@ export const COUNTRIES: ReadonlyMap<string, string> = new Map([
 	['bm', "Bermuda"],
 	['bt', "Bhutan"],
 	['bo', "Bolivia"],
+	['bq', "Bonaire, Sint Eustatius and Saba"],
 	['ba', "Bosnia and Herzegovina"],
 	['bw', "Botswana"],
 	['bv', "Bouvet Island"],
@@ -55,6 +57,7 @@ export const COUNTRIES: ReadonlyMap<string, string> = new Map([
 	['ci', "Cote D'Ivoire"],
 	['hr', "Croatia"],
 	['cu', "Cuba"],
+	['cw', "Curaçao"],
 	['cy', "Cyprus"],
 	['cz', "Czech Republic"],
 	['dk', "Denmark"],
@@ -88,6 +91,7 @@ export const COUNTRIES: ReadonlyMap<string, string> = new Map([
 	['gp', "Guadeloupe"],
 	['gu', "Guam"],
 	['gt', "Guatemala"],
+	['gg', "Guernsey"],
 	['gn', "Guinea"],
 	['gw', "Guinea-Bissau"],
 	['gy', "Guyana"],
@@ -103,10 +107,12 @@ export const COUNTRIES: ReadonlyMap<string, string> = new Map([
 	['ir', "Iran, Islamic Republic of"],
 	['iq', "Iraq"],
 	['ie', "Ireland"],
+	['im', "Isle of Man"],
 	['il', "Israel"],
 	['it', "Italy"],
 	['jm', "Jamaica"],
 	['jp', "Japan"],
+	['je', "Jersey"],
 	['jo', "Jordan"],
 	['kz', "Kazakhstan"],
 	['ke', "Kenya"],
@@ -142,6 +148,7 @@ export const COUNTRIES: ReadonlyMap<string, string> = new Map([
 	['md', "Moldova, Republic of"],
 	['mc', "Monaco"],
 	['mn', "Mongolia"],
+	['me', "Montenegro"],
 	['ms', "Montserrat"],
 	['ma', "Morocco"],
 	['mz', "Mozambique"],
@@ -178,9 +185,11 @@ export const COUNTRIES: ReadonlyMap<string, string> = new Map([
 	['ro', "Romania"],
 	['ru', "Russian Federation"],
 	['rw', "Rwanda"],
+	['bl', "Saint Barthélemy"],
 	['sh', "Saint Helena"],
 	['kn', "Saint Kitts and Nevis"],
 	['lc', "Saint Lucia"],
+	['mf', "Saint Martin (French Part)"],
 	['pm', "Saint Pierre and Miquelon"],
 	['vc', "Saint Vincent and the Grenadines"],
 	['ws', "Samoa"],
@@ -188,16 +197,19 @@ export const COUNTRIES: ReadonlyMap<string, string> = new Map([
 	['st', "Sao Tome and Principe"],
 	['sa', "Saudi Arabia"],
 	['sn', "Senegal"],
+	['rs', "Serbia"],
 	['cs', "Serbia and Montenegro"],
 	['sc', "Seychelles"],
 	['sl', "Sierra Leone"],
 	['sg', "Singapore"],
+	['sx', "Sint Maarten (Dutch Part)"],
 	['sk', "Slovakia"],
 	['si', "Slovenia"],
 	['sb', "Solomon Islands"],
 	['so', "Somalia"],
 	['za', "South Africa"],
 	['gs', "South Georgia and the South Sandwich Islands"],
+	['ss', "South Sudan"],
 	['es', "Spain"],
 	['lk', "Sri Lanka"],
 	['sd', "Sudan"],
@@ -255,9 +267,9 @@ export function countryName(code: string | null | undefined): string {
 
 /**
  * ISO 3166-1 numeric codes (what world-atlas keys its shapes by) back to our
- * alpha-2 codes. Generated from i18n-iso-countries for the codes above; `cs`
- * (Serbia and Montenegro) covers both of today's shapes, and `an` (Netherlands
- * Antilles) has none.
+ * alpha-2 codes. Generated from i18n-iso-countries for the codes above. The
+ * retired `cs` (Serbia and Montenegro) and `an` (Netherlands Antilles) are kept
+ * for accounts that still have them, but have no shape of their own.
  */
 const NUMERIC =
 	'af:004 al:008 dz:012 as:016 ad:020 ao:024 ai:660 aq:010 ag:028 ar:032 am:051 aw:533 au:036 at:040 ' +
@@ -276,8 +288,8 @@ const NUMERIC =
 	'ws:882 sm:674 st:678 sa:682 sn:686 sc:690 sl:694 sg:702 sk:703 si:705 sb:090 so:706 za:710 gs:239 ' +
 	'es:724 lk:144 sd:729 sr:740 sj:744 sz:748 se:752 ch:756 sy:760 tw:158 tj:762 tz:834 th:764 tl:626 ' +
 	'tg:768 tk:772 to:776 tt:780 tn:788 tr:792 tm:795 tc:796 tv:798 ug:800 ua:804 ae:784 gb:826 us:840 ' +
-	'um:581 uy:858 uz:860 vu:548 ve:862 vn:704 vg:092 vi:850 wf:876 eh:732 ye:887 zm:894 zw:716 cs:688 ' +
-	'cs:499';
+	'um:581 uy:858 uz:860 vu:548 ve:862 vn:704 vg:092 vi:850 wf:876 eh:732 ye:887 zm:894 zw:716 rs:688 ' +
+	'me:499 ss:728 ax:248 bl:652 bq:535 cw:531 gg:831 im:833 je:832 mf:663 sx:534';
 
 export const COUNTRY_BY_NUMERIC: ReadonlyMap<string, string> = new Map(
 	[...NUMERIC.matchAll(/([a-z]{2}):(\d{3})/g)].map(([, alpha2, numeric]) => [numeric, alpha2])

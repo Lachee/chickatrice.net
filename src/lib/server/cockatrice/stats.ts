@@ -1,5 +1,5 @@
-import { config } from '#lib/server/config.js';
-import { pool } from '#lib/server/db/index.js';
+import { config } from '#lib/server/config.ts';
+import { pool } from '#lib/server/db/index.ts';
 
 /*
  * Server statistics, read from the tables Servatrice keeps for itself. Every
@@ -35,10 +35,21 @@ function cached<T>(key: string, seconds: number, fn: () => Promise<T>): Promise<
   return value;
 }
 
+/**
+ * `cockatrice_games` has no index on `time_started`, and Servatrice's tables
+ * aren't ours to index. Ids only grow, so once a query has found the first game
+ * in its window, a later window (which starts no earlier) can start from that id
+ * and use the primary key. Only the first query after a restart scans.
+ */
+let firstRecentGameId = 0;
+
 async function rows<T>(query: string, params: unknown[] = []): Promise<T[]> {
   const [ result ] = await pool.query(query, params);
   return result as T[];
 }
+
+/** What to show when the database can't be asked. */
+export const UNKNOWN_STATUS: LiveStatus = { online: false, uptime: 0, users: 0, games: 0, moderators: 0, reportedAt: null, age: null };
 
 export type LiveStatus = {
   online: boolean;
@@ -61,7 +72,7 @@ export function getLiveStatus(): Promise<LiveStatus> {
       FROM ${T.uptime} ORDER BY timest DESC LIMIT 1`);
 
     if (!latest)
-      return { online: false, uptime: 0, users: 0, games: 0, moderators: 0, reportedAt: null, age: null };
+      return UNKNOWN_STATUS;
 
     const online = Number(latest.age) <= config.stats.offlineAfterSeconds;
     return {
@@ -84,13 +95,15 @@ export const RANGES = {
 } as const;
 export type Range = keyof typeof RANGES;
 
+export const isRange = (value: string | null): value is Range => value !== null && Object.hasOwn(RANGES, value);
+
 export type HistoryPoint = {
   /** Epoch seconds at the start of the bucket. */
   t: number;
   /** Peaks within the bucket — a busy moment shouldn't be averaged away. */
   users: number;
   games: number;
-  /** Fraction of the bucket the server was reporting in, 0–1. */
+  /** Fraction of the bucket (so far, for the last one) the server was reporting in, 0–1. */
   availability: number;
 };
 
@@ -119,11 +132,13 @@ export function getHistory(range: Range): Promise<HistoryPoint[]> {
     const points: HistoryPoint[] = [];
     for (let t = start; t <= end; t += bucket) {
       const row = byBucket.get(t);
+      // The last bucket is still filling up: judge it on the part that has happened.
+      const due = t === end ? Math.max(1, (now - end) / 15) : expected;
       points.push({
         t,
         users: Number(row?.users ?? 0),
         games: Number(row?.games ?? 0),
-        availability: Math.min(1, Number(row?.reports ?? 0) / expected),
+        availability: Math.min(1, Number(row?.reports ?? 0) / due),
       });
     }
     return points;
@@ -147,13 +162,17 @@ export function getDaily(): Promise<DailyPoint[]> {
         FROM ${T.sessions}
         WHERE start_time >= CURDATE() - INTERVAL ? DAY
         GROUP BY day`, [ days - 1 ]),
-      rows<{ day: string; n: number }>(`
-        SELECT DATE_FORMAT(time_started, '%Y-%m-%d') AS day, COUNT(*) AS n
+      rows<{ day: string; n: number; first: number }>(`
+        SELECT DATE_FORMAT(time_started, '%Y-%m-%d') AS day, COUNT(*) AS n, MIN(id) AS first
         FROM ${T.games}
-        WHERE time_started >= CURDATE() - INTERVAL ? DAY
-        GROUP BY day`, [ days - 1 ]),
+        WHERE id >= ? AND time_started >= CURDATE() - INTERVAL ? DAY
+        GROUP BY day`, [ firstRecentGameId, days - 1 ]),
       rows<{ today: string }>(`SELECT DATE_FORMAT(CURDATE(), '%Y-%m-%d') AS today`),
     ]);
+
+    // No games in the window means none before the next one either, so that's where to start.
+    const [ next ] = games.length ? [] : await rows<{ next: number }>(`SELECT COALESCE(MAX(id), 0) + 1 AS next FROM ${T.games}`);
+    firstRecentGameId = Math.max(firstRecentGameId, next ? Number(next.next) : Math.min(...games.map((row) => Number(row.first))));
 
     const playersByDay = new Map(players.map((row) => [ row.day, Number(row.n) ]));
     const gamesByDay = new Map(games.map((row) => [ row.day, Number(row.n) ]));
@@ -206,7 +225,8 @@ export function getTotals(): Promise<Totals> {
     const [ [ accounts ], [ active ], [ today ], [ peak ] ] = await Promise.all([
       rows<{ n: number }>(`SELECT COUNT(*) AS n FROM ${T.users} WHERE active = 1`),
       rows<{ n: number }>(`SELECT COUNT(DISTINCT user_name) AS n FROM ${T.sessions} WHERE start_time >= NOW() - INTERVAL 30 DAY`),
-      rows<{ n: number }>(`SELECT COUNT(*) AS n FROM ${T.games} WHERE time_started >= CURDATE()`),
+      // Today is inside getDaily's window, so its starting point holds here too.
+      rows<{ n: number }>(`SELECT COUNT(*) AS n FROM ${T.games} WHERE id >= ? AND time_started >= CURDATE()`, [ firstRecentGameId ]),
       rows<{ n: number | null }>(`SELECT MAX(users_count) AS n FROM ${T.uptime} WHERE timest >= NOW() - INTERVAL 30 DAY`),
     ]);
     return {

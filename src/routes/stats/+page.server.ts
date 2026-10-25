@@ -1,4 +1,4 @@
-import { config } from '#lib/server/config.js';
+import { config } from '#lib/server/config.ts';
 import {
 	RANGES,
 	getCountries,
@@ -6,11 +6,10 @@ import {
 	getHistory,
 	getLiveStatus,
 	getTotals,
+	isRange,
 	type Range
-} from '#lib/server/cockatrice/stats.js';
+} from '#lib/server/cockatrice/stats.ts';
 import type { PageServerLoad } from './$types';
-
-const isRange = (value: string | null): value is Range => value !== null && value in RANGES;
 
 export const load: PageServerLoad = async ({ url }) => {
 	const param = url.searchParams.get('range');

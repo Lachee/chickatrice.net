@@ -36,3 +36,21 @@ export class RateLimiter {
       if (entry.resetAt <= now) this.hits.delete(key);
   }
 }
+
+/**
+ * The key an address is limited under. IPv6 addresses are taken by their /64:
+ * that is what one home or server gets, so anyone could rotate through a
+ * fresh address per attempt otherwise.
+ */
+export function addressKey(address: string): string {
+  const ip = address.split('%')[0]; // zone index, on link-local addresses
+  if (!ip.includes(':')) return ip;
+  const mapped = ip.match(/^::ffff:(\d+\.\d+\.\d+\.\d+)$/i);
+  if (mapped) return mapped[1];
+
+  const [ head, tail ] = ip.split('::');
+  const left = head ? head.split(':') : [];
+  const right = tail ? tail.split(':') : [];
+  const groups = tail === undefined ? left : [ ...left, ...Array(8 - left.length - right.length).fill('0'), ...right ];
+  return groups.slice(0, 4).map((group) => parseInt(group, 16).toString(16)).join(':') + '::/64';
+}

@@ -1,8 +1,9 @@
 import { building, dev } from '$app/env';
-import { pool } from '#lib/server/db/index.js';
-import { withLock } from '#lib/server/db/lock.js';
+import { pool } from '#lib/server/db/index.ts';
+import { withLock } from '#lib/server/db/lock.ts';
 
-import PruneSessions from '#lib/server/cron/PruneSessions.js';
+import PruneOrphans from '#lib/server/cron/PruneOrphans.ts';
+import PruneSessions from '#lib/server/cron/PruneSessions.ts';
 
 export type CronJob = {
   name: string;
@@ -15,6 +16,7 @@ export type CronJob = {
 };
 
 const jobs: CronJob[] = [
+  PruneOrphans,
   PruneSessions,
 ];
 

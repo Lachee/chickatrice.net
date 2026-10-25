@@ -1,8 +1,8 @@
 import { SvelteKitAuth } from '@auth/sveltekit';
 import type { Provider } from '@auth/sveltekit/providers';
 import { getRequestEvent } from '$app/server';
-import { config, type AuthProviderConfig } from '#lib/server/config.js';
-import { findAccountById } from '#lib/server/cockatrice/accounts.js';
+import { config, type AuthProviderConfig } from '#lib/server/config.ts';
+import { findAccountById } from '#lib/server/cockatrice/accounts.ts';
 import { adapter } from './adapter';
 import { findIdentity, hasProvider, refreshIdentity, type ProfileDetails } from './identities';
 import { SESSION_MAX_AGE, sessionAccountId } from './session';
@@ -133,7 +133,9 @@ export const { handle } = SvelteKitAuth({
       if (!account) return false;
 
       const { cookies, url } = getRequestEvent();
-      const current = await sessionAccountId(cookies, url);
+      // A session left over from an account Servatrice's admins deleted counts as none.
+      const sessionAccount = await sessionAccountId(cookies, url);
+      const current = sessionAccount !== null && await findAccountById(sessionAccount) ? sessionAccount : null;
       const identity = await findIdentity(account.provider, account.providerAccountId);
       const owner = identity && await findAccountById(identity.accountId);
 

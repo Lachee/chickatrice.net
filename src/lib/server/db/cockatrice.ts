@@ -1,5 +1,5 @@
 import { char, customType, datetime, int, mysqlEnum, mysqlTable, text, tinyint, varchar } from 'drizzle-orm/mysql-core';
-import { config } from '#lib/server/config.js';
+import { config } from '#lib/server/config.ts';
 
 /*
  * == NOTICE ==

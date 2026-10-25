@@ -6,7 +6,7 @@ declare global {
 		// interface Error {}
 		interface Locals {
 			/** The Cockatrice account signed in, resolved in `hooks.server.ts`. Null when signed out. */
-			account: import('#lib/server/cockatrice/accounts.js').Account | null;
+			account: import('#lib/server/cockatrice/accounts.ts').Account | null;
 		}
 		// interface PageData {}
 		// interface PageState {}

@@ -12,6 +12,10 @@ import http from 'node:http';
 import process from 'node:process';
 
 const origin = process.env.ORIGIN ? new URL(process.env.ORIGIN) : null;
+
+// adapter-node turns away bodies over 512K, well under config.yaml's
+// avatar.maxUploadBytes (5 MB by default). Raise it if that is raised.
+process.env.BODY_SIZE_LIMIT ??= '6M';
 if (origin) {
 	process.env.PROTOCOL_HEADER = 'x-forwarded-proto';
 	process.env.HOST_HEADER = 'x-forwarded-host';

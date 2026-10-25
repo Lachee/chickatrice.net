@@ -1,5 +1,5 @@
 import type { Cookies } from '@sveltejs/kit';
-import type { Flash } from '#lib/flash.js';
+import type { Flash } from '#lib/flash.ts';
 
 const COOKIE = 'chickatrice_flash';
 

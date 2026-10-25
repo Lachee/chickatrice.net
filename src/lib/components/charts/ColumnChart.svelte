@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { compact, full, niceTicks } from '#lib/charts.js';
+	import { compact, full, niceTicks } from '#lib/charts.ts';
 
 	type Column = { day: string; v: number };
 

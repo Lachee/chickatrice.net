@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { enhance, type SubmitFunction } from '$app/forms';
-	import { Button } from '#lib/components/ui/button/index.js';
-	import { Input } from '#lib/components/ui/input/index.js';
-	import { Label } from '#lib/components/ui/label/index.js';
-	import { Badge } from '#lib/components/ui/badge/index.js';
-	import * as Card from '#lib/components/ui/card/index.js';
-	import * as Avatar from '#lib/components/ui/avatar/index.js';
+	import { Button } from '#lib/components/ui/button/index.ts';
+	import { Input } from '#lib/components/ui/input/index.ts';
+	import { Label } from '#lib/components/ui/label/index.ts';
+	import { Badge } from '#lib/components/ui/badge/index.ts';
+	import * as Card from '#lib/components/ui/card/index.ts';
+	import * as Avatar from '#lib/components/ui/avatar/index.ts';
 	import Notice from '#lib/components/Notice.svelte';
 	import ProviderIcon from '#lib/components/ProviderIcon.svelte';
-	import { flag } from '#lib/countries.js';
+	import { flag } from '#lib/countries.ts';
 	import KeyRoundIcon from '@lucide/svelte/icons/key-round';
 	import ImageIcon from '@lucide/svelte/icons/image';
 	import LinkIcon from '@lucide/svelte/icons/link';
@@ -250,8 +250,8 @@
 		</Card.Header>
 		<Card.Content class="space-y-4">
 			{@render result('deleteAccount')}
-			{#if profile.isStaff}
-				<Notice type="info">Staff accounts can't be deleted here, since the bans they issued would go with them. Ask the server's admin.</Notice>
+			{#if profile.deleteRefusal}
+				<Notice type="info">{profile.deleteRefusal}</Notice>
 			{:else if !confirmingDelete}
 				<Button variant="destructive" onclick={() => (confirmingDelete = true)}><Trash2Icon /> Delete account…</Button>
 			{:else}

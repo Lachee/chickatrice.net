@@ -1,15 +1,15 @@
 import { fail, redirect } from '@sveltejs/kit';
-import { config } from '#lib/server/config.js';
-import { COUNTRIES } from '#lib/countries.js';
-import { requireAccount } from '#lib/server/auth/guard.js';
-import { enabledProviders, providerIcon, providerName } from '#lib/server/auth/index.js';
-import { listIdentities, unlinkProvider } from '#lib/server/auth/identities.js';
-import { destroyOtherSessions, sessionCookieName } from '#lib/server/auth/session.js';
-import { findAccountByName, setAvatar, setCountry, setPassword } from '#lib/server/cockatrice/accounts.js';
-import { verifyPassword } from '#lib/server/cockatrice/password.js';
-import { setFlash } from '#lib/server/flash.js';
-import { AvatarError, encodeAvatar, fetchAvatar } from '#lib/server/avatar.js';
-import { eraseAccount } from '#lib/server/erase.js';
+import { config } from '#lib/server/config.ts';
+import { COUNTRIES } from '#lib/countries.ts';
+import { requireAccount } from '#lib/server/auth/guard.ts';
+import { enabledProviders, providerIcon, providerName } from '#lib/server/auth/index.ts';
+import { listIdentities, unlinkProvider } from '#lib/server/auth/identities.ts';
+import { destroyOtherSessions, sessionCookieName } from '#lib/server/auth/session.ts';
+import { findAccountByName, setAvatar, setCountry, setPassword } from '#lib/server/cockatrice/accounts.ts';
+import { verifyPassword } from '#lib/server/cockatrice/password.ts';
+import { setFlash } from '#lib/server/flash.ts';
+import { AvatarError, encodeAvatar, fetchAvatar } from '#lib/server/avatar.ts';
+import { eraseAccount, erasureRefusal } from '#lib/server/erase.ts';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
@@ -41,7 +41,7 @@ export const load: PageServerLoad = async (event) => {
 			hasPassword: account.hasPassword,
 			hasAvatar: account.hasAvatar,
 			registeredAt: account.registeredAt.toISOString(),
-			isStaff: account.admin !== 0
+			deleteRefusal: await erasureRefusal(account)
 		},
 		identities: identities.map((identity) => ({
 			provider: identity.provider,
@@ -160,7 +160,11 @@ export const actions: Actions = {
 					: 'This is your only way to sign in, so it cannot be unlinked.'
 			});
 
-		await unlinkProvider(account.id, provider);
+		// Checked again under a lock, in case another unlink got there first.
+		if (!(await unlinkProvider(account.id, provider, remaining.length === 0)))
+			return fail(400, { action: 'providers', error: 'This is your only way to sign in, so it cannot be unlinked.' });
+		// Whoever signed in with it elsewhere (it may be why it's being unlinked) is signed out.
+		await destroyOtherSessions(account.id, event.cookies, event.url, provider);
 		return {
 			action: 'providers',
 			message: remaining.length
@@ -173,9 +177,9 @@ export const actions: Actions = {
 		const account = requireAccount(event);
 		const form = await event.request.formData();
 
-		// See erase.ts: a staff account's bans would go with it.
-		if (account.admin !== 0)
-			return fail(400, { action: 'deleteAccount', error: "Staff accounts can't be deleted here. Ask the server's admin." });
+		// See erase.ts: bans the account issued would go with it.
+		const refusal = await erasureRefusal(account);
+		if (refusal) return fail(400, { action: 'deleteAccount', error: refusal });
 		if (String(form.get('confirmName') ?? '') !== account.name)
 			return fail(400, { action: 'deleteAccount', error: `Type ${account.name} exactly to confirm.` });
 

@@ -1,5 +1,5 @@
-import { config } from '#lib/server/config.js';
-import { pool } from '#lib/server/db/index.js';
+import { config } from '#lib/server/config.ts';
+import { pool } from '#lib/server/db/index.ts';
 
 /**
  * Which optional `cockatrice_users` columns this database has. Servatrice adds

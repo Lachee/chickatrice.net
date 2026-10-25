@@ -2,7 +2,7 @@ import { drizzle } from 'drizzle-orm/mysql2';
 import mysql from 'mysql2/promise';
 import * as chickatrice from './chickatrice.schema';
 import * as cockatrice from './cockatrice';
-import { config } from '#lib/server/config.js';
+import { config } from '#lib/server/config.ts';
 
 /**
  * `timezone: 'Z'` makes mysql2 read and write DATETIMEs as UTC, matching

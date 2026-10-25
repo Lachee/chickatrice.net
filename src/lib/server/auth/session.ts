@@ -1,8 +1,8 @@
 import { createHash, randomBytes } from 'node:crypto';
 import type { Cookies } from '@sveltejs/kit';
 import { and, eq, gt, lte, ne, sql } from 'drizzle-orm';
-import { config } from '#lib/server/config.js';
-import { db, chickatrice } from '#lib/server/db/index.js';
+import { config } from '#lib/server/config.ts';
+import { db, chickatrice } from '#lib/server/db/index.ts';
 
 /*
  * Sign-ins are Auth.js database sessions: an opaque random token in a cookie,
@@ -85,12 +85,13 @@ export async function sessionAccountId(cookies: Cookies, url: URL): Promise<numb
   return token ? (await findSession(token))?.accountId ?? null : null;
 }
 
-/** Signs the account out of every browser except this one. */
-export async function destroyOtherSessions(accountId: number, cookies: Cookies, url: URL) {
+/** Signs the account out of every browser except this one; only those signed in by `method`, if given. */
+export async function destroyOtherSessions(accountId: number, cookies: Cookies, url: URL, method?: string) {
   const token = cookies.get(sessionCookieName(url));
   await db.delete(sessions).where(and(
     eq(sessions.accountId, accountId),
-    token ? ne(sessions.id, hashToken(token)) : sql`TRUE`,
+    method ? eq(sessions.method, method) : undefined,
+    token ? ne(sessions.id, hashToken(token)) : undefined,
   ));
 }
 

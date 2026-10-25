@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { full } from '#lib/charts.js';
-	import { countryName, flag } from '#lib/countries.js';
+	import { full } from '#lib/charts.ts';
+	import { countryName, flag } from '#lib/countries.ts';
 
 	let {
 		countries: all,

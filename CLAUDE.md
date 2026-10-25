@@ -42,7 +42,7 @@ The original PHP site lives on `master` / `v1.0.0` — useful for how things use
 
 ## Gotchas (SvelteKit 3)
 
-- **`$lib` is gone; use `#lib/...` with an explicit `.js` extension** (`#lib/server/db/index.js`
+- **`$lib` is gone; use `#lib/...` with an explicit `.ts` extension** (`#lib/server/db/index.ts`
   for directories). Without the extension TypeScript can't resolve it.
 - `$app/environment` → `$app/env`; `$env/*` → `$app/env/private` with variables declared in
   `src/env.ts`. Everything else is in `config.yaml` (`#lib/server/config.ts`), and `env:NAME`

@@ -52,6 +52,7 @@ stats:
 avatar:
   # Avatars are cropped square, scaled to this many pixels and stored as PNG.
   # size: 256
+  # Raising this past 6 MB needs BODY_SIZE_LIMIT raised too (see server.js).
   # maxUploadBytes: 5242880
 
 auth:

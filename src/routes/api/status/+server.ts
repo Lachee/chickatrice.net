@@ -1,4 +1,4 @@
-import { getLiveStatus } from '#lib/server/cockatrice/stats.js';
+import { getLiveStatus } from '#lib/server/cockatrice/stats.ts';
 import type { RequestHandler } from './$types';
 
 /** The server's current status, for bots and other sites. */

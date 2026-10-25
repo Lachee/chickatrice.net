@@ -5,6 +5,8 @@ RUN corepack enable
 WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml .npmrc ./
+# pnpm-workspace.yaml's patchedDependencies are read during install.
+COPY patches ./patches
 RUN pnpm install --frozen-lockfile
 
 COPY . .

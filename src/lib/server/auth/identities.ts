@@ -1,5 +1,5 @@
 import { and, asc, eq } from 'drizzle-orm';
-import { db, chickatrice } from '#lib/server/db/index.js';
+import { db, chickatrice } from '#lib/server/db/index.ts';
 
 /*
  * Provider sign-ins linked to Cockatrice accounts: Auth.js' "accounts", kept in
@@ -56,8 +56,20 @@ export async function deleteIdentity(id: number) {
   await db.delete(identities).where(eq(identities.id, id));
 }
 
-export async function unlinkProvider(accountId: number, provider: string): Promise<boolean> {
-  const [ result ] = await db.delete(identities)
-    .where(and(eq(identities.accountId, accountId), eq(identities.provider, provider)));
-  return result.affectedRows > 0;
+/**
+ * Removes the account's link to `provider`. Unless `mayBeLast`, refuses (returns
+ * false) when it is the account's only link. The links are locked while that's
+ * decided, so two unlinks at once can't each leave the other one's behind.
+ */
+export async function unlinkProvider(accountId: number, provider: string, mayBeLast: boolean): Promise<boolean> {
+  return db.transaction(async (tx) => {
+    const linked = await tx.select({ provider: identities.provider }).from(identities)
+      .where(eq(identities.accountId, accountId))
+      .for('update');
+    if (!linked.some((row) => row.provider === provider)) return false;
+    if (linked.length === 1 && !mayBeLast) return false;
+
+    await tx.delete(identities).where(and(eq(identities.accountId, accountId), eq(identities.provider, provider)));
+    return true;
+  });
 }

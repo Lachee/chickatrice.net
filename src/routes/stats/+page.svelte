@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { navigating } from '$app/state';
-	import * as Card from '#lib/components/ui/card/index.js';
+	import * as Card from '#lib/components/ui/card/index.ts';
 	import StatTile from '#lib/components/StatTile.svelte';
 	import StatusBadge from '#lib/components/StatusBadge.svelte';
 	import LineChart from '#lib/components/charts/LineChart.svelte';
 	import ColumnChart from '#lib/components/charts/ColumnChart.svelte';
 	import CountryBars from '#lib/components/charts/CountryBars.svelte';
 	import WorldMap from '#lib/components/charts/WorldMap.svelte';
-	import { compact, duration, full } from '#lib/charts.js';
+	import { compact, duration, full } from '#lib/charts.ts';
 	import type { PageProps } from './$types';
 
 	let { data }: PageProps = $props();

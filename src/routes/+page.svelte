@@ -1,12 +1,12 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { invalidate } from '$app/navigation';
-	import { Button } from '#lib/components/ui/button/index.js';
-	import * as Card from '#lib/components/ui/card/index.js';
+	import { Button } from '#lib/components/ui/button/index.ts';
+	import * as Card from '#lib/components/ui/card/index.ts';
 	import StatusBadge from '#lib/components/StatusBadge.svelte';
 	import CopyField from '#lib/components/CopyField.svelte';
 	import LineChart from '#lib/components/charts/LineChart.svelte';
-	import { duration, full } from '#lib/charts.js';
+	import { duration, full } from '#lib/charts.ts';
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import MessageCircleIcon from '@lucide/svelte/icons/message-circle';
 	import ActivityIcon from '@lucide/svelte/icons/activity';

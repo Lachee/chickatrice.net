@@ -1,9 +1,9 @@
 <script lang="ts">
 	import './layout.css';
 	import { page } from '$app/state';
-	import { Button } from '#lib/components/ui/button/index.js';
-	import * as Avatar from '#lib/components/ui/avatar/index.js';
-	import * as DropdownMenu from '#lib/components/ui/dropdown-menu/index.js';
+	import { Button } from '#lib/components/ui/button/index.ts';
+	import * as Avatar from '#lib/components/ui/avatar/index.ts';
+	import * as DropdownMenu from '#lib/components/ui/dropdown-menu/index.ts';
 	import Notice from '#lib/components/Notice.svelte';
 	import ActivityIcon from '@lucide/svelte/icons/activity';
 	import HouseIcon from '@lucide/svelte/icons/house';

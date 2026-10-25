@@ -12,15 +12,17 @@ services:
     # Servatrice refuses to start against a server in strict mode, and its
     # schema's zero-date defaults need it off too.
     command: ["--sql-mode=NO_ENGINE_SUBSTITUTION"]
+    # Only on this machine: the root password below has a well-known default.
     ports:
-      - 3306:3306
+      - 127.0.0.1:3306:3306
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-mysecretpassword}
       MYSQL_DATABASE: servatrice
     volumes:
       - servatrice-db:/var/lib/mysql
-      - ./docker/backup.sql.gz:/docker-entrypoint-initdb.d/01-servatrice.sql.gz:ro,z
-#      - ./docker/servatrice.sql:/docker-entrypoint-initdb.d/01-servatrice.sql:ro,z
+      - ./docker/servatrice.sql:/docker-entrypoint-initdb.d/01-servatrice.sql:ro,z
+      # Or start from a dump of a live server instead (git ignores docker/*.sql.gz):
+      # - ./docker/backup.sql.gz:/docker-entrypoint-initdb.d/01-servatrice.sql.gz:ro,z
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-p${MYSQL_ROOT_PASSWORD:-mysecretpassword}"]
       interval: 5s

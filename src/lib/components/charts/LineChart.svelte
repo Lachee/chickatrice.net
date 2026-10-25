@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { compact, full, niceTicks } from '#lib/charts.js';
+	import { compact, full, niceTicks } from '#lib/charts.ts';
 
 	type Point = { t: number; v: number };
 

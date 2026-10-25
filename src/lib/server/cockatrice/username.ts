@@ -1,4 +1,4 @@
-import type { UsernameRules } from '#lib/server/config.js';
+import type { UsernameRules } from '#lib/server/config.ts';
 
 /*
  * Servatrice's `usernameIsValid` (servatrice_database_interface.cpp), and a way
@@ -66,11 +66,21 @@ export function usernameStem(raw: string, rules: UsernameRules): string {
  * then the stem with 1, 2, 3, … on the end, trimmed so the number always fits.
  * A stem under the minimum length is zero-padded (`bob` → `bob001`). Only names
  * Servatrice would accept are yielded; whether they are free is for the caller.
+ * When `raw` can't be made into any (say a disallowed pattern matches every
+ * form of it), the names come from `fallback` instead.
  */
 export function* usernameCandidates(raw: string, rules: UsernameRules, fallback = 'player'): Generator<string> {
-  let stem = usernameStem(raw, rules);
-  if (!stem) stem = usernameStem(fallback, rules);
+  let any = false;
+  const stem = usernameStem(raw, rules);
+  if (stem)
+    for (const candidate of numbered(stem, rules)) {
+      any = true;
+      yield candidate;
+    }
+  if (!any) yield* numbered(usernameStem(fallback, rules), rules);
+}
 
+function* numbered(stem: string, rules: UsernameRules): Generator<string> {
   // Without digits there's no way to tell two of the same name apart.
   const limit = rules.allowNumerics ? 100_000 : 1;
   for (let i = 0; i < limit; i++) {

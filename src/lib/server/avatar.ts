@@ -1,5 +1,7 @@
+import { lookup } from 'node:dns/promises';
+import { BlockList, isIP } from 'node:net';
 import sharp from 'sharp';
-import { config } from '#lib/server/config.js';
+import { config } from '#lib/server/config.ts';
 
 /*
  * Despite the column being `avatar_bmp`, Cockatrice loads the avatar with Qt's
@@ -14,11 +16,14 @@ export async function encodeAvatar(input: Buffer): Promise<Buffer> {
   if (input.length > config.avatar.maxUploadBytes)
     throw new AvatarError(`That image is too big — the limit is ${Math.floor(config.avatar.maxUploadBytes / 1024 / 1024)} MB.`);
 
-  const size = config.avatar.size;
   try {
-    return await sharp(input, { animated: false, limitInputPixels: 50_000_000 })
+    const image = sharp(input, { animated: false, limitInputPixels: 50_000_000 });
+    // Never enlarged, but always square: a small picture is cropped to its shorter side.
+    const { width = 0, height = 0 } = await image.metadata();
+    const side = Math.min(config.avatar.size, width, height);
+    return await image
       .rotate() // honour EXIF orientation from phone cameras
-      .resize(size, size, { fit: 'cover', position: 'attention', withoutEnlargement: true })
+      .resize(side, side, { fit: 'cover', position: 'attention' })
       .png({ compressionLevel: 9 })
       .toBuffer();
   } catch {
@@ -26,27 +31,70 @@ export async function encodeAvatar(input: Buffer): Promise<Buffer> {
   }
 }
 
+/** Addresses a provider's picture may not point the server at: its own network. */
+const PRIVATE = new BlockList();
+for (const [ address, prefix ] of [ [ '0.0.0.0', 8 ], [ '10.0.0.0', 8 ], [ '100.64.0.0', 10 ], [ '127.0.0.0', 8 ], [ '169.254.0.0', 16 ], [ '172.16.0.0', 12 ], [ '192.168.0.0', 16 ], [ '224.0.0.0', 3 ] ] as const)
+  PRIVATE.addSubnet(address, prefix, 'ipv4');
+// IPv4-mapped addresses (::ffff:10.0.0.1) are held to the rules above by BlockList itself.
+for (const [ address, prefix ] of [ [ '::', 127 ], [ 'fc00::', 7 ], [ 'fe80::', 10 ], [ 'ff00::', 8 ] ] as const)
+  PRIVATE.addSubnet(address, prefix, 'ipv6');
+
+const MAX_REDIRECTS = 3;
+const downloadFailed = () => new AvatarError('The provider’s picture could not be downloaded.');
+
+/** Refuses anything but https to a public address. */
+async function checkTarget(url: URL) {
+  if (url.protocol !== 'https:')
+    throw new AvatarError('The provider’s picture is not served over https.');
+  const host = url.hostname.replace(/^\[|\]$/g, '');
+  const addresses = isIP(host) ? [ { address: host, family: isIP(host) } ] : await lookup(host, { all: true }).catch(() => { throw downloadFailed(); });
+  if (addresses.some(({ address, family }) => PRIVATE.check(address, family === 6 ? 'ipv6' : 'ipv4')))
+    throw downloadFailed();
+}
+
 /** Downloads the picture a provider gave for the user, for "use my provider's avatar". */
 export async function fetchAvatar(url: string): Promise<Buffer> {
-  let parsed: URL;
+  let target: URL;
   try {
-    parsed = new URL(url);
+    target = new URL(url);
   } catch {
     throw new AvatarError('The provider gave an invalid picture address.');
   }
-  if (parsed.protocol !== 'https:')
-    throw new AvatarError('The provider’s picture is not served over https.');
 
-  const response = await fetch(parsed, { signal: AbortSignal.timeout(10_000), redirect: 'follow' })
-    .catch(() => { throw new AvatarError('The provider’s picture could not be downloaded.'); });
-  if (!response.ok)
-    throw new AvatarError(`The provider’s picture could not be downloaded (${response.status}).`);
+  // The provider's user may control this address, so each hop is checked before it's fetched.
+  const signal = AbortSignal.timeout(10_000);
+  let response: Response;
+  for (let hops = 0; ; hops++) {
+    await checkTarget(target);
+    response = await fetch(target, { signal, redirect: 'manual' }).catch(() => { throw downloadFailed(); });
+    const location = response.headers.get('location');
+    if (response.status < 300 || response.status >= 400 || !location) break;
+    if (hops === MAX_REDIRECTS) throw downloadFailed();
+    target = new URL(location, target);
+  }
+  if (!response.ok || !response.body)
+    throw downloadFailed();
 
-  const length = Number(response.headers.get('content-length') ?? 0);
-  if (length > config.avatar.maxUploadBytes)
-    throw new AvatarError('The provider’s picture is too big.');
+  // Read up to the limit and no further: Content-Length can be missing, or a lie.
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  const reader = response.body.getReader();
+  try {
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      total += value.length;
+      if (total > config.avatar.maxUploadBytes) {
+        await reader.cancel();
+        throw new AvatarError('The provider’s picture is too big.');
+      }
+      chunks.push(value);
+    }
+  } catch (e) {
+    throw e instanceof AvatarError ? e : downloadFailed();
+  }
 
-  return encodeAvatar(Buffer.from(await response.arrayBuffer()));
+  return encodeAvatar(Buffer.concat(chunks));
 }
 
 /** The MIME type of a stored avatar, which may predate this site and be any format Qt reads. */

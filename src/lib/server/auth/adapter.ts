@@ -1,7 +1,7 @@
 import type { Adapter, AdapterUser } from '@auth/sveltekit/adapters';
 import { getRequestEvent } from '$app/server';
-import { COUNTRIES } from '#lib/countries.js';
-import { createAccount, deleteAccount, findAccountById, setActive, type Account } from '#lib/server/cockatrice/accounts.js';
+import { COUNTRIES } from '#lib/countries.ts';
+import { createAccount, deleteAccount, findAccountById, setActive, type Account } from '#lib/server/cockatrice/accounts.ts';
 import { deleteIdentity, findIdentity, insertIdentity } from './identities';
 import { deleteAccountSessions, deleteSession, extendSession, findSession, insertSession } from './session';
 
