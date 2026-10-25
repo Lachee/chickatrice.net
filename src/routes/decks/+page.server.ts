@@ -3,7 +3,7 @@ import { config } from '#lib/server/config.ts';
 import { requireAccount } from '#lib/server/auth/guard.ts';
 import { RateLimiter } from '#lib/server/auth/ratelimit.ts';
 import { capabilities } from '#lib/server/cockatrice/capabilities.ts';
-import { DeckError, countDecks, createDeck, listDecks, summarize } from '#lib/server/cockatrice/decks.ts';
+import { DeckError, countDecks, coverArt, createDeck, listDecks, summarize } from '#lib/server/cockatrice/decks.ts';
 import { cardCount, isCod, normalizeDeck, parseDeck, updateCodMetadata, writeCod } from '#lib/server/decks/format.ts';
 import { ImportError, importFromUrl, importerNames } from '#lib/server/decks/import.ts';
 import { text } from '#lib/server/admin/form.ts';
@@ -18,9 +18,11 @@ const imports = new RateLimiter(10, 60_000);
 
 export const load: PageServerLoad = async (event) => {
 	const account = requireAccount(event);
-	const decks = await listDecks(account.id);
+	const decks = (await listDecks(account.id)).map(summarize);
 	return {
-		decks: decks.map(summarize),
+		decks,
+		// Streamed: the list shouldn't wait on Scryfall.
+		art: coverArt(decks),
 		maxDecks: config.decks.maxPerAccount,
 		importers: importerNames,
 		publicDecks: (await capabilities()).publicDecks

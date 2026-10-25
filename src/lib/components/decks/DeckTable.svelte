@@ -16,12 +16,20 @@
 		cards: number | null;
 	};
 
-	let { decks, showVisibility = true }: { decks: Row[]; showVisibility?: boolean } = $props();
+	type Art = Record<string, { url: string; artist: string | null }>;
+
+	let {
+		decks,
+		showVisibility = true,
+		/** Each deck's cover art by slug, streamed in after the table. */
+		art
+	}: { decks: Row[]; showVisibility?: boolean; art?: Promise<Art> } = $props();
 </script>
 
 <Table.Root>
 	<Table.Header>
 		<Table.Row>
+			<Table.Head class="w-14"><span class="sr-only">Art</span></Table.Head>
 			<Table.Head>Name</Table.Head>
 			<Table.Head class="text-right">Cards</Table.Head>
 			{#if showVisibility}<Table.Head>Shared</Table.Head>{/if}
@@ -32,6 +40,16 @@
 	<Table.Body>
 		{#each decks as deck (deck.slug)}
 			<Table.Row>
+				<Table.Cell class="pr-0">
+					<a href="/decks/{deck.slug}" tabindex="-1" aria-hidden="true" class="block h-9 w-12 overflow-hidden rounded-md bg-muted">
+						{#await art then images}
+							{@const image = images?.[deck.slug]}
+							{#if image}
+								<img src={image.url} alt="" title={image.artist ? `Art by ${image.artist}` : undefined} loading="lazy" class="size-full object-cover" />
+							{/if}
+						{/await}
+					</a>
+				</Table.Cell>
 				<Table.Cell class="max-w-80">
 					<a href="/decks/{deck.slug}" class="block truncate font-medium underline-offset-4 hover:underline">{deck.name}</a>
 					{#if deck.folder}

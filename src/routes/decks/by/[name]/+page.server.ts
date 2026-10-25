@@ -1,6 +1,6 @@
 import { error, redirect } from '@sveltejs/kit';
 import { findAccountByName } from '#lib/server/cockatrice/accounts.ts';
-import { listDecksOf, summarize } from '#lib/server/cockatrice/decks.ts';
+import { coverArt, listDecksOf, summarize } from '#lib/server/cockatrice/decks.ts';
 import { isDeckAdmin } from '#lib/server/decks/access.ts';
 import type { PageServerLoad } from './$types';
 
@@ -12,10 +12,12 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
 	const own = locals.account?.id === owner.id;
 	const everything = own || isDeckAdmin(locals.account);
+	const decks = (await listDecksOf(owner.id, everything)).map(summarize);
 	return {
 		owner: { name: owner.name, hasAvatar: owner.hasAvatar },
 		own,
 		everything,
-		decks: (await listDecksOf(owner.id, everything)).map(summarize)
+		decks,
+		art: coverArt(decks)
 	};
 };

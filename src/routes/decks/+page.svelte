@@ -128,7 +128,7 @@
 	</Card.Header>
 	<Card.Content>
 		{#if data.decks.length}
-			<DeckTable decks={data.decks} />
+			<DeckTable decks={data.decks} art={data.art} />
 		{:else}
 			<p class="text-sm text-muted-foreground">No decks yet. Upload or import one above, or save one to the server from Cockatrice's deck storage.</p>
 		{/if}

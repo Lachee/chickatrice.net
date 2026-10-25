@@ -118,3 +118,20 @@ export const cronRuns = mysqlTable('chickatrice_cron_runs', {
 }, (table) => [
   index('chickatrice_cron_runs_job').on(table.job, table.id),
 ]);
+
+/**
+ * Scryfall's images for the cards in decks, so each card is looked up once
+ * rather than on every view (see server/scryfall.ts). Only URLs are kept; the
+ * images themselves load from Scryfall's CDN. A row with no `normal` is a card
+ * Scryfall didn't know, asked about again after a while.
+ */
+export const cardImages = mysqlTable('chickatrice_card_images', {
+  /** `id:<scryfall id>`, `name:<name>|<set>` or `name:<name>`, lower case. */
+  key: varchar('key', { length: 255 }).primaryKey(),
+  normal: varchar('normal', { length: 255 }),
+  artCrop: varchar('art_crop', { length: 255 }),
+  artist: varchar('artist', { length: 255 }),
+  /** The card's page on Scryfall. */
+  uri: varchar('uri', { length: 512 }),
+  fetchedAt: datetime('fetched_at', { mode: 'date' }).notNull(),
+});

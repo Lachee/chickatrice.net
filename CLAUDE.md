@@ -16,6 +16,9 @@ The original PHP site lives on `master` / `v1.0.0` — useful for how things use
   all raw SQL through `sql.ts`. `decks.ts` is the client's server deck storage (`decklist_files`).
 - `src/lib/server/decks/` — `format.ts` (`.cod` and plain-text lists, the deck hash),
   `import.ts` (Moxfield, Archidekt), `access.ts` (owner or admin manages; others view if shared).
+  Card images: `#lib/server/scryfall.ts` looks cards up in batches and caches the URLs in
+  `chickatrice_card_images`; pages stream them (`images`/`art` promises) and browsers load the
+  pictures from Scryfall's CDN.
 - `src/lib/server/auth/` — `index.ts` (Auth.js config, as in labooru), `adapter.ts` (Auth.js
   users = Cockatrice accounts), `session.ts` (DB sessions, password sign-in), `identities.ts`
   (provider ↔ account links), `guard.ts` (`requireAccount`, `requireStaff`), `ratelimit.ts`.

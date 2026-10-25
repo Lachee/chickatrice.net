@@ -36,6 +36,13 @@
       "when": 1792927179632,
       "tag": "0004_cron_runs",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1792927819986,
+      "tag": "0005_card_images",
+      "breakpoints": true
     }
   ]
 }

@@ -4,10 +4,11 @@ import { requireAccount } from '#lib/server/auth/guard.ts';
 import { logAdminAction } from '#lib/server/admin/log.ts';
 import { text } from '#lib/server/admin/form.ts';
 import { capabilities } from '#lib/server/cockatrice/capabilities.ts';
-import { DeckError, countDecks, createDeck, deleteDeck, findDeckBySlug, setDeckVisibility, updateDeck } from '#lib/server/cockatrice/decks.ts';
+import { DeckError, countDecks, createDeck, deleteDeck, findDeckBySlug, setDeckVisibility, summarize, updateDeck } from '#lib/server/cockatrice/decks.ts';
 import { deckAccess } from '#lib/server/decks/access.ts';
 import { MAX_DECK_NAME, cardCount, deckHash, parseCod, updateCodMetadata } from '#lib/server/decks/format.ts';
 import { setFlash } from '#lib/server/flash.ts';
+import { cardImages, cardKey } from '#lib/server/scryfall.ts';
 import { isVisibility, zoneLabel } from '#lib/decks.ts';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -24,6 +25,7 @@ async function visibleDeck(event: Pick<RequestEvent, 'params' | 'locals'>) {
 export const load: PageServerLoad = async (event) => {
 	const { deck, access } = await visibleDeck(event);
 	const parsed = parseCod(deck.content);
+	const { cover } = summarize(deck);
 
 	return {
 		deck: {
@@ -41,11 +43,14 @@ export const load: PageServerLoad = async (event) => {
 				name: zone.name,
 				label: zoneLabel(zone.name),
 				count: cardCount({ zones: [zone] }),
-				cards: zone.cards.map(({ name, count, set }) => ({ name, count, set: set ?? null }))
+				cards: zone.cards.map((card) => ({ name: card.name, count: card.count, set: card.set ?? null, key: cardKey(card) }))
 			})),
 			cards: parsed ? cardCount(parsed) : null,
-			hash: parsed ? deckHash(parsed) : null
+			hash: parsed ? deckHash(parsed) : null,
+			coverKey: cover ? cardKey(cover) : null
 		},
+		// Streamed, so the list shows at once and the pictures follow.
+		images: cardImages([...(parsed?.zones.flatMap((zone) => zone.cards) ?? []), ...(cover ? [cover] : [])]),
 		access,
 		canCopy: Boolean(event.locals.account) && !access.owner,
 		publicDecks: (await capabilities()).publicDecks

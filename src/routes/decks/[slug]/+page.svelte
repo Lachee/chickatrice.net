@@ -17,6 +17,8 @@
 	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
 	import FileTextIcon from '@lucide/svelte/icons/file-text';
 	import FolderIcon from '@lucide/svelte/icons/folder';
+	import LayoutGridIcon from '@lucide/svelte/icons/layout-grid';
+	import ListIcon from '@lucide/svelte/icons/list';
 	import Trash2Icon from '@lucide/svelte/icons/trash-2';
 	import type { PageProps } from './$types';
 
@@ -39,6 +41,9 @@
 	const shareUrl = $derived(`${page.url.origin}/decks/${deck.slug}`);
 	const sourceName = $derived(deck.sourceUrl ? new URL(deck.sourceUrl).hostname.replace(/^www\./, '') : null);
 	const scryfall = (name: string) => `https://scryfall.com/search?q=${encodeURIComponent(`!"${name}"`)}`;
+
+	type Images = Awaited<PageProps['data']['images']>;
+	let view = $state<'images' | 'list'>('images');
 </script>
 
 <svelte:head>
@@ -65,6 +70,18 @@
 </a>
 
 <div class="mb-6 flex flex-wrap items-start justify-between gap-4">
+	<div class="flex min-w-0 items-start gap-4">
+	{#await data.images then images}
+		{@const cover = deck.coverKey ? images[deck.coverKey] : null}
+		{#if cover?.artCrop}
+			<img
+				src={cover.artCrop}
+				alt=""
+				title={cover.artist ? `Art by ${cover.artist}` : undefined}
+				class="hidden h-16 w-22 shrink-0 rounded-lg object-cover shadow-sm sm:block"
+			/>
+		{/if}
+	{/await}
 	<div class="min-w-0">
 		<h1 class="flex flex-wrap items-center gap-2 text-2xl font-semibold tracking-tight">
 			<span class="break-words">{deck.name}</span>
@@ -82,6 +99,7 @@
 				{#each deck.tags as tag (tag)}<Badge variant="outline">{tag}</Badge>{/each}
 			</div>
 		{/if}
+	</div>
 	</div>
 	<div class="flex flex-wrap gap-2">
 		<Button href="/decks/{deck.slug}/download" data-sveltekit-reload><DownloadIcon /> Download</Button>
@@ -109,29 +127,87 @@
 	<p class="mb-6 max-w-3xl text-sm whitespace-pre-line">{deck.comments}</p>
 {/if}
 
+{#snippet zones(images: Images | null)}
+	{#if view === 'images'}
+		<div class="mb-2 space-y-4">
+			{#each deck.zones as zone (zone.name)}
+				<Card.Root size="sm">
+					<Card.Header>
+						<Card.Title>{zone.label} <span class="font-normal text-muted-foreground">({zone.count})</span></Card.Title>
+					</Card.Header>
+					<Card.Content>
+						<ul class="grid grid-cols-[repeat(auto-fill,minmax(8.5rem,1fr))] gap-2">
+							{#each zone.cards as card, i (i)}
+								{@const image = images?.[card.key]}
+								<li>
+									<a
+										href={image?.uri ?? scryfall(card.name)}
+										target="_blank"
+										rel="noopener noreferrer"
+										title="{card.count} × {card.name}{image?.artist ? ` (art by ${image.artist})` : ''}"
+										class="relative block aspect-[488/680] overflow-hidden rounded-[4.75%/3.5%] bg-muted shadow-sm transition-transform hover:-translate-y-0.5"
+									>
+										{#if image}
+											<img src={image.normal} alt={card.name} loading="lazy" class="size-full object-cover" />
+										{:else}
+											<span class="flex size-full items-center justify-center p-2 text-center text-xs font-medium text-muted-foreground">{card.name}</span>
+										{/if}
+										{#if card.count > 1}
+											<span class="absolute bottom-1.5 left-1.5 rounded-md bg-black/75 px-1.5 py-0.5 text-xs font-semibold text-white tabular-nums">×{card.count}</span>
+										{/if}
+									</a>
+								</li>
+							{/each}
+						</ul>
+					</Card.Content>
+				</Card.Root>
+			{/each}
+		</div>
+	{:else}
+		<div class="mb-2 grid items-start gap-4 md:grid-cols-2 lg:grid-cols-3">
+			{#each deck.zones as zone (zone.name)}
+				<Card.Root size="sm" class={zone.name === 'main' ? 'lg:col-span-2' : ''}>
+					<Card.Header>
+						<Card.Title>{zone.label} <span class="font-normal text-muted-foreground">({zone.count})</span></Card.Title>
+					</Card.Header>
+					<Card.Content>
+						<ul class="gap-x-6 text-sm {zone.name === 'main' ? 'sm:columns-2' : ''}">
+							{#each zone.cards as card, i (i)}
+								<li class="flex break-inside-avoid gap-2 py-0.5">
+									<span class="w-6 shrink-0 text-right tabular-nums text-muted-foreground">{card.count}</span>
+									<a href={images?.[card.key]?.uri ?? scryfall(card.name)} target="_blank" rel="noopener noreferrer" class="min-w-0 truncate underline-offset-4 hover:underline">{card.name}</a>
+									{#if card.set}<span class="ml-auto shrink-0 text-xs uppercase text-muted-foreground">{card.set}</span>{/if}
+								</li>
+							{/each}
+						</ul>
+					</Card.Content>
+				</Card.Root>
+			{/each}
+		</div>
+	{/if}
+{/snippet}
+
 {#if deck.cards === null}
 	<Notice type="error" class="mb-6">This deck's file can't be read here. It can still be downloaded and opened in Cockatrice.</Notice>
 {:else}
-	<div class="mb-6 grid items-start gap-4 md:grid-cols-2 lg:grid-cols-3">
-		{#each deck.zones as zone (zone.name)}
-			<Card.Root size="sm" class={zone.name === 'main' ? 'lg:col-span-2' : ''}>
-				<Card.Header>
-					<Card.Title>{zone.label} <span class="font-normal text-muted-foreground">({zone.count})</span></Card.Title>
-				</Card.Header>
-				<Card.Content>
-					<ul class="gap-x-6 text-sm {zone.name === 'main' ? 'sm:columns-2' : ''}">
-						{#each zone.cards as card, i (i)}
-							<li class="flex break-inside-avoid gap-2 py-0.5">
-								<span class="w-6 shrink-0 text-right tabular-nums text-muted-foreground">{card.count}</span>
-								<a href={scryfall(card.name)} target="_blank" rel="noopener noreferrer" class="min-w-0 truncate underline-offset-4 hover:underline">{card.name}</a>
-								{#if card.set}<span class="ml-auto shrink-0 text-xs uppercase text-muted-foreground">{card.set}</span>{/if}
-							</li>
-						{/each}
-					</ul>
-				</Card.Content>
-			</Card.Root>
-		{/each}
+	<div class="mb-3 flex justify-end">
+		<div class="inline-flex rounded-lg border p-0.5" role="group" aria-label="Show cards as">
+			<Button size="sm" variant={view === 'images' ? 'secondary' : 'ghost'} aria-pressed={view === 'images'} onclick={() => (view = 'images')}>
+				<LayoutGridIcon /> Images
+			</Button>
+			<Button size="sm" variant={view === 'list' ? 'secondary' : 'ghost'} aria-pressed={view === 'list'} onclick={() => (view = 'list')}>
+				<ListIcon /> List
+			</Button>
+		</div>
 	</div>
+	{#await data.images}
+		{@render zones(null)}
+	{:then images}
+		{@render zones(images)}
+	{/await}
+	<p class="mb-6 text-right text-xs text-muted-foreground">
+		Card images from <a href="https://scryfall.com" target="_blank" rel="noopener noreferrer" class="underline-offset-4 hover:underline">Scryfall</a>.
+	</p>
 {/if}
 
 {#if data.access.manage}

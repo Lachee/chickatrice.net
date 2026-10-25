@@ -40,7 +40,7 @@
 <Card.Root>
 	<Card.Content>
 		{#if data.decks.length}
-			<DeckTable decks={data.decks} showVisibility={data.everything} />
+			<DeckTable decks={data.decks} art={data.art} showVisibility={data.everything} />
 		{:else}
 			<p class="text-sm text-muted-foreground">{data.everything ? 'No decks.' : 'No public decks.'}</p>
 		{/if}

@@ -3,6 +3,7 @@ import { and, eq, inArray, sql } from 'drizzle-orm';
 import { db, chickatrice } from '#lib/server/db/index.ts';
 import type { DeckVisibility } from '#lib/decks.ts';
 import { MAX_DECK_BYTES, MAX_DECK_NAME, cardCount, parseCod, type DeckList } from '#lib/server/decks/format.ts';
+import { cardImages, cardKey, type CardRef } from '#lib/server/scryfall.ts';
 import { capabilities } from './capabilities';
 import { execute, rows, table } from './sql';
 
@@ -233,12 +234,32 @@ export async function deleteDeck(deck: Pick<Deck, 'id' | 'ownerId'>): Promise<vo
 export type DeckSummary = Pick<Deck, 'slug' | 'name' | 'folder' | 'uploadedAt' | 'visibility' | 'publicFolder'> & {
   /** Null when the client saved something the site can't read. */
   cards: number | null;
+  /** The card whose art stands for the deck: its banner card, or else the first in the main deck. */
+  cover: CardRef | null;
 };
 
 export function summarize(deck: Deck & { content: string }): DeckSummary {
   const parsed = parseCod(deck.content);
   const { slug, name, folder, uploadedAt, visibility, publicFolder } = deck;
-  return { slug, name, folder, uploadedAt, visibility, publicFolder, cards: parsed ? cardCount(parsed) : null };
+  const first = (parsed?.zones.find((zone) => zone.name === 'main') ?? parsed?.zones[0])?.cards[0];
+  const banner = parsed?.bannerCard;
+  return {
+    slug, name, folder, uploadedAt, visibility, publicFolder,
+    cards: parsed ? cardCount(parsed) : null,
+    cover: banner ? { name: banner.name, providerId: banner.providerId }
+      : first ? { name: first.name, providerId: first.providerId, set: first.set } : null,
+  };
+}
+
+export type CoverArt = { url: string; artist: string | null };
+
+/** Each deck's cover art, by slug, for the decks whose cover Scryfall knows. */
+export async function coverArt(decks: DeckSummary[]): Promise<Record<string, CoverArt>> {
+  const images = await cardImages(decks.flatMap((deck) => (deck.cover ? [ deck.cover ] : [])));
+  return Object.fromEntries(decks.flatMap((deck) => {
+    const image = deck.cover && images[cardKey(deck.cover)];
+    return image?.artCrop ? [ [ deck.slug, { url: image.artCrop, artist: image.artist } ] ] : [];
+  }));
 }
 
 /** The decks of `ownerId` anyone may see listed; or all of them, for its owner and admins. */
