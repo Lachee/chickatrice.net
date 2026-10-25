@@ -21,6 +21,8 @@ The original PHP site lives on `master` / `v1.0.0` — useful for how things use
   (provider ↔ account links), `guard.ts` (`requireAccount`, `requireStaff`), `ratelimit.ts`.
 - `src/lib/server/admin/` — `log.ts` (`chickatrice_admin_log`: what staff did from the site),
   `actions.ts` (form actions shared between admin pages), `form.ts`.
+- `src/lib/server/cron/` — scheduled jobs, one MySQL named lock each so one replica runs them;
+  every run is recorded in `chickatrice_cron_runs` for `/admin/cron`, which can also run one now.
 - `src/routes/admin/` — the staff pages. Access is Servatrice's `admin` bitfield, mapped in
   `#lib/staff.ts`: developers view, moderators moderate, admins administer.
 - `src/lib/server/db/` — `cockatrice.ts` (Servatrice tables, never migrated),

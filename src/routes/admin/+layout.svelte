@@ -15,7 +15,8 @@
 			{ href: '/admin/reports', label: 'Reports', show: data.staff.moderate && data.caps.reports, count: data.openReports },
 			{ href: '/admin/logs', label: 'Logs', show: true },
 			{ href: '/admin/staff', label: 'Staff', show: data.staff.moderate },
-			{ href: '/admin/settings', label: 'Settings', show: data.staff.moderate }
+			{ href: '/admin/settings', label: 'Settings', show: data.staff.moderate },
+			{ href: '/admin/cron', label: 'Cron', show: true }
 		].filter((tab) => tab.show)
 	);
 

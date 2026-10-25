@@ -1,4 +1,4 @@
-import { datetime, index, int, mysqlEnum, mysqlTable, serial, text, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
+import { boolean, datetime, index, int, mysqlEnum, mysqlTable, serial, text, uniqueIndex, varchar } from 'drizzle-orm/mysql-core';
 
 /*
  * This site's own tables. Everything it adds to the Servatrice database is
@@ -95,4 +95,26 @@ export const decks = mysqlTable('chickatrice_decks', {
 }, (table) => [
   uniqueIndex('chickatrice_decks_slug').on(table.slug),
   index('chickatrice_decks_account').on(table.accountId),
+]);
+
+/**
+ * Every run of a cron job, from whichever instance got its lock: the admin
+ * page's last-run column and history. Rows older than `RUN_HISTORY_DAYS`
+ * (server/cron/index.ts) are dropped as each job records its next run.
+ */
+export const cronRuns = mysqlTable('chickatrice_cron_runs', {
+  id: serial('id').primaryKey(),
+  /** `CronJob.name`. */
+  job: varchar('job', { length: 64 }).notNull(),
+  startedAt: datetime('started_at', { mode: 'date' }).notNull(),
+  durationMs: int('duration_ms', { unsigned: true }).notNull(),
+  ok: boolean('ok').notNull(),
+  /** Started by staff from the admin page rather than by the timer. */
+  manual: boolean('manual').notNull(),
+  /** What the run said it did; null when it had nothing to say. */
+  summary: text('summary'),
+  /** Why it failed; null when `ok`. */
+  error: text('error'),
+}, (table) => [
+  index('chickatrice_cron_runs_job').on(table.job, table.id),
 ]);

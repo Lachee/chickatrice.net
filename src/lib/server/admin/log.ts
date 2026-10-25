@@ -11,7 +11,8 @@ export type AdminAction =
   | 'room.create' | 'room.update' | 'room.delete'
   | 'servermessage'
   | 'cardart.set' | 'cardart.remove'
-  | 'deck.update' | 'deck.visibility' | 'deck.delete';
+  | 'deck.update' | 'deck.visibility' | 'deck.delete'
+  | 'cron.run';
 
 export type AdminLogEntry = {
   id: number;
