@@ -4,11 +4,12 @@ import { COUNTRIES } from '#lib/countries.js';
 import { requireAccount } from '#lib/server/auth/guard.js';
 import { enabledProviders, providerName } from '#lib/server/auth/index.js';
 import { listIdentities, unlinkProvider } from '#lib/server/auth/identities.js';
-import { destroyOtherSessions } from '#lib/server/auth/session.js';
+import { destroyOtherSessions, sessionCookieName } from '#lib/server/auth/session.js';
 import { findAccountByName, setAvatar, setCountry, setPassword } from '#lib/server/cockatrice/accounts.js';
 import { verifyPassword } from '#lib/server/cockatrice/password.js';
 import { setFlash } from '#lib/server/flash.js';
 import { AvatarError, encodeAvatar, fetchAvatar } from '#lib/server/avatar.js';
+import { eraseAccount } from '#lib/server/erase.js';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
@@ -39,7 +40,8 @@ export const load: PageServerLoad = async (event) => {
 			active: account.active,
 			hasPassword: account.hasPassword,
 			hasAvatar: account.hasAvatar,
-			registeredAt: account.registeredAt.toISOString()
+			registeredAt: account.registeredAt.toISOString(),
+			isStaff: account.admin !== 0
 		},
 		identities: identities.map((identity) => ({
 			provider: identity.provider,
@@ -164,5 +166,30 @@ export const actions: Actions = {
 				? `${providerName(provider)} unlinked.`
 				: `${providerName(provider)} unlinked. Sign in with your Cockatrice name and password from now on.`
 		};
+	},
+
+	deleteAccount: async (event) => {
+		const account = requireAccount(event);
+		const form = await event.request.formData();
+
+		// See erase.ts: a staff account's bans would go with it.
+		if (account.admin !== 0)
+			return fail(400, { action: 'deleteAccount', error: "Staff accounts can't be deleted here. Ask the server's admin." });
+		if (String(form.get('confirmName') ?? '') !== account.name)
+			return fail(400, { action: 'deleteAccount', error: `Type ${account.name} exactly to confirm.` });
+
+		// The same proof the password change asks for.
+		const identities = await listIdentities(account.id);
+		if (account.hasPassword && identities.length === 0) {
+			const stored = await findAccountByName(account.name);
+			if (!stored || !(await verifyPassword(String(form.get('current') ?? ''), stored.passwordHash)))
+				return fail(400, { action: 'deleteAccount', error: 'Your password is wrong.' });
+		}
+
+		await eraseAccount(account);
+		// Its sessions are gone with it; this just tidies up the browser's cookie.
+		event.cookies.delete(sessionCookieName(event.url), { path: '/', secure: event.url.protocol === 'https:' });
+		setFlash(event.cookies, { type: 'success', message: `${account.name} and its data have been deleted.` });
+		redirect(303, '/');
 	}
 };

@@ -12,6 +12,7 @@
 	import ImageIcon from '@lucide/svelte/icons/image';
 	import LinkIcon from '@lucide/svelte/icons/link';
 	import Trash2Icon from '@lucide/svelte/icons/trash-2';
+	import TriangleAlertIcon from '@lucide/svelte/icons/triangle-alert';
 	import UploadIcon from '@lucide/svelte/icons/upload';
 	import type { PageProps } from './$types';
 
@@ -32,6 +33,10 @@
 				pending = null;
 			};
 		};
+
+	// Deleting takes two steps: open the confirmation, then type the name.
+	let confirmingDelete = $state(false);
+	let confirmName = $state('');
 
 	const dateFormat = new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeZone: 'UTC' });
 	const feedback = (action: string) => (form?.action === action ? form : null);
@@ -226,6 +231,74 @@
 						</form>
 					{/each}
 				</div>
+			{/if}
+		</Card.Content>
+	</Card.Root>
+
+	<Card.Root id="delete" class="ring-1 ring-destructive/25 lg:col-span-2">
+		<Card.Header>
+			<Card.Title class="flex items-center gap-2 text-destructive"><TriangleAlertIcon class="size-4" /> Delete account</Card.Title>
+			<Card.Description>
+				Permanently delete <strong class="text-foreground">{profile.name}</strong> and its data, from this site and the Cockatrice server.
+				This can't be undone.
+			</Card.Description>
+		</Card.Header>
+		<Card.Content class="space-y-4">
+			{@render result('deleteAccount')}
+			{#if profile.isStaff}
+				<Notice type="info">Staff accounts can't be deleted here, since the bans they issued would go with them. Ask the server's admin.</Notice>
+			{:else if !confirmingDelete}
+				<Button variant="destructive" onclick={() => (confirmingDelete = true)}><Trash2Icon /> Delete account…</Button>
+			{:else}
+				<div class="grid gap-4 text-sm sm:grid-cols-2">
+					<div>
+						<h3 class="mb-1.5 font-medium">Deleted</h3>
+						<ul class="list-disc space-y-1 pl-5 text-muted-foreground">
+							<li>Your Cockatrice account, password and avatar</li>
+							<li>Saved decks, deck folders and shared deck links</li>
+							<li>Buddy and ignore lists, and access to your replays</li>
+							<li>Chat messages the server logged from you</li>
+							<li>Connection and login history, including IP addresses</li>
+							<li>Linked sign-ins, and your sessions on this site</li>
+						</ul>
+					</div>
+					<div>
+						<h3 class="mb-1.5 font-medium">Kept</h3>
+						<ul class="list-disc space-y-1 pl-5 text-muted-foreground">
+							<li>Bans, warnings and reports: the server's moderation record</li>
+							<li>Games you played, which are other players' history too</li>
+						</ul>
+						<p class="mt-3 text-muted-foreground">Afterwards, anyone can register the name {profile.name}.</p>
+					</div>
+				</div>
+				<form method="POST" action="?/deleteAccount" class="max-w-md space-y-4" use:enhance={submit('deleteAccount', false)}>
+					<div class="space-y-1.5">
+						<Label for="confirm-name">Type <strong>{profile.name}</strong> to confirm</Label>
+						<Input id="confirm-name" name="confirmName" autocomplete="off" spellcheck="false" bind:value={confirmName} required />
+					</div>
+					{#if data.needsCurrentPassword}
+						<div class="space-y-1.5">
+							<Label for="delete-password">Your password</Label>
+							<Input id="delete-password" name="current" type="password" autocomplete="current-password" required />
+						</div>
+					{/if}
+					<div class="flex flex-wrap gap-2">
+						<Button
+							type="submit"
+							class="bg-destructive text-white hover:bg-destructive/90"
+							disabled={confirmName !== profile.name || pending === 'deleteAccount'}
+						>
+							<Trash2Icon /> Delete my account forever
+						</Button>
+						<Button
+							variant="ghost"
+							onclick={() => {
+								confirmingDelete = false;
+								confirmName = '';
+							}}>Cancel</Button
+						>
+					</div>
+				</form>
 			{/if}
 		</Card.Content>
 	</Card.Root>
