@@ -55,7 +55,7 @@
 						<span class="hidden text-sm sm:inline">{data.account.name}</span>
 						<Avatar.Root class="size-8 ring-2 ring-white/70">
 							{#if data.account.hasAvatar}
-								<Avatar.Image src="/avatar/{encodeURIComponent(data.account.name)}" alt="" />
+								<Avatar.Image src="/api/user/{encodeURIComponent(data.account.name)}/avatar" alt="" />
 							{/if}
 							<Avatar.Fallback class="text-xs">{data.account.name.slice(0, 2).toUpperCase()}</Avatar.Fallback>
 						</Avatar.Root>

@@ -41,6 +41,7 @@ export const load: PageServerLoad = async ({ locals, url, cookies }) => {
 };
 
 export const actions: Actions = {
+	/** Login with username + password action */
 	default: async ({ request, cookies, url, getClientAddress }) => {
 		if (!config.auth.allowPasswordLogin)
 			return fail(403, { username: '', error: 'Signing in with a password is turned off.' });

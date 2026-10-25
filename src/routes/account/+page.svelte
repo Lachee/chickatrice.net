@@ -55,7 +55,7 @@
 <div class="mb-8 flex flex-wrap items-center gap-4">
 	<Avatar.Root class="size-16 rounded-xl after:rounded-xl">
 		{#if profile.hasAvatar}
-			<Avatar.Image src="/avatar/{encodeURIComponent(profile.name)}?v={avatarVersion}" alt="" class="rounded-xl" />
+			<Avatar.Image src="/api/user/{encodeURIComponent(profile.name)}/avatar?v={avatarVersion}" alt="" class="rounded-xl" />
 		{/if}
 		<Avatar.Fallback class="rounded-xl text-lg">{profile.name.slice(0, 2).toUpperCase()}</Avatar.Fallback>
 	</Avatar.Root>
@@ -149,7 +149,7 @@
 				<div class="flex items-start gap-4">
 					<Avatar.Root class="size-20 shrink-0 rounded-xl after:rounded-xl">
 						{#if profile.hasAvatar}
-							<Avatar.Image src="/avatar/{encodeURIComponent(profile.name)}?v={avatarVersion}" alt="Your avatar" class="rounded-xl" />
+							<Avatar.Image src="/api/user/{encodeURIComponent(profile.name)}/avatar?v={avatarVersion}" alt="Your avatar" class="rounded-xl" />
 						{/if}
 						<Avatar.Fallback class="rounded-xl text-xs text-muted-foreground">None</Avatar.Fallback>
 					</Avatar.Root>
