@@ -7,6 +7,7 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import * as Avatar from '#lib/components/ui/avatar/index.js';
 	import Notice from '#lib/components/Notice.svelte';
+	import ProviderIcon from '#lib/components/ProviderIcon.svelte';
 	import { flag } from '#lib/countries.js';
 	import KeyRoundIcon from '@lucide/svelte/icons/key-round';
 	import ImageIcon from '@lucide/svelte/icons/image';
@@ -41,10 +42,6 @@
 	const dateFormat = new Intl.DateTimeFormat('en', { dateStyle: 'medium', timeZone: 'UTC' });
 	const feedback = (action: string) => (form?.action === action ? form : null);
 </script>
-
-<svelte:head>
-	<title>Account · {profile.name}</title>
-</svelte:head>
 
 {#snippet result(action: string)}
 	{@const f = feedback(action)}
@@ -208,7 +205,9 @@
 					{#each data.identities as identity (identity.provider)}
 						<li class="flex flex-wrap items-center justify-between gap-3 px-3.5 py-2.5">
 							<div class="min-w-0">
-								<div class="text-sm font-medium">{identity.providerName}</div>
+								<div class="flex items-center gap-2 text-sm font-medium">
+									<ProviderIcon src={identity.providerIcon} />{identity.providerName}
+								</div>
 								<div class="truncate text-xs text-muted-foreground">
 									{identity.username ?? identity.email ?? 'Linked'} · since {dateFormat.format(new Date(identity.linkedAt))}
 								</div>
@@ -227,7 +226,12 @@
 						<!-- Signed in, Auth.js links the provider instead of signing in with it. -->
 						<form method="POST" action="/auth/signin/{provider.id}">
 							<input type="hidden" name="callbackUrl" value="/account?linked={provider.id}" />
-							<Button type="submit" variant="outline"><LinkIcon /> Link {provider.name}</Button>
+							<Button type="submit" variant="outline">
+								<ProviderIcon src={provider.icon}>
+									{#snippet fallback()}<LinkIcon />{/snippet}
+								</ProviderIcon>
+								Link {provider.name}
+							</Button>
 						</form>
 					{/each}
 				</div>

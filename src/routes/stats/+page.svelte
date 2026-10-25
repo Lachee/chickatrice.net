@@ -17,10 +17,6 @@
 	const loading = $derived(navigating.to?.url.pathname === '/stats');
 </script>
 
-<svelte:head>
-	<title>Statistics · {data.status.online ? `${data.status.users} online` : 'offline'}</title>
-</svelte:head>
-
 <div class="mb-6 flex flex-wrap items-end justify-between gap-4">
 	<div>
 		<h1 class="flex items-center gap-3 text-3xl font-semibold tracking-tight">

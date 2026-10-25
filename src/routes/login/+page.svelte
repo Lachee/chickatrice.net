@@ -6,15 +6,12 @@
 	import * as Card from '#lib/components/ui/card/index.js';
 	import Notice from '#lib/components/Notice.svelte';
 	import LogInIcon from '@lucide/svelte/icons/log-in';
+	import ProviderIcon from '#lib/components/ProviderIcon.svelte';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
 	let submitting = $state(false);
 </script>
-
-<svelte:head>
-	<title>Sign in</title>
-</svelte:head>
 
 <div class="mx-auto max-w-sm pt-6">
 	<Card.Root>
@@ -40,7 +37,10 @@
 						<form method="POST" action="/auth/signin/{provider.id}">
 							<input type="hidden" name="callbackUrl" value={data.next} />
 							<Button type="submit" variant="outline" size="lg" class="w-full">
-								<LogInIcon /> Continue with {provider.name}
+								<ProviderIcon src={provider.icon}>
+									{#snippet fallback()}<LogInIcon />{/snippet}
+								</ProviderIcon>
+								Continue with {provider.name}
 							</Button>
 						</form>
 					{/each}

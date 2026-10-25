@@ -59,6 +59,12 @@ const providerSchema = z.object({
   /** Also the callback path: `<ORIGIN>/auth/callback/<id>`. */
   id: z.string().regex(/^[a-z0-9_-]+$/i, 'provider ids may only contain letters, digits, - and _'),
   name: z.string().optional(),
+  /**
+   * Shown on the provider's buttons. A selfh.st icon name (https://selfh.st/icons),
+   * like `discord` or `authentik-light`, is the SVG unless it ends in `.png` or
+   * `.webp`; anything else must be a full https URL to an image.
+   */
+  icon: z.union([ z.string().regex(/^[a-z0-9-]+(\.(svg|png|webp))?$/), z.url({ protocol: /^https$/ }) ]).optional(),
   type: z.enum([ 'oidc', 'oauth' ]).default('oidc'),
   clientId: secret(),
   clientSecret: secret(),

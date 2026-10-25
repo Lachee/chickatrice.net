@@ -71,6 +71,9 @@ auth:
   providers:
     - id: authentik
       name: Authentik
+      # A selfh.st icon (https://selfh.st/icons) by name, e.g. discord or
+      # authentik-light; add .png or .webp for those formats. Or any https URL.
+      icon: authentik
       type: oidc
       issuer: https://auth.example.com/application/o/chickatrice/
       clientId: env:OIDC_CLIENT_ID
@@ -85,6 +88,7 @@ auth:
     # Discord, which speaks plain OAuth2:
     # - id: discord
     #   name: Discord
+    #   icon: discord
     #   type: oauth
     #   issuer: https://discord.com
     #   clientId: env:DISCORD_CLIENT_ID

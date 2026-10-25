@@ -17,13 +17,13 @@
 	// The status is cached for a few seconds server-side; every 30s is plenty.
 	onMount(() => {
 		const timer = setInterval(() => {
-			if (document.visibilityState === 'visible') invalidate('chickatrice:status');
+			if (document.visibilityState === 'visible')
+				invalidate('chickatrice:status');
 		}, 30_000);
 		return () => clearInterval(timer);
 	});
 
 	const heroButton = 'h-11 px-4 text-base';
-	// White outline on the hero, filled white on hover (Bulma's "is-inverted is-outlined").
 	const outlined = `${heroButton} border-2 border-white/80 bg-transparent text-white hover:border-white hover:bg-white hover:text-primary dark:bg-transparent dark:border-white/80`;
 </script>
 
@@ -42,7 +42,7 @@
 					alt=""
 					width="112"
 					height="112"
-					class="size-20 shrink-0 rounded-[20px] bg-white shadow-[0_12px_30px_-10px_rgb(80_10_10/0.45)] [image-rendering:pixelated] sm:size-24 lg:size-28"
+					class="size-20 shrink-0 [image-rendering:pixelated] sm:size-24 lg:size-28"
 				/>
 				<div>
 					<h1 class="text-5xl font-bold tracking-tight text-white sm:text-6xl">Chickatrice</h1>

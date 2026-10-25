@@ -42,19 +42,23 @@ export const load: PageServerLoad = async ({ locals, url, cookies }) => {
 
 export const actions: Actions = {
 	default: async ({ request, cookies, url, getClientAddress }) => {
-		if (!config.auth.allowPasswordLogin) return fail(403, { username: '', error: 'Signing in with a password is turned off.' });
+		if (!config.auth.allowPasswordLogin)
+			return fail(403, { username: '', error: 'Signing in with a password is turned off.' });
 
 		const form = await request.formData();
 		const username = String(form.get('username') ?? '').trim();
 		const password = String(form.get('password') ?? '');
-		if (!username || !password) return fail(400, { username, error: 'Enter your Cockatrice name and password.' });
+		if (!username || !password)
+			return fail(400, { username, error: 'Enter your Cockatrice name and password.' });
 
 		const wait = Math.max(perAddress.hit(getClientAddress()), perName.hit(username.toLowerCase()));
-		if (wait) return fail(429, { username, error: `Too many attempts. Try again in ${Math.ceil(wait / 60)} minute(s).` });
+		if (wait)
+			return fail(429, { username, error: `Too many attempts. Try again in ${Math.ceil(wait / 60)} minute(s).` });
 
 		const account = await findAccountByName(username);
 		const correct = await verifyPassword(password, account?.passwordHash ?? DECOY_HASH);
-		if (!account || !correct) return fail(400, { username, error: 'Incorrect name or password.' });
+		if (!account || !correct)
+			return fail(400, { username, error: 'Incorrect name or password.' });
 
 		// Only said once the password is right, so it doesn't tell strangers which accounts are linked.
 		const linked = await listIdentities(account.id);

@@ -71,13 +71,25 @@ function createProvider(provider: AuthProviderConfig): Provider {
   } as Provider;
 }
 
+const SELFHST = 'https://cdn.jsdelivr.net/gh/selfhst/icons';
+
+/** A provider's `icon` as an image URL: selfh.st names go to its CDN, URLs are used as they are. */
+function iconUrl(icon: string | undefined): string | null {
+  if (!icon) return null;
+  if (icon.startsWith('https://')) return icon;
+  const [ name, format = 'svg' ] = icon.split('.');
+  return `${SELFHST}/${format}/${name}.${format}`;
+}
+
 /** What the login and account pages need to render their sign-in buttons. */
 export const enabledProviders = config.auth.providers.map((provider) => ({
   id: provider.id,
   name: provider.name ?? provider.id,
+  icon: iconUrl(provider.icon),
 }));
 
 export const providerName = (id: string) => enabledProviders.find((provider) => provider.id === id)?.name ?? id;
+export const providerIcon = (id: string) => enabledProviders.find((provider) => provider.id === id)?.icon ?? null;
 
 /**
  * The `?error=` codes Auth.js sends to the login page, and the ones `signIn`

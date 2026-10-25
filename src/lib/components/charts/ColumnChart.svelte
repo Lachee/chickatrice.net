@@ -96,7 +96,7 @@
 				role="button"
 				tabindex="0"
 				aria-label="{longFormat.format(asDate(column.day))}: {full(column.v)} {label.toLowerCase()}"
-				class="outline-none"
+				class="cursor-default outline-none"
 				onpointerenter={() => (active = i)}
 				onpointerleave={() => (active = null)}
 				onfocus={() => (active = i)}

@@ -149,6 +149,12 @@
 	::selection {
 		background: oklch(0.7 0.16 25 / 35%);
 	}
+	/* Tailwind 4 leaves buttons with the default arrow; here they all point. */
+	button:not(:disabled),
+	[role='button']:not([aria-disabled='true']),
+	::file-selector-button {
+		cursor: pointer;
+	}
 }
 
 /* Breaks out of `<main>`'s width to span the window. */

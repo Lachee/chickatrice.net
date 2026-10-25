@@ -2,7 +2,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { config } from '#lib/server/config.js';
 import { COUNTRIES } from '#lib/countries.js';
 import { requireAccount } from '#lib/server/auth/guard.js';
-import { enabledProviders, providerName } from '#lib/server/auth/index.js';
+import { enabledProviders, providerIcon, providerName } from '#lib/server/auth/index.js';
 import { listIdentities, unlinkProvider } from '#lib/server/auth/identities.js';
 import { destroyOtherSessions, sessionCookieName } from '#lib/server/auth/session.js';
 import { findAccountByName, setAvatar, setCountry, setPassword } from '#lib/server/cockatrice/accounts.js';
@@ -46,6 +46,7 @@ export const load: PageServerLoad = async (event) => {
 		identities: identities.map((identity) => ({
 			provider: identity.provider,
 			providerName: providerName(identity.provider),
+			providerIcon: providerIcon(identity.provider),
 			username: identity.username,
 			email: identity.email,
 			hasImage: Boolean(identity.image),
