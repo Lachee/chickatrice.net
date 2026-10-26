@@ -35,6 +35,13 @@ export function protectedFrom(staff: Staff, target: Pick<PlayerDetail, 'id' | 'a
   return null;
 }
 
+/** {@link protectedFrom} for renames, which admins may also do to other admins. */
+export function renameRefusal(staff: Staff, target: Pick<PlayerDetail, 'id' | 'admin'>): string | null {
+  if (staff.id !== target.id && target.admin & 1)
+    return staff.access.administer ? null : 'Only an admin can rename an admin.';
+  return protectedFrom(staff, target);
+}
+
 /** `` "1 day" ``, `` "permanently" ``: how long a ban is, for messages and the log. */
 export function banLength(minutes: number): string {
   if (minutes === 0) return 'permanently';

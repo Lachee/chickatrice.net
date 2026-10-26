@@ -1,14 +1,15 @@
-import { error, fail, type RequestEvent } from '@sveltejs/kit';
+import { error, fail, redirect, type RequestEvent } from '@sveltejs/kit';
 import { config } from '#lib/server/config.ts';
 import { requireStaff } from '#lib/server/auth/guard.ts';
 import { providerName } from '#lib/server/auth/index.ts';
 import { listIdentities } from '#lib/server/auth/identities.ts';
 import { deleteAccountSessions } from '#lib/server/auth/session.ts';
-import { liftBanAction, placeBan, protectedFrom } from '#lib/server/admin/actions.ts';
+import { liftBanAction, placeBan, protectedFrom, renameRefusal } from '#lib/server/admin/actions.ts';
 import { checked, text } from '#lib/server/admin/form.ts';
 import { listAdminLog, logAdminAction } from '#lib/server/admin/log.ts';
 import { setAvatar } from '#lib/server/cockatrice/accounts.ts';
 import { capabilities } from '#lib/server/cockatrice/capabilities.ts';
+import { usernameProblem } from '#lib/server/cockatrice/username.ts';
 import {
 	PRIVILEGES,
 	activateAccount,
@@ -18,6 +19,8 @@ import {
 	getPlayer,
 	listPlayerSessions,
 	listWarnings,
+	renamePlayer,
+	renameProblem,
 	resetPassword,
 	setAdminNotes,
 	setPrivilege,
@@ -26,6 +29,7 @@ import {
 } from '#lib/server/cockatrice/moderation.ts';
 import { listReports } from '#lib/server/cockatrice/reports.ts';
 import { isDuplicate } from '#lib/server/cockatrice/sql.ts';
+import { setFlash } from '#lib/server/flash.ts';
 import { ADJUSTABLE_FLAGS, STAFF_FLAGS, staffLabels } from '#lib/staff.ts';
 import type { Actions, PageServerLoad } from './$types';
 
@@ -69,7 +73,8 @@ export const load: PageServerLoad = async (event) => {
 		privileges: PRIVILEGES,
 		adjustableFlags: STAFF_FLAGS.filter((flag) => flag.bit & ADJUSTABLE_FLAGS),
 		/** Why this staff member can't ban, warn or reset them, if they can't. */
-		refusal: protectedFrom(staff, player)
+		refusal: protectedFrom(staff, player),
+		renameRefusal: renameRefusal(staff, player)
 	};
 };
 
@@ -123,6 +128,31 @@ export const actions: Actions = {
 				: `Give ${player.name} this password, and ask them to change it.`,
 			password
 		};
+	},
+
+	rename: async (event) => {
+		const { staff, player } = await target(event, 'rename', false);
+		const refusal = renameRefusal(staff, player);
+		if (refusal) return fail(403, { action: 'rename', error: refusal });
+		const name = text(await event.request.formData(), 'name');
+		if (!name || name === player.name) return fail(400, { action: 'rename', error: 'Give them a new name.' });
+		const rule = usernameProblem(name, config.cockatrice.usernames);
+		if (rule) return fail(400, { action: 'rename', error: `That name ${rule}.` });
+		const problem = await renameProblem(player.id, name);
+		if (problem) return fail(400, { action: 'rename', error: problem });
+
+		try {
+			await renamePlayer(player.id, player.name, name);
+		} catch (e) {
+			if (isDuplicate(e)) return fail(400, { action: 'rename', error: `${name} was taken a moment ago.` });
+			throw e;
+		}
+		await logAdminAction(staff, 'account.rename', name, `renamed from ${player.name}`);
+		setFlash(event.cookies, {
+			type: 'success',
+			message: `Renamed ${player.name} to ${name}. They log in with the new name from now on; if they're connected, Servatrice keeps calling them ${player.name} until they reconnect.`
+		});
+		redirect(303, `/admin/players/${encodeURIComponent(name)}`);
 	},
 
 	removeAvatar: async (event) => {

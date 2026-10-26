@@ -1,6 +1,8 @@
 import { randomInt } from 'node:crypto';
 import { isIP } from 'node:net';
+import { sql } from 'drizzle-orm';
 import { config } from '#lib/server/config.ts';
+import { db, pool } from '#lib/server/db/index.ts';
 import { likeEscape } from '#lib/server/admin/form.ts';
 import { ADJUSTABLE_FLAGS } from '#lib/staff.ts';
 import { capabilities } from './capabilities';
@@ -407,6 +409,71 @@ export async function setPrivilege(accountId: number, level: Privilege, endsAt: 
       privlevelStartDate = IF(privlevel = ?, privlevelStartDate, UTC_TIMESTAMP()),
       privlevelEndDate = COALESCE(?, UTC_TIMESTAMP())
     WHERE id = ?`, [ level, level, endsAt, accountId ]);
+}
+
+/**
+ * Where an account is known by name rather than id ([table, column], ours
+ * unprefixed): what follows the account to its new name. Bans have to, or a
+ * rename would lift them; warnings, sessions and reports keep its history
+ * findable. Games and the chat log stay as they happened, under the old name,
+ * as does the donations table. `activation_emails` usually cascades from
+ * `users.name`, but not every database has the key.
+ */
+const NAME_COLUMNS: [string, string][] = [
+  [ 'sessions', 'user_name' ],
+  [ 'bans', 'user_name' ],
+  [ 'warnings', 'user_name' ],
+  [ 'warnings', 'mod_name' ],
+  [ 'reports', 'reporter_name' ],
+  [ 'reports', 'reported_user_name' ],
+  [ 'report_comments', 'author_name' ],
+  [ 'activation_emails', 'name' ],
+  [ 'forgot_password', 'name' ],
+  [ 'audit', 'name' ],
+];
+const OUR_NAME_COLUMNS: [string, string][] = [
+  [ 'chickatrice_admin_log', 'target' ],
+  [ 'chickatrice_admin_log', 'actor_name' ],
+];
+
+/**
+ * Why `name` can't be taken by account `accountId`, or null if it can. The
+ * collation is case-insensitive, so changing only the case of a name is fine.
+ */
+export async function renameProblem(accountId: number, name: string): Promise<string | null> {
+  const [ taken ] = await rows(`SELECT 1 FROM ${T.users} WHERE name = ? AND id <> ? LIMIT 1`, [ name, accountId ]);
+  if (taken) return `${name} is taken.`;
+  // Bans on a name outlive the account that had it; taking the name would inherit them.
+  const [ banned ] = await rows(`
+    SELECT 1 FROM ${T.bans} b JOIN ${T.users} u ON u.id = ?
+    WHERE b.user_name = ? AND b.user_name <> u.name LIMIT 1`, [ accountId, name ]);
+  if (banned) return `${name} has bans of its own.`;
+  return null;
+}
+
+/**
+ * Servatrice has no rename command; this changes `users.name` and every row
+ * that refers to the account by name, in one transaction. Callers check
+ * {@link renameProblem} first.
+ */
+export async function renamePlayer(accountId: number, oldName: string, newName: string): Promise<void> {
+  const prefixed = NAME_COLUMNS.map(([ name, column ]): [string, string] => [ `${config.cockatrice.prefix}_${name}`, column ]);
+  const targets = [ ...prefixed, ...OUR_NAME_COLUMNS ];
+
+  // Older schemas lack some of these tables (reports, for one).
+  const [ present ] = await pool.query(
+    `SELECT CONCAT(TABLE_NAME, '.', COLUMN_NAME) AS name FROM information_schema.COLUMNS
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN (?)`,
+    [ [ ...new Set(targets.map(([ name ]) => name)) ] ]);
+  const columns = new Set((present as { name: string }[]).map((row) => row.name));
+
+  await db.transaction(async (tx) => {
+    await tx.execute(sql`UPDATE ${sql.identifier(`${config.cockatrice.prefix}_users`)} SET name = ${newName} WHERE id = ${accountId}`);
+    for (const [ name, column ] of targets) {
+      if (!columns.has(`${name}.${column}`)) continue;
+      await tx.execute(sql`UPDATE ${sql.identifier(name)} SET ${sql.identifier(column)} = ${newName} WHERE ${sql.identifier(column)} = ${oldName}`);
+    }
+  });
 }
 
 const PASSWORD_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789';

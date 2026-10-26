@@ -5,7 +5,7 @@ const { adminLog } = chickatrice;
 
 export type AdminAction =
   | 'ban' | 'ban.lift' | 'warn'
-  | 'account.activate' | 'account.password' | 'account.avatar' | 'account.notes' | 'account.signout'
+  | 'account.activate' | 'account.password' | 'account.rename' | 'account.avatar' | 'account.notes' | 'account.signout'
   | 'account.staff' | 'account.privilege'
   | 'report.assign' | 'report.resolve' | 'report.dismiss' | 'report.comment'
   | 'room.create' | 'room.update' | 'room.delete'

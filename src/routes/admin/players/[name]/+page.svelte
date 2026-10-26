@@ -160,6 +160,19 @@
 					</form>
 				{/if}
 			</div>
+			{#if !data.renameRefusal}
+				<form method="POST" action="?/rename" class="space-y-1.5" use:enhance={submit('rename')}>
+					{@render result('rename')}
+					<Label for="rename">Username</Label>
+					<div class="flex gap-2">
+						<Input id="rename" name="name" value={player.name} required autocomplete="off" />
+						<Button type="submit" variant="outline" disabled={pending === 'rename'}>Rename</Button>
+					</div>
+					<p class="text-xs text-muted-foreground">
+						Their bans, warnings, sessions and reports move to the new name; games and chat stay under the old one. If they're connected, they keep the old name until they reconnect.
+					</p>
+				</form>
+			{/if}
 		</Card.Content>
 	</Card.Root>
 
