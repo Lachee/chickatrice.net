@@ -151,9 +151,9 @@ export const actions: Actions = {
 	},
 
 	staff: async (event) => {
-		const { staff, player, refusal } = await target(event, 'staff');
+		// Only admins get here, and the admin bit itself isn't touched, so any account's roles may change, admins' too.
+		const { staff, player } = await target(event, 'staff', false);
 		if (!staff.access.administer) return fail(403, { action: 'staff', error: 'Only an admin can change staff roles.' });
-		if (refusal) return refusal;
 		const form = await event.request.formData();
 		const flags = STAFF_FLAGS.filter((flag) => flag.bit & ADJUSTABLE_FLAGS && checked(form, flag.id)).reduce((n, flag) => n | flag.bit, 0);
 

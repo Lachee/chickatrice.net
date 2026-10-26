@@ -191,12 +191,12 @@
 					<div class="flex flex-wrap gap-4">
 						{#each data.adjustableFlags as role (role.id)}
 							<label class="flex items-center gap-2 text-sm">
-								<input type="checkbox" name={role.id} checked={(player.admin & role.bit) !== 0} disabled={!!data.refusal} class="rounded" />
+								<input type="checkbox" name={role.id} checked={(player.admin & role.bit) !== 0} class="rounded" />
 								{role.label}
 							</label>
 						{/each}
 					</div>
-					<Button type="submit" size="sm" variant="secondary" disabled={!!data.refusal || pending === 'staff'}>Save roles</Button>
+					<Button type="submit" size="sm" variant="secondary" disabled={pending === 'staff'}>Save roles</Button>
 				</form>
 
 				<form method="POST" action="?/privilege" class="space-y-3" use:enhance={submit('privilege', false)}>
