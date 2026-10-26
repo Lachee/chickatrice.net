@@ -145,6 +145,7 @@
 	html {
 		@apply font-sans;
 		scrollbar-color: var(--scrollbar) transparent;
+		scrollbar-gutter: stable;
 	}
 	::selection {
 		background: oklch(0.7 0.16 25 / 35%);
