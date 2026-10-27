@@ -8,6 +8,7 @@
 // set, this stamps it onto every request so the app sees that origin instead.
 // It goes in the X-Forwarded-* headers because Auth.js reads those itself when
 // it works out its own address; both then agree on it, whatever the client sent.
+// Requests addressed to any other host are redirected to ORIGIN, keeping the path.
 import http from 'node:http';
 import process from 'node:process';
 
@@ -26,6 +27,14 @@ const { handler } = await import('./build/handler.js');
 
 const server = http.createServer((req, res) => {
 	if (origin) {
+		// A proxy that sets X-Forwarded-Host is the one that saw the client's host.
+		const requested = req.headers['x-forwarded-host'] ?? req.headers.host;
+		if (requested !== origin.host) {
+			res.statusCode = req.method === 'GET' || req.method === 'HEAD' ? 301 : 308;
+			res.setHeader('location', new URL(req.url ?? '/', origin).href);
+			res.end();
+			return;
+		}
 		req.headers['x-forwarded-proto'] = origin.protocol.slice(0, -1);
 		req.headers['x-forwarded-host'] = origin.host;
 	}
