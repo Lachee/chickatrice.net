@@ -1,6 +1,6 @@
 import { config } from '#lib/server/config.ts';
 import { takeFlash } from '#lib/server/flash.ts';
-import { staffAccess } from '#lib/staff.ts';
+import { canViewNameChanges, staffAccess } from '#lib/staff.ts';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async ({ locals, cookies }) => {
@@ -10,7 +10,8 @@ export const load: LayoutServerLoad = async ({ locals, cookies }) => {
 			name: account.name,
 			hasAvatar: account.hasAvatar,
 			hasPassword: account.hasPassword,
-			staff: staffAccess(account.admin).view
+			staff: staffAccess(account.admin).view,
+			nameChanges: canViewNameChanges(account.admin)
 		},
 		flash: takeFlash(cookies),
 		umami: config.umami ?? null

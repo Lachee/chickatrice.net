@@ -129,6 +129,8 @@ const configSchema = z.object({
     passwordFormat: z.enum([ 'legacy', 'scrypt' ]).default('legacy'),
     /** Servatrice's `users/minpasswordlength`. */
     minPasswordLength: z.number().int().min(1).default(6),
+    /** Hours a player must wait between renaming themselves. Names the site picks, and staff renames, don't count. */
+    nameChangeCooldownHours: z.number().min(0).default(24),
     /**
      * Servatrice's `[users]` name rules. Names derived from a provider are made
      * to fit these, so keep them in step with servatrice.ini or the server will

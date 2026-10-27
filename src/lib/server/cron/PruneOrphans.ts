@@ -15,7 +15,7 @@ export default {
   run: async () => {
     const { users } = cockatrice;
     let pruned = 0;
-    for (const table of [ chickatrice.identities, chickatrice.sessions ]) {
+    for (const table of [ chickatrice.identities, chickatrice.sessions, chickatrice.nameChanges ]) {
       const [ result ] = await db.delete(table)
         .where(notExists(db.select({ id: users.id }).from(users).where(eq(users.id, table.accountId))));
       pruned += result.affectedRows;

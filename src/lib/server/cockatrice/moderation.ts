@@ -2,7 +2,7 @@ import { randomInt } from 'node:crypto';
 import { isIP } from 'node:net';
 import { sql } from 'drizzle-orm';
 import { config } from '#lib/server/config.ts';
-import { db, pool } from '#lib/server/db/index.ts';
+import { chickatrice, db, pool } from '#lib/server/db/index.ts';
 import { likeEscape } from '#lib/server/admin/form.ts';
 import { ADJUSTABLE_FLAGS } from '#lib/staff.ts';
 import { capabilities } from './capabilities';
@@ -453,10 +453,15 @@ export async function renameProblem(accountId: number, name: string): Promise<st
 
 /**
  * Servatrice has no rename command; this changes `users.name` and every row
- * that refers to the account by name, in one transaction. Callers check
- * {@link renameProblem} first.
+ * that refers to the account by name, in one transaction, and adds the change
+ * to the account's name history. Callers check {@link renameProblem} first.
  */
-export async function renamePlayer(accountId: number, oldName: string, newName: string): Promise<void> {
+export async function renamePlayer(
+  accountId: number,
+  oldName: string,
+  newName: string,
+  change: { source: 'user' } | { source: 'staff'; by: number },
+): Promise<void> {
   const prefixed = NAME_COLUMNS.map(([ name, column ]): [string, string] => [ `${config.cockatrice.prefix}_${name}`, column ]);
   const targets = [ ...prefixed, ...OUR_NAME_COLUMNS ];
 
@@ -473,6 +478,14 @@ export async function renamePlayer(accountId: number, oldName: string, newName: 
       if (!columns.has(`${name}.${column}`)) continue;
       await tx.execute(sql`UPDATE ${sql.identifier(name)} SET ${sql.identifier(column)} = ${newName} WHERE ${sql.identifier(column)} = ${oldName}`);
     }
+    await tx.insert(chickatrice.nameChanges).values({
+      accountId,
+      oldName,
+      newName,
+      source: change.source,
+      changedBy: change.source === 'staff' ? change.by : null,
+      createdAt: sql`UTC_TIMESTAMP()`,
+    });
   });
 }
 

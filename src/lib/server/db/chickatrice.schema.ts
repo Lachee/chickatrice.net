@@ -135,3 +135,25 @@ export const cardImages = mysqlTable('chickatrice_card_images', {
   uri: varchar('uri', { length: 512 }),
   fetchedAt: datetime('fetched_at', { mode: 'date' }).notNull(),
 });
+
+/**
+ * Every name an account has had. The first row is the name it was made with;
+ * after that, one row per rename. `source` says who chose the name: `signup`
+ * names are picked by the site from a provider's, `user` is the player renaming
+ * themselves (the only kind the once-a-day limit counts), `staff` is an admin.
+ * Names are copied in, so the history reads whatever the account is called now.
+ */
+export const nameChanges = mysqlTable('chickatrice_name_changes', {
+  id: serial('id').primaryKey(),
+  accountId: int('account_id', { unsigned: true }).notNull(),
+  /** Null for `signup`: there was no name before it. */
+  oldName: varchar('old_name', { length: 35 }),
+  newName: varchar('new_name', { length: 35 }).notNull(),
+  source: mysqlEnum('source', [ 'signup', 'user', 'staff' ]).notNull(),
+  /** The staff account behind a `staff` change. */
+  changedBy: int('changed_by', { unsigned: true }),
+  createdAt: datetime('created_at', { mode: 'date' }).notNull(),
+}, (table) => [
+  index('chickatrice_name_changes_account').on(table.accountId, table.id),
+  index('chickatrice_name_changes_created').on(table.createdAt),
+]);

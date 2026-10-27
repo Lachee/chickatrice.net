@@ -34,3 +34,10 @@ export function staffAccess(admin: number): StaffAccess {
 }
 
 export const staffLabels = (admin: number) => STAFF_FLAGS.filter((flag) => admin & flag.bit).map((flag) => flag.label);
+
+/**
+ * Who may open the Recent Name Changes page. It is meant for every signed-in
+ * player eventually; until then, moderators. Widen it here and the nav and the
+ * page follow.
+ */
+export const canViewNameChanges = (admin: number) => staffAccess(admin).moderate;

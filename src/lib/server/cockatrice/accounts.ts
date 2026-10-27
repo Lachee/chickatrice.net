@@ -1,6 +1,6 @@
 import { eq, inArray, sql } from 'drizzle-orm';
 import { config } from '#lib/server/config.ts';
-import { db, cockatrice } from '#lib/server/db/index.ts';
+import { db, chickatrice, cockatrice } from '#lib/server/db/index.ts';
 import { capabilities } from './capabilities';
 import { hashPassword } from './password';
 import { usernameCandidates } from './username';
@@ -120,6 +120,10 @@ export async function createAccount({ usernameSeed, email, country }: NewAccount
         });
         const account = await findAccountById(result.insertId);
         if (!account) throw new Error(`account ${name} vanished after being created`);
+        // The first line of its name history, which the once-a-day limit doesn't count.
+        await db.insert(chickatrice.nameChanges).values({
+          accountId: account.id, oldName: null, newName: name, source: 'signup', createdAt: sql`UTC_TIMESTAMP()`,
+        });
         return account;
       } catch (e) {
         if ((e as { code?: string }).code === ER_DUP_ENTRY) continue;

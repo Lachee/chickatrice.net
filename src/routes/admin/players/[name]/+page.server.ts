@@ -9,6 +9,7 @@ import { checked, text } from '#lib/server/admin/form.ts';
 import { listAdminLog, logAdminAction } from '#lib/server/admin/log.ts';
 import { setAvatar } from '#lib/server/cockatrice/accounts.ts';
 import { capabilities } from '#lib/server/cockatrice/capabilities.ts';
+import { nameHistory, previousNames } from '#lib/server/cockatrice/names.ts';
 import { usernameProblem } from '#lib/server/cockatrice/username.ts';
 import {
 	PRIVILEGES,
@@ -39,14 +40,15 @@ export const load: PageServerLoad = async (event) => {
 	if (!player) error(404, `There's no account called ${event.params.name}.`);
 
 	const caps = await capabilities();
-	const [sessions, alts, bans, warnings, reports, identities, actions] = await Promise.all([
+	const [sessions, alts, bans, warnings, reports, identities, actions, names] = await Promise.all([
 		listPlayerSessions(player.name, 25),
 		findAlts(player),
 		banHistory(player.name),
 		listWarnings({ userId: player.id }),
 		caps.reports ? listReports({ filter: 'all', userName: player.name, limit: 10 }) : Promise.resolve(null),
 		listIdentities(player.id),
-		listAdminLog({ target: player.name, limit: 20 })
+		listAdminLog({ target: player.name, limit: 20 }),
+		nameHistory(player.id)
 	]);
 
 	// The newest ban on the name is the one Servatrice goes by.
@@ -69,6 +71,8 @@ export const load: PageServerLoad = async (event) => {
 			lastLoginAt: Math.floor(identity.lastLoginAt.getTime() / 1000)
 		})),
 		actions,
+		nameHistory: names,
+		previousNames: previousNames(names, player.name),
 		officialWarnings: config.cockatrice.officialWarnings,
 		privileges: PRIVILEGES,
 		adjustableFlags: STAFF_FLAGS.filter((flag) => flag.bit & ADJUSTABLE_FLAGS),
@@ -142,7 +146,7 @@ export const actions: Actions = {
 		if (problem) return fail(400, { action: 'rename', error: problem });
 
 		try {
-			await renamePlayer(player.id, player.name, name);
+			await renamePlayer(player.id, player.name, name, { source: 'staff', by: staff.id });
 		} catch (e) {
 			if (isDuplicate(e)) return fail(400, { action: 'rename', error: `${name} was taken a moment ago.` });
 			throw e;
