@@ -72,6 +72,9 @@
 			<Time at={player.lastLogin} relative empty="never" />{#if player.clientVersion}&nbsp;on {player.clientVersion}{/if} ·
 			<a href="/decks/by/{encodeURIComponent(player.name)}" class="underline-offset-4 hover:underline">decks</a>
 		</p>
+		{#if data.previousNames.length}
+			<p class="text-sm text-muted-foreground">Previously known as <span class="font-medium text-foreground">{data.previousNames.join(', ')}</span></p>
+		{/if}
 	</div>
 </div>
 
@@ -172,6 +175,21 @@
 						Their bans, warnings, sessions and reports move to the new name; games and chat stay under the old one. If they're connected, they keep the old name until they reconnect.
 					</p>
 				</form>
+			{/if}
+			{#if data.nameHistory.length}
+				<div class="space-y-1.5">
+					<h3 class="text-sm font-medium">Name history</h3>
+					<ul class="divide-y rounded-lg border text-sm">
+						{#each data.nameHistory as entry (`${entry.at}:${entry.newName}`)}
+							<li class="flex flex-wrap items-center justify-between gap-x-3 px-3 py-1.5">
+								<span>{#if entry.oldName}{entry.oldName} → {/if}<strong class="font-medium">{entry.newName}</strong></span>
+								<span class="text-xs text-muted-foreground">
+									{entry.source === 'staff' ? 'by staff' : entry.source === 'signup' ? 'at sign-up' : 'by themselves'} · <Time at={entry.at} />
+								</span>
+							</li>
+						{/each}
+					</ul>
+				</div>
 			{/if}
 		</Card.Content>
 	</Card.Root>

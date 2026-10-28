@@ -43,6 +43,13 @@
       "when": 1792927819986,
       "tag": "0005_card_images",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1793065352654,
+      "tag": "0006_name_changes",
+      "breakpoints": true
     }
   ]
 }

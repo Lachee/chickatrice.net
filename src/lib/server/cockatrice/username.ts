@@ -35,6 +35,17 @@ export function usernameProblem(name: string, rules: UsernameRules): string | nu
   return null;
 }
 
+/** The rules in words, for the form: "6–12 characters: letters, numbers and _ . -". */
+export function describeRules(rules: UsernameRules): string {
+  const kinds = [
+    rules.allowLowercase && rules.allowUppercase ? 'letters' : rules.allowLowercase ? 'lowercase letters' : rules.allowUppercase ? 'uppercase letters' : '',
+    rules.allowNumerics ? 'numbers' : '',
+    rules.allowedPunctuation ? [ ...rules.allowedPunctuation ].join(' ') : '',
+  ].filter(Boolean);
+  const list = kinds.length > 1 ? `${kinds.slice(0, -1).join(', ')} and ${kinds.at(-1)}` : kinds[0];
+  return `${rules.minLength}–${rules.maxLength} characters: ${list}${rules.allowPunctuationPrefix || !rules.allowedPunctuation ? '' : ', not starting with punctuation'}.`;
+}
+
 /**
  * The stem a provider's name is turned into: accents dropped, anything Servatrice
  * wouldn't allow removed, banned words cut out, cased to fit, and trimmed to the

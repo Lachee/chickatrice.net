@@ -6,7 +6,9 @@ import { enabledProviders, providerIcon, providerName } from '#lib/server/auth/i
 import { listIdentities, unlinkProvider } from '#lib/server/auth/identities.ts';
 import { destroyOtherSessions, sessionCookieName } from '#lib/server/auth/session.ts';
 import { findAccountByName, setAvatar, setCountry, setPassword } from '#lib/server/cockatrice/accounts.ts';
+import { nameHistory, renameSelf, renameStatus } from '#lib/server/cockatrice/names.ts';
 import { verifyPassword } from '#lib/server/cockatrice/password.ts';
+import { describeRules } from '#lib/server/cockatrice/username.ts';
 import { setFlash } from '#lib/server/flash.ts';
 import { AvatarError, encodeAvatar, fetchAvatar } from '#lib/server/avatar.ts';
 import { eraseAccount, erasureRefusal } from '#lib/server/erase.ts';
@@ -37,6 +39,8 @@ export const load: PageServerLoad = async (event) => {
 		redirect(303, '/account');
 	}
 
+	const [history, rename] = await Promise.all([nameHistory(account.id), renameStatus(account)]);
+
 	return {
 		profile: {
 			name: account.name,
@@ -48,6 +52,8 @@ export const load: PageServerLoad = async (event) => {
 			registeredAt: account.registeredAt.toISOString(),
 			deleteRefusal: await erasureRefusal(account)
 		},
+		rename: { ...rename, rules: describeRules(config.cockatrice.usernames), maxLength: config.cockatrice.usernames.maxLength },
+		nameHistory: history,
 		identities: identities.map((identity) => ({
 			provider: identity.provider,
 			providerName: providerName(identity.provider),
@@ -95,6 +101,19 @@ export const actions: Actions = {
 			message: account.hasPassword
 				? 'Password changed. Use the new one next time you connect from Cockatrice.'
 				: `Password set. You can now log in to Cockatrice as ${account.name}.`
+		};
+	},
+
+	rename: async (event) => {
+		const account = requireAccount(event);
+		const name = String((await event.request.formData()).get('name') ?? '').trim();
+		if (!name) return fail(400, { action: 'rename', error: 'Enter a new name.' });
+
+		const result = await renameSelf(account, name);
+		if (!result.ok) return fail(400, { action: 'rename', error: result.error });
+		return {
+			action: 'rename',
+			message: `You are now ${name}. Log in to Cockatrice with the new name from now on; if you're connected, the server calls you ${account.name} until you reconnect.`
 		};
 	},
 

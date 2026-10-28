@@ -10,6 +10,8 @@ The original PHP site lives on `master` / `v1.0.0` — useful for how things use
 - `src/lib/server/cockatrice/` — everything that touches Servatrice's tables:
   `accounts.ts` (create/find/update `cockatrice_users`), `password.ts` (both hash formats),
   `username.ts` (Servatrice's name rules + deriving a name from a provider),
+  `names.ts` (name history in `chickatrice_name_changes`, a player renaming themselves, the
+  Recent Name Changes list; `renamePlayer` in `moderation.ts` does the actual move),
   `capabilities.ts` (which optional columns and tables this schema version has), `stats.ts`,
   and for the admin pages `moderation.ts` (players, bans, warnings, account changes),
   `metrics.ts`, `reports.ts`, `settings.ts` (rooms, server message, card art), `logs.ts`,
@@ -66,6 +68,10 @@ The original PHP site lives on `master` / `v1.0.0` — useful for how things use
   `trackSubmit` for posts to Auth.js), never `data-umami-event` on an internal link: Umami turns
   that click into a full page load. Server-only outcomes ride on a flash's `event`. Event data
   never identifies anyone (no names, emails, deck titles).
+- **Renames go through `renamePlayer`** so bans, warnings etc. follow the account and the change
+  lands in `chickatrice_name_changes`. A player may rename only with a provider linked, once per
+  `nameChangeCooldownHours`; only `source = 'user'` rows count toward that (sign-up names and staff
+  renames don't). `/names` is gated by `canViewNameChanges` in `#lib/staff.ts` (moderators for now).
 - **Databases from the old site** are converted by `0001_legacy_import.sql`: its Discord links
   become identities on provider id `discord` (keep that id), and its tables are kept as
   `legacy_chickatrice_*`, outside drizzle-kit's `chickatrice_*` filter. Nothing reads them.

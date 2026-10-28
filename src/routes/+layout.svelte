@@ -13,6 +13,7 @@
 	import UserCogIcon from '@lucide/svelte/icons/user-cog';
 	import LogOutIcon from '@lucide/svelte/icons/log-out';
 	import LogInIcon from '@lucide/svelte/icons/log-in';
+	import SignatureIcon from '@lucide/svelte/icons/signature';
 	import ShieldIcon from '@lucide/svelte/icons/shield';
 	import type { LayoutProps } from './$types';
 
@@ -22,6 +23,7 @@
 		{ href: '/', label: 'Home', icon: HouseIcon },
 		{ href: '/stats', label: 'Statistics', icon: ActivityIcon },
 		...(data.account ? [{ href: '/decks', label: 'Decks', icon: LayersIcon }] : []),
+		...(data.account?.nameChanges ? [{ href: '/names', label: 'Name changes', icon: SignatureIcon }] : []),
 		...(data.account?.staff ? [{ href: '/admin', label: 'Admin', icon: ShieldIcon }] : [])
 	]);
 

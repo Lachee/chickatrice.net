@@ -40,6 +40,8 @@ cockatrice:
   # Keep these in step with servatrice.ini, so accounts made here are ones the
   # server will let in. The defaults are Servatrice's.
   # minPasswordLength: 6             # [users] minpasswordlength
+  # Hours between a player renaming themselves (0 for no limit). Staff renames don't count.
+  # nameChangeCooldownHours: 24
   # usernames:
   #   minLength: 6                   # [users] minnamelength
   #   maxLength: 12                  # [users] maxnamelength
