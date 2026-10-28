@@ -194,6 +194,49 @@
 		</Card.Content>
 	</Card.Root>
 
+	<Card.Root id="username" class="lg:col-span-2">
+		<Card.Header>
+			<Card.Title class="flex items-center gap-2"><SignatureIcon class="size-4" /> Username</Card.Title>
+			<Card.Description>
+				Your name in Cockatrice. Your decks, bans and warnings come with you; games and chat already played stay under the old name.
+			</Card.Description>
+		</Card.Header>
+		<Card.Content class="grid gap-6 md:grid-cols-2">
+			<div class="space-y-3">
+				{@render result('rename')}
+				{#if data.rename.refusal}
+					<Notice type="info">{data.rename.refusal}</Notice>
+				{:else}
+					<form method="POST" action="?/rename" class="space-y-1.5" use:enhance={submit('rename', false)}>
+						<Label for="rename">New username</Label>
+						<div class="flex gap-2">
+							<Input id="rename" name="name" value={profile.name} maxlength={data.rename.maxLength} required autocomplete="off" spellcheck="false" />
+							<Button type="submit" variant="secondary" disabled={pending === 'rename'}>Change</Button>
+						</div>
+						<p class="text-xs text-muted-foreground">{data.rename.rules} You can only change it once a day, so choose carefully.</p>
+					</form>
+				{/if}
+			</div>
+			<div>
+				<h3 class="mb-1.5 text-sm font-medium">Name history</h3>
+				<ul class="divide-y rounded-lg border text-sm">
+					{#each data.nameHistory as entry (`${entry.at}:${entry.newName}`)}
+						<li class="flex flex-wrap items-center justify-between gap-x-3 px-3.5 py-2">
+							<span>
+								{#if entry.oldName}{entry.oldName} → {/if}<strong class="font-medium">{entry.newName}</strong>
+							</span>
+							<span class="text-xs text-muted-foreground">
+								{entry.source === 'staff' ? 'Changed by staff' : entry.source === 'signup' ? 'Chosen at sign-up' : 'Changed by you'} · <Time at={entry.at} />
+							</span>
+						</li>
+					{:else}
+						<li class="px-3.5 py-2 text-muted-foreground">You've had {profile.name} since the start.</li>
+					{/each}
+				</ul>
+			</div>
+		</Card.Content>
+	</Card.Root>
+
 	<Card.Root class="lg:col-span-2">
 		<Card.Header>
 			<Card.Title class="flex items-center gap-2"><LinkIcon class="size-4" /> Sign-in methods</Card.Title>
@@ -243,49 +286,6 @@
 					{/each}
 				</div>
 			{/if}
-		</Card.Content>
-	</Card.Root>
-
-	<Card.Root id="username" class="lg:col-span-2">
-		<Card.Header>
-			<Card.Title class="flex items-center gap-2"><SignatureIcon class="size-4" /> Username</Card.Title>
-			<Card.Description>
-				Your name in Cockatrice. Your decks, bans and warnings come with you; games and chat already played stay under the old name.
-			</Card.Description>
-		</Card.Header>
-		<Card.Content class="grid gap-6 md:grid-cols-2">
-			<div class="space-y-3">
-				{@render result('rename')}
-				{#if data.rename.refusal}
-					<Notice type="info">{data.rename.refusal}</Notice>
-				{:else}
-					<form method="POST" action="?/rename" class="space-y-1.5" use:enhance={submit('rename', false)}>
-						<Label for="rename">New username</Label>
-						<div class="flex gap-2">
-							<Input id="rename" name="name" value={profile.name} maxlength={data.rename.maxLength} required autocomplete="off" spellcheck="false" />
-							<Button type="submit" variant="secondary" disabled={pending === 'rename'}>Change</Button>
-						</div>
-						<p class="text-xs text-muted-foreground">{data.rename.rules} You can only change it once a day, so choose carefully.</p>
-					</form>
-				{/if}
-			</div>
-			<div>
-				<h3 class="mb-1.5 text-sm font-medium">Name history</h3>
-				<ul class="divide-y rounded-lg border text-sm">
-					{#each data.nameHistory as entry (`${entry.at}:${entry.newName}`)}
-						<li class="flex flex-wrap items-center justify-between gap-x-3 px-3.5 py-2">
-							<span>
-								{#if entry.oldName}{entry.oldName} → {/if}<strong class="font-medium">{entry.newName}</strong>
-							</span>
-							<span class="text-xs text-muted-foreground">
-								{entry.source === 'staff' ? 'Changed by staff' : entry.source === 'signup' ? 'Chosen at sign-up' : 'Changed by you'} · <Time at={entry.at} />
-							</span>
-						</li>
-					{:else}
-						<li class="px-3.5 py-2 text-muted-foreground">You've had {profile.name} since the start.</li>
-					{/each}
-				</ul>
-			</div>
 		</Card.Content>
 	</Card.Root>
 
