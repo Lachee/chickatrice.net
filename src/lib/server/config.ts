@@ -83,7 +83,9 @@ const providerSchema = z.object({
   /**
    * Which profile fields hold what. The defaults are the standard OIDC claims.
    * `username` seeds the in-game name; when none of them is present the local
-   * part of the email is used, and failing that a generic name.
+   * part of the email is used, and failing that a generic name. A claim with
+   * `{field}` in it is a template filled from the profile's fields, e.g.
+   * `https://cdn.discordapp.com/avatars/{id}/{avatar}.png`.
    */
   claims: z.object({
     id: claim('sub'),

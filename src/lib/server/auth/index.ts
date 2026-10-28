@@ -20,13 +20,32 @@ import { SESSION_MAX_AGE, sessionAccountId } from './session';
  * posts (`@auth/sveltekit` switches off Auth.js' own token for that reason).
  */
 
-/** Reads the configured claims off a provider's profile. */
+/**
+ * Reads the configured claims off a provider's profile. A claim with `{field}`
+ * in it is a template, filled from those fields and skipped if any is missing:
+ * Discord gives only an avatar hash, which has to be made into a CDN URL.
+ */
 function readProfile(provider: AuthProviderConfig, profile: Record<string, unknown>): { subject: string | null } & ProfileDetails {
+  const field = (name: string) => {
+    const value = profile[name];
+    if (typeof value === 'string' && value !== '') return value;
+    if (typeof value === 'number') return String(value);
+    return null;
+  };
   const read = (names: string[]) => {
     for (const name of names) {
-      const value = profile[name];
-      if (typeof value === 'string' && value !== '') return value;
-      if (typeof value === 'number') return String(value);
+      if (!name.includes('{')) {
+        const value = field(name);
+        if (value) return value;
+        continue;
+      }
+      let complete = true;
+      const value = name.replace(/\{(\w+)\}/g, (_, key: string) => {
+        const part = field(key);
+        if (part === null) complete = false;
+        return encodeURIComponent(part ?? '');
+      });
+      if (complete) return value;
     }
     return null;
   };

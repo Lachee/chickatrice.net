@@ -127,6 +127,8 @@ auth:
     #     id: id
     #     username: [username, global_name]
     #     email: email
+    #     # Discord sends an avatar hash; {field} fills in a profile field.
+    #     image: https://cdn.discordapp.com/avatars/{id}/{avatar}.png?size=256
 
     # Google, an OIDC provider. Create an OAuth client ID ("Web application") at
     # https://console.cloud.google.com/apis/credentials. Google has no username
