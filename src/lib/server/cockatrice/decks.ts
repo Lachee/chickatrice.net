@@ -5,6 +5,7 @@ import type { DeckVisibility } from '#lib/decks.ts';
 import { MAX_DECK_BYTES, MAX_DECK_NAME, cardCount, parseCod, type DeckList } from '#lib/server/decks/format.ts';
 import { cardImages, cardKey, type CardRef } from '#lib/server/scryfall.ts';
 import { capabilities } from './capabilities';
+import { unshareDeck } from './shares';
 import { execute, rows, table } from './sql';
 
 /*
@@ -217,17 +218,20 @@ export async function updateDeck(deck: Pick<Deck, 'id' | 'ownerId'>, name: strin
 
 /**
  * On schema 37+, public is the deck's own `is_public`. A deck made public by
- * its folder stays public whatever is set here; the page says so.
+ * its folder stays public whatever is set here; the page says so. Making it
+ * private ends its "Open in Cockatrice" share, which anyone holding could follow.
  */
 export async function setDeckVisibility(deck: Pick<Deck, 'id' | 'ownerId'>, visibility: DeckVisibility): Promise<void> {
   await db.update(decks).set({ visibility }).where(and(eq(decks.deckId, deck.id), eq(decks.accountId, deck.ownerId)));
   if ((await capabilities()).publicDecks)
     await execute(`UPDATE ${T.files} SET is_public = ? WHERE id = ? AND id_user = ?`, [ visibility === 'public' ? 1 : 0, deck.id, deck.ownerId ]);
+  if (visibility === 'private') await unshareDeck(deck.id);
 }
 
 export async function deleteDeck(deck: Pick<Deck, 'id' | 'ownerId'>): Promise<void> {
   await execute(`DELETE FROM ${T.files} WHERE id = ? AND id_user = ?`, [ deck.id, deck.ownerId ]);
   await db.delete(decks).where(eq(decks.deckId, deck.id));
+  await unshareDeck(deck.id);
 }
 
 /** A row of a deck list page. */

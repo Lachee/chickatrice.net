@@ -15,7 +15,8 @@ The original PHP site lives on `master` / `v1.0.0` — useful for how things use
   `capabilities.ts` (which optional columns and tables this schema version has), `stats.ts`,
   and for the admin pages `moderation.ts` (players, bans, warnings, account changes),
   `metrics.ts`, `reports.ts`, `settings.ts` (rooms, server message, card art), `logs.ts`,
-  all raw SQL through `sql.ts`. `decks.ts` is the client's server deck storage (`decklist_files`).
+  all raw SQL through `sql.ts`. `decks.ts` is the client's server deck storage (`decklist_files`);
+  `shares.ts` writes the `deck_share` rows behind "Open in Cockatrice" (`cockatrice://opendeck`).
 - `src/lib/server/decks/` — `format.ts` (`.cod` and plain-text lists, the deck hash),
   `import.ts` (Moxfield, Archidekt), `access.ts` (owner or admin manages; others view if shared).
   Card images: `#lib/server/scryfall.ts` looks cards up in batches and caches the URLs in

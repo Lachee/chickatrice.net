@@ -98,6 +98,21 @@ export const decks = mysqlTable('chickatrice_decks', {
 ]);
 
 /**
+ * The Servatrice deck share (`deck_share`, schema 37+) the site last made for a
+ * deck, for its "Open in Cockatrice" link: handed out again while it lasts and
+ * the deck hasn't changed, so every click doesn't make another.
+ */
+export const deckShares = mysqlTable('chickatrice_deck_shares', {
+  /** `decklist_files.id`. */
+  deckId: int('deck_id', { unsigned: true }).primaryKey(),
+  /** `deck_share.id`. Servatrice deletes it (and its items) once it expires. */
+  shareId: int('share_id', { unsigned: true }).notNull(),
+  /** SHA-256 of the `.cod` the share holds: a share of anything else is stale. */
+  contentHash: varchar('content_hash', { length: 64 }).notNull(),
+  createdAt: datetime('created_at', { mode: 'date' }).notNull(),
+});
+
+/**
  * Every run of a cron job, from whichever instance got its lock: the admin
  * page's last-run column and history. Rows older than `RUN_HISTORY_DAYS`
  * (server/cron/index.ts) are dropped as each job records its next run.

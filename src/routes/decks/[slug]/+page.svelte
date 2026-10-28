@@ -14,6 +14,7 @@
 	import VisibilityBadge from '#lib/components/decks/VisibilityBadge.svelte';
 	import { VISIBILITIES } from '#lib/decks.ts';
 	import { track, trackResult } from '#lib/umami.ts';
+	import AppWindowIcon from '@lucide/svelte/icons/app-window';
 	import CopyIcon from '@lucide/svelte/icons/copy';
 	import DownloadIcon from '@lucide/svelte/icons/download';
 	import ExternalLinkIcon from '@lucide/svelte/icons/external-link';
@@ -41,7 +42,22 @@
 			};
 		};
 
+	// The action hands back a cockatrice:// link; following it is what opens the client.
+	const open: SubmitFunction = () => {
+		pending = 'open';
+		return async ({ result, update }) => {
+			trackResult('deck-open-client', result);
+			if (result.type === 'success' && typeof result.data?.link === 'string') window.location.href = result.data.link;
+			await update({ reset: false });
+			pending = null;
+		};
+	};
+
 	const feedback = (action: string) => (form?.action === action ? form : null);
+	const openLink = $derived.by(() => {
+		const f = feedback('open');
+		return f && 'link' in f && typeof f.link === 'string' ? f.link : null;
+	});
 	const shareUrl = $derived(`${page.url.origin}/decks/${deck.slug}`);
 	const sourceName = $derived(deck.sourceUrl ? new URL(deck.sourceUrl).hostname.replace(/^www\./, '') : null);
 	const scryfall = (name: string) => `https://scryfall.com/search?q=${encodeURIComponent(`!"${name}"`)}`;
@@ -137,6 +153,13 @@
 				<FileTextIcon /> As text
 			</Button>
 		{/if}
+		{#if data.canOpen}
+			<form method="POST" action="?/open" use:enhance={open}>
+				<Button type="submit" variant="outline" disabled={pending === 'open'} title="Opens the deck in the Cockatrice client, which signs in to this server for it">
+					<AppWindowIcon /> Open in Cockatrice
+				</Button>
+			</form>
+		{/if}
 		{#if data.canCopy}
 			<form method="POST" action="?/copy" use:enhance={submit('copy')}>
 				<Button type="submit" variant="outline" disabled={pending === 'copy'}><CopyIcon /> Copy to my decks</Button>
@@ -158,6 +181,16 @@
 
 {#if feedback('copy')}
 	<div class="mb-4">{@render result('copy')}</div>
+{/if}
+
+{#if openLink}
+	<Notice class="mb-4">
+		Opening it in Cockatrice, which asks before connecting to the server.
+		Nothing happened? <a href={openLink} class="font-medium underline underline-offset-4">Try again</a>, or download the deck instead:
+		opening links needs a recent Cockatrice. The link works for a day.
+	</Notice>
+{:else if feedback('open')}
+	<div class="mb-4">{@render result('open')}</div>
 {/if}
 
 {#if deck.comments}

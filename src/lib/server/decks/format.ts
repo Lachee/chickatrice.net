@@ -41,6 +41,8 @@ export type DeckList = {
   /** The card shown on the deck's tile in the client. */
   bannerCard?: { name: string; providerId?: string };
   tags?: string[];
+  /** The client's `<format>`, like `commander`. Read only, for deck shares. */
+  format?: string;
 };
 
 /** Servatrice's `decklist_files.content` is a TEXT column. */
@@ -118,6 +120,7 @@ export function parseCod(xml: string): DeckList | null {
     zones,
     bannerCard: banner?.text ? { name: banner.text, providerId: banner.attributes.providerId || undefined } : undefined,
     tags: tags ? [ ...tags.raw.matchAll(/<tag>([\s\S]*?)<\/tag>/g) ].map(([ , tag ]) => decode(tag)) : undefined,
+    format: element(xml, 'format')?.text.trim() || undefined,
   };
 }
 

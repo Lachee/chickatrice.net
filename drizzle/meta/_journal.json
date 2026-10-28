@@ -50,6 +50,13 @@
       "when": 1793065352654,
       "tag": "0006_name_changes",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "5",
+      "when": 1793147969978,
+      "tag": "0007_deck_shares",
+      "breakpoints": true
     }
   ]
 }

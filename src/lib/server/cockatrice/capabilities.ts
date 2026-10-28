@@ -29,6 +29,11 @@ export type Capabilities = {
    * other players can browse from the client.
    */
   publicDecks: boolean;
+  /**
+   * The `deck_share` and `deck_share_item` tables (schema 37+): decks fetched by
+   * token, which `cockatrice://opendeck` links open in the client.
+   */
+  deckShares: boolean;
 };
 
 let cached: Promise<Capabilities> | undefined;
@@ -50,7 +55,7 @@ async function probe(): Promise<Capabilities> {
     ),
     pool.query(
       'SELECT TABLE_NAME AS name FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME IN (?)',
-      [ [ 'reports', 'report_comments', 'card_art_name_rules' ].map((name) => `${prefix}_${name}`) ],
+      [ [ 'reports', 'report_comments', 'card_art_name_rules', 'deck_share', 'deck_share_item' ].map((name) => `${prefix}_${name}`) ],
     ),
     pool.query(
       `SELECT TABLE_NAME AS name FROM information_schema.COLUMNS
@@ -71,5 +76,6 @@ async function probe(): Promise<Capabilities> {
     reports: tables.has('reports') && tables.has('report_comments'),
     cardArtRules: tables.has('card_art_name_rules'),
     publicDecks: (deckRows as unknown[]).length === 2,
+    deckShares: tables.has('deck_share') && tables.has('deck_share_item'),
   };
 }

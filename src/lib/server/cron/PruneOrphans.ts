@@ -3,6 +3,7 @@ import type { CronJob } from '#lib/server/cron/index.ts';
 import { ONE_DAY } from '#lib/server/cron/intervals.ts';
 import { db, chickatrice, cockatrice } from '#lib/server/db/index.ts';
 import { pruneDeckRows } from '#lib/server/cockatrice/decks.ts';
+import { pruneDeckShareRows } from '#lib/server/cockatrice/shares.ts';
 
 /**
  * Servatrice's admins delete accounts by hand, and players delete decks from
@@ -22,6 +23,9 @@ export default {
     }
     // Decks go from the client without us hearing of it, and with their accounts.
     const decks = await pruneDeckRows();
-    if (pruned || decks) return `pruned ${pruned} link(s) and session(s) of deleted accounts, and ${decks} row(s) of deleted decks`;
+    // After the decks, so a deleted deck's share row goes too. Servatrice deletes the expired shares themselves.
+    const shares = await pruneDeckShareRows();
+    if (pruned || decks || shares)
+      return `pruned ${pruned} link(s) and session(s) of deleted accounts, ${decks} row(s) of deleted decks and ${shares} of expired deck shares`;
   },
 } satisfies CronJob;
