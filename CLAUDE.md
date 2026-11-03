@@ -27,6 +27,9 @@ The original PHP site lives on `master` / `v1.0.0` — useful for how things use
   (provider ↔ account links), `guard.ts` (`requireAccount`, `requireStaff`), `ratelimit.ts`.
 - `src/lib/server/admin/` — `log.ts` (`chickatrice_admin_log`: what staff did from the site),
   `actions.ts` (form actions shared between admin pages), `form.ts`.
+- `src/lib/server/site/banner.ts` — the site-wide notice (outages etc.) in `chickatrice_site_banner`,
+  set from `/admin/settings`, cached 30 s per replica. Not the same thing as a player's card-art
+  "banner" (`cockatrice/banner.ts`).
 - `src/lib/server/cron/` — scheduled jobs, one MySQL named lock each so one replica runs them;
   every run is recorded in `chickatrice_cron_runs` for `/admin/cron`, which can also run one now.
 - `src/routes/admin/` — the staff pages. Access is Servatrice's `admin` bitfield, mapped in

@@ -172,3 +172,17 @@ export const nameChanges = mysqlTable('chickatrice_name_changes', {
   index('chickatrice_name_changes_account').on(table.accountId, table.id),
   index('chickatrice_name_changes_created').on(table.createdAt),
 ]);
+
+/**
+ * The notice across the top of every page, for outages and the like. One row
+ * at most (`id` 1); no row, or one past `expires_at`, means no banner.
+ */
+export const siteBanner = mysqlTable('chickatrice_site_banner', {
+  id: int('id', { unsigned: true }).primaryKey(),
+  message: text('message').notNull(),
+  level: mysqlEnum('level', [ 'info', 'warning', 'outage' ]).notNull(),
+  /** When it takes itself down; null keeps it up until someone clears it. */
+  expiresAt: datetime('expires_at', { mode: 'date' }),
+  updatedBy: int('updated_by', { unsigned: true }).notNull(),
+  updatedAt: datetime('updated_at', { mode: 'date' }).notNull(),
+});

@@ -9,7 +9,7 @@ export type AdminAction =
   | 'account.staff' | 'account.privilege'
   | 'report.assign' | 'report.resolve' | 'report.dismiss' | 'report.comment'
   | 'room.create' | 'room.update' | 'room.delete'
-  | 'servermessage'
+  | 'servermessage' | 'banner.set' | 'banner.clear'
   | 'cardart.set' | 'cardart.remove'
   | 'deck.update' | 'deck.visibility' | 'deck.delete'
   | 'cron.run';

@@ -5,6 +5,7 @@
 	import * as Avatar from '#lib/components/ui/avatar/index.ts';
 	import * as DropdownMenu from '#lib/components/ui/dropdown-menu/index.ts';
 	import Notice from '#lib/components/Notice.svelte';
+	import SiteBanner from '#lib/components/SiteBanner.svelte';
 	import Umami from '#lib/components/Umami.svelte';
 	import { track, trackSubmit } from '#lib/umami.ts';
 	import ActivityIcon from '@lucide/svelte/icons/activity';
@@ -118,6 +119,10 @@
 		{/if}
 	</nav>
 </header>
+
+{#if data.banner}
+	<SiteBanner banner={data.banner} />
+{/if}
 
 <!-- A column so a page's last section can `flex-1` down to the footer (the home hero does). -->
 <main class="mx-auto flex w-full max-w-6xl flex-1 flex-col px-4 py-8">

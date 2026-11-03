@@ -20,12 +20,27 @@ import {
 	setCardArtRule,
 	type RoomInput
 } from '#lib/server/cockatrice/settings.ts';
+import {
+	BANNER_LEVELS,
+	BANNER_MAX_LENGTH,
+	clearBanner,
+	getStoredBanner,
+	setBanner,
+	type BannerLevel
+} from '#lib/server/site/banner.ts';
 import type { Actions, PageServerLoad } from './$types';
+
+/** "Take it down after" choices, in hours; 0 is never. */
+const BANNER_DURATIONS = [0, 1, 3, 6, 12, 24, 72, 168];
 
 export const load: PageServerLoad = async (event) => {
 	requireStaff(event, 'moderate');
-	const [rooms, messages, cardArt] = await Promise.all([listRooms(), listServerMessages(10), listCardArtRules()]);
+	const [rooms, messages, cardArt, banner] = await Promise.all([listRooms(), listServerMessages(10), listCardArtRules(), getStoredBanner()]);
 	return {
+		banner,
+		bannerLevels: BANNER_LEVELS,
+		bannerDurations: BANNER_DURATIONS,
+		bannerMaxLength: BANNER_MAX_LENGTH,
 		rooms,
 		messages,
 		cardArt,
@@ -104,6 +119,30 @@ export const actions: Actions = {
 			action: 'message',
 			message: 'Posted. Servatrice shows it once it restarts, or when an admin uses Server → Update server message in the client.'
 		};
+	},
+
+	setBanner: async (event) => {
+		const staff = requireStaff(event, 'administer');
+		const form = await event.request.formData();
+		const message = text(form, 'message');
+		const level = text(form, 'level') as BannerLevel;
+		const hours = integer(form, 'hours') ?? 0;
+		if (!message) return fail(400, { action: 'banner', error: 'Write the banner first.' });
+		if (message.length > BANNER_MAX_LENGTH) return fail(400, { action: 'banner', error: `Keep it under ${BANNER_MAX_LENGTH} characters.` });
+		if (!BANNER_LEVELS.includes(level)) return fail(400, { action: 'banner', error: 'Pick how serious it is.' });
+		if (!BANNER_DURATIONS.includes(hours)) return fail(400, { action: 'banner', error: 'Pick when it comes down.' });
+
+		const expiresAt = hours ? new Date(Date.now() + hours * 3600_000) : null;
+		await setBanner({ message, level, expiresAt }, staff.id);
+		await logAdminAction(staff, 'banner.set', null, `${level}${hours ? ` for ${hours}h` : ''}: ${message}`);
+		return { action: 'banner', message: 'Banner is up. Every page shows it within half a minute.' };
+	},
+
+	clearBanner: async (event) => {
+		const staff = requireStaff(event, 'administer');
+		if (!(await clearBanner())) return fail(404, { action: 'banner', error: 'There was no banner up.' });
+		await logAdminAction(staff, 'banner.clear', null);
+		return { action: 'banner', message: 'Banner taken down.' };
 	},
 
 	setCardArt: async (event) => {

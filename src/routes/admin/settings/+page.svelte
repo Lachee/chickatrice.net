@@ -36,6 +36,15 @@
 	const feedback = (action: string, id?: number | null) =>
 		form?.action === action && (id === undefined || ('id' in form && form.id === id)) ? form : null;
 
+	const bannerLevelLabel: Record<string, string> = {
+		info: 'Info: grey, players can dismiss it',
+		warning: 'Warning: amber, stays up',
+		outage: 'Outage: red, stays up'
+	};
+	const durationLabel = (hours: number) =>
+		hours === 0 ? 'Never' : hours % 24 === 0 ? `${hours / 24} day${hours === 24 ? '' : 's'}` : `${hours} hour${hours === 1 ? '' : 's'}`;
+	const bannerExpired = $derived(data.banner?.expiresAt != null && data.banner.expiresAt * 1000 <= Date.now());
+
 	const permissionLabel: Record<string, string> = { NONE: 'Anyone', REGISTERED: 'Registered players', MODERATOR: 'Moderators', ADMINISTRATOR: 'Admins' };
 	const privilegeLabel: Record<string, string> = { NONE: 'No privilege needed', PRIVILEGED: 'Privileged', VIP: 'VIP', DONATOR: 'Donator' };
 
@@ -114,6 +123,60 @@
 {/snippet}
 
 <div class="space-y-4">
+	<Card.Root id="banner">
+		<Card.Header>
+			<Card.Title>Site banner</Card.Title>
+			<Card.Description>
+				A notice across the top of every page of this site, for outages and other short-lived news. It doesn't reach Cockatrice; use the
+				server message for that.
+			</Card.Description>
+		</Card.Header>
+		<Card.Content class="space-y-4">
+			{#if !canEdit}<Notice type="info">Only admins can change the banner.</Notice>{/if}
+			{@render result('banner')}
+			{#if data.banner}
+				<p class="text-sm text-muted-foreground">
+					{#if bannerExpired}
+						The last banner came down at <Time at={data.banner.expiresAt} />.
+					{:else}
+						Up since <Time at={data.banner.updatedAt} />{#if data.banner.expiresAt}, until <Time at={data.banner.expiresAt} />{/if}.
+					{/if}
+				</p>
+			{/if}
+			{#if canEdit}
+				<form method="POST" action="?/setBanner" class="space-y-3" use:enhance={submit('banner')}>
+					<Textarea name="message" rows={2} maxlength={data.bannerMaxLength} value={data.banner?.message ?? ''} required aria-label="Banner message" />
+					<div class="flex flex-wrap items-end gap-3">
+						<div class="space-y-1.5">
+							<Label for="banner-level">Kind</Label>
+							<Select id="banner-level" name="level" value={data.banner?.level ?? 'info'}>
+								{#each data.bannerLevels as level (level)}
+									<option value={level}>{bannerLevelLabel[level]}</option>
+								{/each}
+							</Select>
+						</div>
+						<div class="space-y-1.5">
+							<Label for="banner-hours">Take it down after</Label>
+							<Select id="banner-hours" name="hours" value="0">
+								{#each data.bannerDurations as hours (hours)}
+									<option value={hours}>{durationLabel(hours)}</option>
+								{/each}
+							</Select>
+						</div>
+						<Button type="submit" disabled={pending === 'banner'}>{data.banner && !bannerExpired ? 'Update banner' : 'Put up banner'}</Button>
+					</div>
+				</form>
+				{#if data.banner}
+					<form method="POST" action="?/clearBanner" use:enhance={submit('clearBanner')}>
+						<Button type="submit" variant="ghost" size="sm" class="text-muted-foreground" disabled={pending === 'clearBanner'}>
+							<Trash2Icon /> {bannerExpired ? 'Clear it' : 'Take it down now'}
+						</Button>
+					</form>
+				{/if}
+			{/if}
+		</Card.Content>
+	</Card.Root>
+
 	<Card.Root id="rooms">
 		<Card.Header>
 			<Card.Title>Rooms and game types</Card.Title>
